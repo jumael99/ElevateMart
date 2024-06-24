@@ -6,11 +6,23 @@ const userSchema = mongoose.Schema(
     name: {
       type: String,
       required: true,
+      validate: {
+        validator: function (v) {
+          return /^[a-zA-Z ]+$/.test(v);
+        },
+        message: (props) => `${props.value} is not a valid name!`,
+      },
     },
     email: {
       type: String,
       required: true,
       unique: true,
+      validate: {
+        validator: function (v) {
+          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+        },
+        message: (props) => `${props.value} is not a valid email!`,
+      },
     },
     phone: {
       type: String,
@@ -18,12 +30,23 @@ const userSchema = mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+
+      select: false,
+    },
+    address: {
+      type: String,
     },
     isAdmin: {
       type: Boolean,
-      required: true,
       default: false,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verificationCode: {
+      type: String,
+      select: false,
     },
   },
   {

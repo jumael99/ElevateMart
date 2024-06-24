@@ -1,41 +1,38 @@
-import asyncHandler from '../middleware/asyncHandler.js';
-import generateToken from '../utils/generateToken.js';
-import User from '../models/userModel.js';
+import asyncHandler from "../middleware/asyncHandler.js";
+import generateToken from "../utils/generateToken.js";
+import User from "../models/userModel.js";
+import generateOTP from "../utils/generateOTP.js";
 
 // @desc    Register a new user
 // @route   POST /api/users
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, phone, address } = req.body;
 
-  const userExists = await User.findOne({ email });
-
-  if (userExists) {
+  // Check if the name, email, and phone fields are not empty
+  if (!name || !email || !phone) {
     res.status(400);
-    throw new Error('User already exists');
+    throw new Error("Please fill in name, email, and phone fields!");
   }
 
-  const user = await User.create({
-    name,
-    email,
-    password,
-  });
-
-  if (user) {
-    generateToken(res, user._id);
-
-    res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      isAdmin: user.isAdmin,
-    });
-  } else {
+  // Check if the email is valid and unique
+  const prevUser = await User.findOne({ email });
+  if (prevUser) {
     res.status(400);
-    throw new Error('Invalid user data');
+    throw new Error("User already exists! Please login to continue.");
   }
+
+  // Create a new user
+  // const user = await User.create({
+  //   name,
+  //   email,
+  //   phone,
+  //   address,
+  // });
+
+  // Create OTP for email verification
+  const otp = generateOTP();
+  res.status(201).json({ otp });
 });
 
-export {
-  registerUser,
-};
+export { registerUser };
