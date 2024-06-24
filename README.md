@@ -9,3 +9,12 @@ On production scripts:
 
  On development scripts:
   "dev": "concurrently \"npm run server\" \"npm run client:dev\"",
+
+
+  Branching strategy:
+
+
+sprint-01-[feature-name]-[frontend/backend]-[developer-name]
+
+example:
+sprint-01-registration-frontend-efat
