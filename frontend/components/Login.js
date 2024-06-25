@@ -2,8 +2,9 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import styles from '../styles/Login.module.css';
+import login from '@/pages/login';
 
-export default function Login() {
+ function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
@@ -49,3 +50,4 @@ export default function Login() {
     </div>
   );
 }
+export default Login;
