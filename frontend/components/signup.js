@@ -3,24 +3,29 @@ import axios from 'axios';
 import { useRouter } from 'next/router';
 import styles from '../styles/Login.module.css';
 
-export default function Login() {
+export default function SignUp() {
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = async (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const res = await axios.post('http://localhost:5001/api/auth/login', { email, password });
+      const res = await axios.post('http://localhost:5001/api/auth/register', {
+        username,
+        email,
+        password,
+      });
+
       localStorage.setItem('token', res.data.token);
-      console.log(res.data.token);
       router.push('/');
     } catch (error) {
       console.error(error);
-      alert('Invalid credentials');
+      alert('Registration failed');
     } finally {
       setLoading(false);
     }
@@ -28,8 +33,17 @@ export default function Login() {
 
   return (
     <div className={styles.loginContainer}>
-      <h1>Login</h1>
-      <form onSubmit={handleLogin}>
+      <h1>Sign Up</h1>
+      <form onSubmit={handleSignUp}>
+        <div className={styles.formGroup}>
+          <label>Username:</label>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+        </div>
         <div className={styles.formGroup}>
           <label>Email:</label>
           <input
@@ -49,7 +63,7 @@ export default function Login() {
           />
         </div>
         <button type="submit" disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
+          {loading ? 'Signing Up...' : 'Sign Up'}
         </button>
       </form>
     </div>

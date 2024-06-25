@@ -2,42 +2,52 @@ import path from 'path';
 import express from 'express';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
-dotenv.config();
+import cors from 'cors';
 import connectDB from './config/db.js';
-import userRoutes from './routes/userRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 
+dotenv.config();
+
 const port = process.env.PORT || 5001;
+const __dirname = path.resolve();
 
 connectDB();
 
 const app = express();
 
+// Enable CORS for all routes
+app.use(cors({
+  origin: 'http://localhost:3000', // Your frontend URL
+  credentials: true, // If you want to allow cookies
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.use('/api/users', userRoutes);
+// Routes
+app.use('/api/auth', authRoutes);
 
+// Static assets and frontend setup
 if (process.env.NODE_ENV === 'production') {
-  const __dirname = path.resolve();
+  app.use(express.static(path.join(__dirname, 'frontend', 'build')));
   app.use('/uploads', express.static('/var/data/uploads'));
-  app.use(express.static(path.join(__dirname, '/frontend/build')));
-
-  app.get('*', (req, res) =>
-    res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'))
-  );
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'));
+  });
 } else {
-  const __dirname = path.resolve();
-  app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
+  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
   app.get('/', (req, res) => {
     res.send('API is running....');
   });
 }
 
+// Error handling middleware
 app.use(notFound);
 app.use(errorHandler);
 
-app.listen(port, () =>
-  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${port}`)
-);
+// Start server
+app.listen(port, () => {
+  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${port}`);
+});

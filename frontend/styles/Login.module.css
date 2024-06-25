@@ -1,79 +1,77 @@
-/* styles/Login.module.css */
 .loginContainer {
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 30px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background: #ffffff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    color: black;
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 30px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  color: black;
+}
+
+.loginContainer h1 {
+  margin-bottom: 30px;
+  font-size: 24px;
+  color: #333;
+}
+
+.loginContainer label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: #555;
+}
+
+.loginContainer input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+.loginContainer input:focus {
+  border-color: #0070f3;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 112, 243, 0.2);
+}
+
+.loginContainer button {
+  width: 100%;
+  padding: 14px;
+  background: #0070f3;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.loginContainer button:hover {
+  background: #005bb5;
+}
+
+.loginContainer button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.loginContainer .formGroup {
+  margin-bottom: 20px;
+}
+
+@media (max-width: 480px) {
+  .loginContainer {
+    padding: 20px;
+    margin: 20px;
   }
-  
+
   .loginContainer h1 {
-    margin-bottom: 30px;
-    font-size: 24px;
-    color: #333;
+    font-size: 20px;
   }
-  
-  .loginContainer label {
-    display: block;
-    margin-bottom: 10px;
-    font-weight: 600;
-    color: #555;
-  }
-  
-  .loginContainer input {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    box-sizing: border-box;
-    font-size: 16px;
-  }
-  
-  .loginContainer input:focus {
-    border-color: #0070f3;
-    outline: none;
-    box-shadow: 0 0 5px rgba(0, 112, 243, 0.2);
-  }
-  
-  .loginContainer button {
-    width: 100%;
-    padding: 14px;
-    background: #0070f3;
-    border: none;
-    border-radius: 6px;
-    color: white;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-  
-  .loginContainer button:hover {
-    background: #005bb5;
-  }
-  
-  .loginContainer button:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-  }
-  
-  .loginContainer .form-group {
-    margin-bottom: 20px;
-  }
-  
-  @media (max-width: 480px) {
-    .loginContainer {
-      padding: 20px;
-      margin: 20px;
-    }
-  
-    .loginContainer h1 {
-      font-size: 20px;
-    }
-  }
-  
+}
