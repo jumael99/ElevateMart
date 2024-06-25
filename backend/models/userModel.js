@@ -30,7 +30,6 @@ const userSchema = mongoose.Schema(
     },
     password: {
       type: String,
-
       select: false,
     },
     address: {
@@ -46,6 +45,14 @@ const userSchema = mongoose.Schema(
     },
     verificationCode: {
       type: String,
+      select: false,
+    },
+    resetPasswordToken: {
+      type: String,
+      select: false,
+    },
+    resetPasswordExpire: {
+      type: Date,
       select: false,
     },
   },
@@ -68,6 +75,21 @@ userSchema.pre("save", async function (next) {
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
+
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("verificationCode")) {
+    next();
+  }
+  if (this.isVerified) {
+    this.verificationCode = undefined;
+  }
+  const salt = await bcrypt.genSalt(10);
+  this.verificationCode = bcrypt.hash(this.verificationCode, salt);
+});
+
+userSchema.methods.verifyVarificationCode = async function (verifyCode) {
+  return await bcrypt.compare(verifyCode, this.verificationCode);
+};
 
 const User = mongoose.model("User", userSchema);
 

@@ -2,13 +2,16 @@ import path from "path";
 import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-dotenv.config();
-import connectDB from "./config/db.js";
-import userRoutes from "./routes/userRoutes.js";
-import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
+
 import morgan from "morgan";
 import ExpressMongoSanitize from "express-mongo-sanitize";
 import { xss } from "express-xss-sanitizer";
+
+import connectDB from "./config/db.js";
+import authRoutes from "./routes/authRoutes.js";
+import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
+
+dotenv.config();
 
 const port = process.env.PORT || 5001;
 
@@ -39,7 +42,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/api/v1/users", userRoutes);
+// This is a router that handles all the routes related to authentication.
+app.use("/api/v1/auth", authRoutes);
 
 if (process.env.NODE_ENV === "production") {
   const __dirname = path.resolve();
