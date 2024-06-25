@@ -2,6 +2,7 @@ import path from "path";
 import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 
 import morgan from "morgan";
 import ExpressMongoSanitize from "express-mongo-sanitize";
@@ -24,6 +25,14 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
+app.use(cookieParser());
+// This middleware function is used to enable CORS.
+const corsOptions = {
+  origin: "http://localhost:3000",
+  credentials: true,
+};
+app.use(cors(corsOptions));
+
 // This middleware function is used to remove data, which is not allowed by the MongoDB query language, from the request body.
 // This prevents NoSQL injection attacks.
 app.use(ExpressMongoSanitize());
@@ -34,7 +43,6 @@ app.use(xss());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
 
 // This middleware function is used to add the requestTime property to the request object.
 app.use((req, res, next) => {

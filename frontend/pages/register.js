@@ -13,13 +13,13 @@ export default function register() {
 
     const data = {
       name,
-      mobile,
+      phone: mobile,
       email,
       address,
     };
 
     try {
-      await Axios.post("http://localhost:5001/api/v1/auth", data);
+      const res = await Axios.post("http://localhost:5001/api/v1/auth", data);
       alert("User registered successfully");
       form.reset();
     } catch (error) {

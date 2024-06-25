@@ -48,9 +48,7 @@ const registerUser = asyncHandler(async (req, res) => {
   const hashedEmail = encryptedEmail.encryptedData + "-" + encryptedEmail.iv;
 
   // Hash email and create the verification URL
-  const verifyURL = `${req.protocol}://${req.get(
-    "host"
-  )}/api/v1/auth/verify/${hashedEmail} `;
+  const verifyURL = `${req.protocol}://localhost:3000//verify/${hashedEmail}`;
 
   // Send the OTP to the user's email
   await sendOTPEmail(email, otp, verifyURL);
@@ -131,6 +129,8 @@ const setPassword = asyncHandler(async (req, res) => {
     throw new Error("Passwords do not match!");
   }
 
+  console.log(req.cookies);
+
   // Decrypt the email
   const email = req.cookies.elevateMartUserEmail;
   console.log(email);
@@ -168,4 +168,41 @@ const setPassword = asyncHandler(async (req, res) => {
   });
 });
 
-export { registerUser, verifyUser, setPassword };
+// @desc   check user is verified
+// @route  GET /api/v1/auth/verify/:email
+// @access Public
+const checkUserVerified = asyncHandler(async (req, res) => {
+  const email = decryptEmail(req.params.email);
+
+  // Get the user from email
+  const user = await User.findOne({
+    email,
+  });
+
+  // Check if the user exists
+  if (!user) {
+    res.status(400);
+    throw new Error("Invalid Token. No user found with this token!");
+  }
+
+  // Check if the user is verified
+
+  if (user.isVerified && user.password) {
+    res.status(201).json({
+      status: "success",
+      message: "User Verified and Password Set",
+    });
+  } else if (user.isVerified) {
+    res.status(200).json({
+      status: "success",
+      message: "User Verified",
+    });
+  } else {
+    res.status(200).json({
+      status: "failed",
+      message: "User not Verified",
+    });
+  }
+});
+
+export { registerUser, verifyUser, setPassword, checkUserVerified };
