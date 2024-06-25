@@ -13,14 +13,14 @@ const createTransporter = () => {
   return transport;
 };
 
-const sendOTPEmail = async (email, otp, hashedEmail) => {
+const sendOTPEmail = async (email, otp, verifyURL) => {
   const transporter = createTransporter();
 
   const mailOptions = {
-    from: process.env.EMAIL_FROM,
+    from: "Welcome <system@elevatemart.com>",
     to: email,
     subject: "OTP for email verification",
-    html: emailTemplate(email, otp),
+    html: emailTemplate(email, otp, verifyURL),
   };
 
   await transporter.sendMail(mailOptions);

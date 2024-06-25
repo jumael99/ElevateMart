@@ -1,4 +1,4 @@
-const otpEmailTemplate = (email, otp) => {
+const otpEmailTemplate = (email, otp, verifyURL) => {
   return `<!DOCTYPE html>
 <html lang="en-US">
   <head>
@@ -164,7 +164,7 @@ const otpEmailTemplate = (email, otp) => {
                         <strong class="st2">Password</strong>${otp}
                       </p>
 
-                        <a href="#" class="logo">
+                        <a href="${verifyURL}" class="logo">
                         Verify account
                         </a>
                     </td>

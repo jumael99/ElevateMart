@@ -69,26 +69,30 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
 // Encrypt password using bcrypt
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
-    next();
+    return next();
   }
 
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+  next();
 });
 
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("verificationCode")) {
-    next();
+  if (!this.isModified("verificationCode") || this.isVerified) {
+    return next();
   }
-  if (this.isVerified) {
-    this.verificationCode = undefined;
-  }
+
+  // Generate a salt and hash the verificationCode
   const salt = await bcrypt.genSalt(10);
-  this.verificationCode = bcrypt.hash(this.verificationCode, salt);
+  this.verificationCode = await bcrypt.hash(this.verificationCode, salt);
+  next();
 });
 
-userSchema.methods.verifyVarificationCode = async function (verifyCode) {
-  return await bcrypt.compare(verifyCode, this.verificationCode);
+userSchema.methods.verifyVarificationCode = async function (
+  verifyCode,
+  databaseCode
+) {
+  return await bcrypt.compare(verifyCode, databaseCode);
 };
 
 const User = mongoose.model("User", userSchema);
