@@ -50,6 +50,21 @@ const seedProfiles = async () => {
                     zip: '67890'
                 },
                 profilePhoto: 'https://example.com/photos/jane.jpg'
+            },
+            {
+                firstName: 'Imtiaj',
+                lastName: 'Hossain',
+                birthday: new Date('1992-09-10'),
+                gender: 'Male',
+                email: 'imtiaj.hossain@example.com',
+                phone: '1234567890',
+                address: {
+                    street: 'Main Avenue',
+                    number: '789',
+                    city: 'Lakeside',
+                    zip: '12345'
+                },
+                profilePhoto: 'https://example.com/photos/imtiaj.jpg'
             }
         ];
 
