@@ -1,5 +1,5 @@
 import React from 'react';
-
+ 
 const Header = () => {
   return (
     <header>
@@ -39,6 +39,14 @@ const Header = () => {
               className="w-10 h-10 rounded-full ml-4"
               alt="Profile"
             />
+              <div className="flex gap-2 ml-4">
+    <button className="py-2 px-4 text-white bg-blue-500 rounded hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-300">
+      Login
+    </button>
+    <button className="py-2 px-4 text-white bg-blue-500 rounded hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-300">
+      Sign Up
+    </button>
+  </div>
           </div>
           <div className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-search">
             <div className="relative mt-3 md:hidden">
@@ -55,21 +63,43 @@ const Header = () => {
               />
             </div>
             <ul className="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-lightBlue-500 md:flex-row md:space-x-8 md:mt-0 md:border-0">
-              <li>
-                <a href="/" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">Home</a>
+              <li className="group relative">
+                <button className="flex items-center py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">
+                  Home
+                  <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </button>
+                <div className="absolute hidden text-gray-700 pt-1 group-hover:block">
+                  <a className="block px-4 py-2 text-sm hover:bg-gray-400" href="/">Subitem 1</a>
+                  <a className="block px-4 py-2 text-sm hover:bg-gray-400" href="/">Subitem 2</a>
+                </div>
               </li>
-              <li>
-                <a href="/" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">Products</a>
+              <li className="group relative">
+                <button className="flex items-center py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">
+                  Products
+                  <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </button>
+                <div className="absolute hidden text-gray-700 pt-1 group-hover:block">
+                  <a className="block px-4 py-2 text-sm hover:bg-gray-400" href="/">Subitem 1</a>
+                  <a className="block px-4 py-2 text-sm hover:bg-gray-400" href="/">Subitem 2</a>
+                </div>
               </li>
-              <li>
-                <a href="/" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">Services</a>
+              <li className="group relative">
+                <button className="flex items-center py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">
+                  Services
+                  <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </button>
+                <div className="absolute hidden text-gray-700 pt-1 group-hover:block">
+                  <a className="block px-4 py-2 text-sm hover:bg-gray-400" href="/">Subitem 1</a>
+                  <a className="block px-4 py-2 text-sm hover:bg-gray-400" href="/">Subitem 2</a>
+                </div>
               </li>
-              <li>
-                <a href="/" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">Login</a>
-              </li>
-              <li>
-                <a href="/" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">Sign Up</a>
-              </li>
+            
               <li className="ml-6">
                 <div className="relative py-2">
                   <div className="absolute top-0 left-3">
