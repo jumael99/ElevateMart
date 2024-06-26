@@ -41,15 +41,15 @@ const Profile = () => {
         <div className="flex items-center">
           <div className="relative w-full">
             <div className="absolute">
-            <FontAwesomeIcon
-            icon={faMagnifyingGlass}
-            style={{
-              color: "#9c9c9c",
-              left: "24px",
-              padding: "15px",
-              pointerEvents: "none",
-            }}
-          />
+              <FontAwesomeIcon
+                icon={faMagnifyingGlass}
+                style={{
+                  color: "#9c9c9c",
+                  left: "24px",
+                  padding: "15px",
+                  pointerEvents: "none",
+                }}
+              />
             </div>
             <input
               type="text"
@@ -75,7 +75,9 @@ const Profile = () => {
           </h3>
           <div className="flex gap-5 flex-wrap">
             <div className="flex-grow">
-              <label className="pt-3 pb-2 block text-gray-600">First Name</label>
+              <label className="pt-3 pb-2 block text-gray-600">
+                First Name
+              </label>
               <input
                 placeholder=" Enter your first name "
                 className="w-full p-2 border border-gray-300 rounded"
@@ -195,7 +197,9 @@ const Profile = () => {
             </div>
           </div>
           <div className="bg-white p-4 border rounded">
-            <label className="text-gray-600 text-lg">Select profile photo</label>
+            <label className="text-gray-600 text-lg">
+              Select profile photo
+            </label>
             <div className="flex items-center gap-5 p-4">
               <Image
                 src={picturePreview}
