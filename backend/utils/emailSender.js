@@ -1,6 +1,21 @@
 import nodemailer from "nodemailer";
 import emailTemplate from "./emailTemplate.js";
 
+// Transporter configuration gmail
+// const createTransporter = () => {
+//   const transport = nodemailer.createTransport({
+//     host: "smtp.gmail.com",
+//     port: 587,
+//     secure: false,
+//     auth: {
+//       user: process.env.GMAIL_USER,
+//       pass: process.env.GMAIL_PASS,
+//     },
+//   });
+//   return transport;
+// };
+
+// Transporter configuration mailtrap
 const createTransporter = () => {
   const transport = nodemailer.createTransport({
     host: "sandbox.smtp.mailtrap.io",
@@ -13,14 +28,15 @@ const createTransporter = () => {
   return transport;
 };
 
-const sendOTPEmail = async (email, otp, verifyURL) => {
+// Send the OTP email
+const sendOTPEmail = async (user, otp, verifyURL) => {
   const transporter = createTransporter();
 
   const mailOptions = {
     from: "Welcome <system@elevatemart.com>",
-    to: email,
+    to: user.email,
     subject: "OTP for email verification",
-    html: emailTemplate(email, otp, verifyURL),
+    html: emailTemplate(user, otp, verifyURL),
   };
 
   await transporter.sendMail(mailOptions);

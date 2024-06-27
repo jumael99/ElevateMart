@@ -20,6 +20,14 @@ function encrypt(text) {
   return { iv: iv.toString("hex"), encryptedData: encrypted };
 }
 
+// Decrypt the email
+const decryptEmail = (hashedEmail) => {
+  const iv = hashedEmail.split("-")[1];
+  const encryptedEmail = hashedEmail.split("-")[0];
+  const email = decrypt(encryptedEmail, iv);
+  return email;
+};
+
 // Function to decrypt text
 function decrypt(encryptedData, iv) {
   // Secret key and algorithm from environment variables
@@ -45,4 +53,4 @@ function decrypt(encryptedData, iv) {
 }
 
 // Export the functions
-export { encrypt, decrypt };
+export { encrypt, decrypt, decryptEmail };
