@@ -11,13 +11,13 @@ import OTP from "../models/otpModel.js";
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, phone, address, password } = req.body;
 
-  // Check if the name, email, and phone fields are not empty
+  // Feilds check
   if (!name || !email || !phone || !password) {
     res.status(400);
     throw new Error("Please fill in name, email, password and phone fields!");
   }
 
-  // Check if the email is valid and unique
+  // User Check
   const prevUser = await User.findOne({ email });
   if (prevUser) {
     res.status(400);
@@ -36,13 +36,14 @@ const registerUser = asyncHandler(async (req, res) => {
     password,
   });
 
+  // Encrypt the email
   const encryptedEmail = encrypt(email);
   const hashedEmail = encryptedEmail.encryptedData + "-" + encryptedEmail.iv;
 
-  // Hash email and create the verification URL
+  // Create the verification URL
   const verifyURL = `${req.protocol}://localhost:3000/verify/${hashedEmail}`;
 
-  // Send the OTP to the user's email
+  // Send the OTP
   await sendOTPEmail(user, otp, verifyURL);
 
   // Send the response
@@ -57,6 +58,8 @@ const registerUser = asyncHandler(async (req, res) => {
 // @access Public
 const verifyUser = asyncHandler(async (req, res) => {
   const { otp } = req.body;
+
+  // Feild Check
   if (!otp) {
     res.status(400);
     throw new Error("Please provide the OTP!");
@@ -64,7 +67,7 @@ const verifyUser = asyncHandler(async (req, res) => {
 
   const email = decryptEmail(req.params.email);
 
-  // Get the user from email and OTP
+  // Get User
   const user = await User.findOne({
     email,
   });
@@ -74,7 +77,7 @@ const verifyUser = asyncHandler(async (req, res) => {
     throw new Error("Invalid Token. No user found with this token!");
   }
 
-  // Check if the user is already verified
+  // Check user is varified
   if (user.isVerified) {
     res.status(400);
     throw new Error("User already verified");
@@ -83,7 +86,6 @@ const verifyUser = asyncHandler(async (req, res) => {
   // Find the OTP
   const findOTP = await OTP.findOne({
     email,
-    usedFor: "verify",
     active: true,
   });
 
@@ -92,26 +94,27 @@ const verifyUser = asyncHandler(async (req, res) => {
     throw new Error("Invalid OTP!");
   }
 
-  // Check if the OTP is valid
+  // Check for validity
   const isMatch = await findOTP.isCorrect(otp);
   if (!isMatch) {
     res.status(400);
     throw new Error("Invalid OTP!");
   }
 
-  // Check if the OTP has expired
+  // Check for expiry
   const isExpired = findOTP.isExpired();
   if (isExpired) {
     res.status(400);
     throw new Error("OTP has expired. Please request a new OTP!");
   }
 
-  // Update the user as verified
+  // Update user
   user.isVerified = true;
   await user.save();
 
-  // Update the OTP as inactive
+  // Update OTP
   findOTP.active = false;
+  findOTP.used = true;
   await findOTP.save();
 
   res.status(201).json({
@@ -121,7 +124,51 @@ const verifyUser = asyncHandler(async (req, res) => {
 });
 
 // @desc   Request a new OTP
-// @route  POST /api/auth/:email/requestOTP
+// @route  GET /api/auth/:email
 // @access Public
+const requestOTP = asyncHandler(async (req, res) => {
+  const email = decryptEmail(req.params.email);
 
-export { registerUser, verifyUser };
+  // Get the user from email
+  const user = await User.findOne({
+    email,
+  });
+
+  if (!user) {
+    res.status(400);
+    throw new Error("Invalid Token. No user found with this token!");
+  }
+
+  // Check user is varified
+  if (user.isVerified) {
+    res.status(400);
+    throw new Error("User already verified");
+  }
+
+  // Deactivate the active OTP
+  const activeOTP = await OTP.findOne({
+    email,
+    active: true,
+  });
+
+  if (activeOTP) {
+    activeOTP.active = false;
+    await activeOTP.save();
+  }
+
+  // Create a new OTP
+  const newOtp = await createOTP(email, "verify");
+
+  // Create the verification URL
+  const verifyURL = `${req.protocol}://localhost:3000/verify/${req.params.email}`;
+
+  // Send OTP
+  await sendOTPEmail(user, newOtp, verifyURL);
+
+  res.status(201).json({
+    status: "success",
+    message: "OTP sent successfully",
+  });
+});
+
+export { registerUser, verifyUser, requestOTP };

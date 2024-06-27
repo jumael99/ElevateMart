@@ -1,25 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
 import Axios from "axios";
+import { FaEye } from "react-icons/fa";
+import { IoEyeOffSharp } from "react-icons/io5";
 
 export default function register() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
+  const [error, setError] = useState({});
+
   async function handleSubmit(e) {
     e.preventDefault();
     const form = e.target;
-    const formData = new FormData(e.target);
-    const name = formData.get("name");
-    const mobile = formData.get("mobile");
-    const email = formData.get("email");
-    const address = formData.get("address");
+    const formObject = validate(e, setError);
+    if (!formObject) {
+      return;
+    }
 
-    const data = {
-      name,
-      phone: mobile,
-      email,
-      address,
-    };
+    const url = "http://localhost:5001/api/auth/register";
 
     try {
-      const res = await Axios.post("http://localhost:5001/api/v1/auth", data);
+      const res = await Axios.post(url, formObject);
       alert("User registered successfully");
       form.reset();
     } catch (error) {
@@ -32,14 +32,18 @@ export default function register() {
     <div>
       <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          {/* Logo */}
+          <img
+            className="mx-auto h-10 w-auto"
+            src="https://freepnglogo.com/images/all_img/1691819865alight-motion-logo-transparent.png"
+            alt="elevateMart logo"
+          />
           <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
             Sign up to your account
           </h2>
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <label
                 htmlFor="name"
@@ -53,11 +57,16 @@ export default function register() {
                   name="name"
                   type="string"
                   autoComplete="full-name"
-                  required
                   placeholder="Enter your full name"
-                  className="px-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="px-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-300 sm:text-sm sm:leading-6 focus:outline-none"
                 />
               </div>
+
+              {error.name && (
+                <div className="px-4 py-2 text-xs text-red-800 rounded-lg bg-red-50">
+                  Full name is required!
+                </div>
+              )}
             </div>
 
             <div>
@@ -73,11 +82,15 @@ export default function register() {
                   name="email"
                   type="email"
                   autoComplete="email"
-                  required
                   placeholder="Enter your email"
-                  className="px-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="px-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-300 sm:text-sm sm:leading-6 focus:outline-none"
                 />
               </div>
+              {error.email && (
+                <div className="px-4 py-2 text-xs text-red-800 rounded-lg bg-red-50">
+                  Input a valid Email Address.
+                </div>
+              )}
             </div>
 
             <div>
@@ -88,15 +101,67 @@ export default function register() {
                 Password
               </label>
               <div className="mt-2">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="password"
-                  required
-                  placeholder="Enter a password"
-                  className="px-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
+                <div className="flex justify-between items-center px-3  w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6">
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="password"
+                    placeholder="Enter a password"
+                    className="block focus:ring-transparent focus:outline-none w-full"
+                  />
+                  <div
+                    onClick={() => {
+                      setShowPassword(!showPassword);
+                    }}
+                  >
+                    {showPassword ? <FaEye /> : <IoEyeOffSharp />}
+                  </div>
+                </div>
+                {error.password && Object.keys(error.password).length > 0 && (
+                  <div className="px-4 py-2 text-xs text-red-800 rounded-lg bg-red-50">
+                    <ul className="list-disc list-inside">
+                      {Object.values(error.password).map((err, index) => (
+                        <li key={index} className="px-2">
+                          {err}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="passwordConfirm"
+                className="block text-sm font-medium leading-6 text-gray-900"
+              >
+                Password Confirm
+              </label>
+              <div className="mt-2">
+                <div className="flex justify-between items-center px-3  w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6">
+                  <input
+                    id="passwordConfirm"
+                    name="passwordConfirm"
+                    type={showConfirmPass ? "text" : "password"}
+                    autoComplete="password"
+                    placeholder="Enter a password"
+                    className="block focus:ring-transparent focus:outline-none w-full"
+                  />
+                  <div
+                    onClick={() => {
+                      setShowConfirmPass(!showConfirmPass);
+                    }}
+                  >
+                    {showConfirmPass ? <FaEye /> : <IoEyeOffSharp />}
+                  </div>
+                </div>
+                {error.passwordConfirm && (
+                  <div className="px-4 py-2 text-xs text-red-800 rounded-lg bg-red-50">
+                    Password and confirm password do not match.
+                  </div>
+                )}
               </div>
             </div>
 
@@ -113,11 +178,15 @@ export default function register() {
                   name="phone"
                   type="string"
                   autoComplete="mobile-number"
-                  required
                   placeholder="Enter your your mobile number"
-                  className="px-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="px-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-300 sm:text-sm sm:leading-6 focus:outline-none"
                 />
               </div>
+              {error.mobile && (
+                <div className="px-4 py-2 text-xs text-red-800 rounded-lg bg-red-50">
+                  Phone number is required!
+                </div>
+              )}
             </div>
 
             <div>
@@ -133,9 +202,8 @@ export default function register() {
                   name="address"
                   type="address"
                   autoComplete="address"
-                  required
                   placeholder="Enter your address"
-                  className="px-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="px-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-300 sm:text-sm sm:leading-6 focus:outline-none"
                 />
               </div>
             </div>
@@ -145,7 +213,7 @@ export default function register() {
                 type="submit"
                 className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
-                Sign in
+                Sign up
               </button>
             </div>
           </form>
@@ -164,3 +232,100 @@ export default function register() {
     </div>
   );
 }
+
+const validate = (e, setError) => {
+  e.preventDefault();
+  const form = e.target;
+  const formData = new FormData(e.target);
+  const name = formData.get("name");
+  const mobile = formData.get("phone");
+  const email = formData.get("email");
+  const address = formData.get("address");
+  const password = formData.get("password");
+  const passwordConfirm = formData.get("passwordConfirm");
+
+  let errorObj = {};
+  if (!name) {
+    errorObj = { ...errorObj, name: "Full name is required" };
+  }
+
+  if (validateEmail(email) !== "") {
+    errorObj = { ...errorObj, email: validateEmail(email) };
+  }
+
+  if (Object.keys(validatePassword(password)).length !== 0) {
+    errorObj = { ...errorObj, password: validatePassword(password) };
+  }
+
+  if (!mobile) {
+    errorObj = { ...errorObj, mobile: "Mobile number is required" };
+  }
+
+  if (password !== passwordConfirm) {
+    errorObj = { ...errorObj, passwordConfirm: "Passwords do not match" };
+  }
+
+  if (Object.keys(errorObj).length > 0) {
+    setError(errorObj);
+    return;
+  }
+
+  setError({});
+  const formObject = {
+    name,
+    phone: mobile,
+    email,
+    address,
+    password,
+  };
+  return formObject;
+};
+
+const validateEmail = (email) => {
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (email.length === 0) {
+    return "Email is required";
+  }
+  if (!emailRegex.test(email)) {
+    return "Invalid email address";
+  }
+  return "";
+};
+
+const validatePassword = (password) => {
+  let passwordError = {};
+  const allowedSpecialCharacters = /[!@#$%^&*\-+?]+/;
+
+  if (password.length === 0) {
+    passwordError = { ...passwordError, main: "Password is required" };
+    return passwordError;
+  }
+  if (password.length < 8) {
+    passwordError = {
+      ...passwordError,
+      len: "Password must be atleast 8 characters long",
+    };
+  }
+  if (!/[a-zA-Z]/.test(password)) {
+    passwordError = {
+      ...passwordError,
+      letter: "Password must contain a letter",
+    };
+  }
+  if (!/\d/.test(password)) {
+    passwordError = {
+      ...passwordError,
+      number: "Password must contain a number",
+    };
+  }
+  if (
+    !allowedSpecialCharacters.test(password) ||
+    /[^a-zA-Z0-9!@#$%^&*\-+?]/.test(password)
+  ) {
+    passwordError = {
+      ...passwordError,
+      special: "Password must contain a special character",
+    };
+  }
+  return passwordError;
+};
