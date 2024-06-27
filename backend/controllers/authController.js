@@ -1,31 +1,23 @@
 import asyncHandler from "../middleware/asyncHandler.js";
 import User from "../models/userModel.js";
-import generateOTP from "../utils/generateOTP.js";
+import createOTP from "../utils/generateOTP.js";
 import sendOTPEmail from "../utils/emailSender.js";
-import { encrypt, decrypt } from "../utils/textCypher.js";
-import generateToken from "../utils/generateToken.js";
-
-// Decrypt the email
-const decryptEmail = (hashedEmail) => {
-  const iv = hashedEmail.split("-")[1];
-  const encryptedEmail = hashedEmail.split("-")[0];
-  const email = decrypt(encryptedEmail, iv);
-  return email;
-};
+import { encrypt, decryptEmail } from "../utils/textCypher.js";
+import OTP from "../models/otpModel.js";
 
 // @desc    Register a new user
-// @route   POST /api/v1/auth
+// @route   POST /api/auth/register
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, phone, address } = req.body;
+  const { name, email, phone, address, password } = req.body;
 
-  // Check if the name, email, and phone fields are not empty
-  if (!name || !email || !phone) {
+  // Feilds check
+  if (!name || !email || !phone || !password) {
     res.status(400);
-    throw new Error("Please fill in name, email, and phone fields!");
+    throw new Error("Please fill in name, email, password and phone fields!");
   }
 
-  // Check if the email is valid and unique
+  // User Check
   const prevUser = await User.findOne({ email });
   if (prevUser) {
     res.status(400);
@@ -33,7 +25,7 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   // Generate an OTP
-  const otp = await generateOTP();
+  const otp = await createOTP(email, "verify");
 
   // Create a new user
   const user = await User.create({
@@ -41,17 +33,18 @@ const registerUser = asyncHandler(async (req, res) => {
     email,
     phone,
     address,
-    verificationCode: otp,
+    password,
   });
 
+  // Encrypt the email
   const encryptedEmail = encrypt(email);
   const hashedEmail = encryptedEmail.encryptedData + "-" + encryptedEmail.iv;
 
-  // Hash email and create the verification URL
-  const verifyURL = `${req.protocol}://localhost:3000//verify/${hashedEmail}`;
+  // Create the verification URL
+  const verifyURL = `${req.protocol}://localhost:3000/verify/${hashedEmail}`;
 
-  // Send the OTP to the user's email
-  await sendOTPEmail(email, otp, verifyURL);
+  // Send the OTP
+  await sendOTPEmail(user, otp, verifyURL);
 
   // Send the response
   res.status(201).json({
@@ -61,10 +54,12 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 // @desc   Verify a user
-// @route  POST /api/v1/auth/verify/:email
+// @route  POST /api/auth/verify/:email
 // @access Public
 const verifyUser = asyncHandler(async (req, res) => {
   const { otp } = req.body;
+
+  // Feild Check
   if (!otp) {
     res.status(400);
     throw new Error("Please provide the OTP!");
@@ -72,38 +67,55 @@ const verifyUser = asyncHandler(async (req, res) => {
 
   const email = decryptEmail(req.params.email);
 
-  // Get the user from email and OTP
+  // Get User
   const user = await User.findOne({
     email,
-  }).select("+verificationCode");
+  });
 
   if (!user) {
     res.status(400);
     throw new Error("Invalid Token. No user found with this token!");
   }
 
-  // Check if the OTP is correct
-  if (!(await user.verifyVarificationCode(otp, user.verificationCode))) {
-    res.status(400);
-    throw new Error("Invalid OTP. Please provide the correct OTP!");
-  }
-
-  // Check if the user is already verified
+  // Check user is varified
   if (user.isVerified) {
     res.status(400);
     throw new Error("User already verified");
   }
 
-  // Update the user as verified
+  // Find the OTP
+  const findOTP = await OTP.findOne({
+    email,
+    active: true,
+  });
+
+  if (!findOTP) {
+    res.status(400);
+    throw new Error("Invalid OTP!");
+  }
+
+  // Check for validity
+  const isMatch = await findOTP.isCorrect(otp);
+  if (!isMatch) {
+    res.status(400);
+    throw new Error("Invalid OTP!");
+  }
+
+  // Check for expiry
+  const isExpired = findOTP.isExpired();
+  if (isExpired) {
+    res.status(400);
+    throw new Error("OTP has expired. Please request a new OTP!");
+  }
+
+  // Update user
   user.isVerified = true;
-  user.verificationCode = undefined;
   await user.save();
 
-  res.cookie("elevateMartUserEmail", email, {
-    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-  });
+  // Update OTP
+  findOTP.active = false;
+  findOTP.used = true;
+  await findOTP.save();
 
   res.status(201).json({
     status: "success",
@@ -111,67 +123,10 @@ const verifyUser = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc   Set the password for the user
-// @route  POST /api/v1/auth/verify/:email/password
+// @desc   Request a new OTP
+// @route  GET /api/auth/:email
 // @access Public
-const setPassword = asyncHandler(async (req, res) => {
-  const { password, confirmPassword } = req.body;
-
-  // Check if the password and confirm password fields are not empty
-  if (!password || !confirmPassword) {
-    res.status(400);
-    throw new Error("Please provide the password and confirm password!");
-  }
-
-  // Check if the password and confirm password match
-  if (password !== confirmPassword) {
-    res.status(400);
-    throw new Error("Passwords do not match!");
-  }
-
-  console.log(req.cookies);
-
-  // Decrypt the email
-  const email = req.cookies.elevateMartUserEmail;
-  console.log(email);
-
-  // Get the user from email
-  const user = await User.findOne({
-    email,
-  });
-
-  // Check if the user exists
-  if (!user) {
-    res.status(400);
-    throw new Error("Invalid Token. No user found with this token!");
-  }
-
-  // Check if the user is verified
-  if (!user.isVerified) {
-    res.status(400);
-    throw new Error("User not verified. Please verify the user first!");
-  }
-
-  // Set the password
-  user.password = password;
-  await user.save();
-
-  // Destroy the cookie
-  res.clearCookie("elevateMartUserEmail");
-
-  // set user cookie with jwt token
-  generateToken(res, user._id, user.isAdmin);
-
-  res.status(201).json({
-    status: "success",
-    message: "Password set successfully",
-  });
-});
-
-// @desc   check user is verified
-// @route  GET /api/v1/auth/verify/:email
-// @access Public
-const checkUserVerified = asyncHandler(async (req, res) => {
+const requestOTP = asyncHandler(async (req, res) => {
   const email = decryptEmail(req.params.email);
 
   // Get the user from email
@@ -179,30 +134,41 @@ const checkUserVerified = asyncHandler(async (req, res) => {
     email,
   });
 
-  // Check if the user exists
   if (!user) {
     res.status(400);
     throw new Error("Invalid Token. No user found with this token!");
   }
 
-  // Check if the user is verified
-
-  if (user.isVerified && user.password) {
-    res.status(201).json({
-      status: "success",
-      message: "User Verified and Password Set",
-    });
-  } else if (user.isVerified) {
-    res.status(200).json({
-      status: "success",
-      message: "User Verified",
-    });
-  } else {
-    res.status(200).json({
-      status: "failed",
-      message: "User not Verified",
-    });
+  // Check user is varified
+  if (user.isVerified) {
+    res.status(400);
+    throw new Error("User already verified");
   }
+
+  // Deactivate the active OTP
+  const activeOTP = await OTP.findOne({
+    email,
+    active: true,
+  });
+
+  if (activeOTP) {
+    activeOTP.active = false;
+    await activeOTP.save();
+  }
+
+  // Create a new OTP
+  const newOtp = await createOTP(email, "verify");
+
+  // Create the verification URL
+  const verifyURL = `${req.protocol}://localhost:3000/verify/${req.params.email}`;
+
+  // Send OTP
+  await sendOTPEmail(user, newOtp, verifyURL);
+
+  res.status(201).json({
+    status: "success",
+    message: "OTP sent successfully",
+  });
 });
 
-export { registerUser, verifyUser, setPassword, checkUserVerified };
+export { registerUser, verifyUser, requestOTP };
