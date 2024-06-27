@@ -41,7 +41,7 @@ const registerUser = asyncHandler(async (req, res) => {
   const hashedEmail = encryptedEmail.encryptedData + "-" + encryptedEmail.iv;
 
   // Create the verification URL
-  const verifyURL = `${req.protocol}://localhost:3000/verify/${hashedEmail}`;
+  const verifyURL = `${req.protocol}://localhost:3000/auth/verify/${hashedEmail}`;
 
   // Send the OTP
   await sendOTPEmail(user, otp, verifyURL);
@@ -160,7 +160,7 @@ const requestOTP = asyncHandler(async (req, res) => {
   const newOtp = await createOTP(email, "verify");
 
   // Create the verification URL
-  const verifyURL = `${req.protocol}://localhost:3000/verify/${req.params.email}`;
+  const verifyURL = `${req.protocol}://localhost:3000/auth/verify/${req.params.email}`;
 
   // Send OTP
   await sendOTPEmail(user, newOtp, verifyURL);
