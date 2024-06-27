@@ -5,8 +5,8 @@ import cookieParser from 'cookie-parser';
 dotenv.config();
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
-import profileRoutes from './routes/profileRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
+import profileRoutes from "./routes/profileRoutes.js";
 
 const port = process.env.PORT || 5001;
 
@@ -18,10 +18,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-
 app.use('/api/users', userRoutes);
-app.use('/Profile', profileRoutes); // Add Profile routes
-
+// Add Profile routes
+app.use('/Profile', profileRoutes);
 
 if (process.env.NODE_ENV === 'production') {
   const __dirname = path.resolve();
