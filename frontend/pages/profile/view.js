@@ -5,6 +5,7 @@ import {
   faMagnifyingGlass,
   faPaperclip,
 } from "@fortawesome/free-solid-svg-icons";
+import Link from "next/link";
 
 const Profile = () => {
   const [firstName, setFirstName] = useState("");
@@ -22,24 +23,19 @@ const Profile = () => {
     "/images/defaultUser.png"
   );
 
-  const handleGenderChange = (e) => {
-    setGender(e.target.value);
-  };
 
   const handleImageChange = (e) => {
     setpicturePreview(e.target.value);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  };
 
   return (
-    <div className="px-10 pb-5 bg-gray-100 ">
+    <div className="flex justify-center px-5 pb-5 bg-gray-100 min-h-screen">
+      <div className="w-11/12">
       <div className="flex justify-between py-4">
         {/* search and search icon  */}
         <div className="flex items-center">
-          <div className="relative w-full">
+          <div className="relative">
             <div className="absolute">
               <FontAwesomeIcon
                 icon={faMagnifyingGlass}
@@ -66,9 +62,9 @@ const Profile = () => {
       </div>
       <div className="flex flex-wrap justify-center gap-5">
         {/* form */}
+        <div className="flex-grow">
         <form
-          className="flex-grow bg-white border rounded p-7"
-          onSubmit={handleSubmit}
+          className=" justify-center bg-white border rounded-lg p-10 mb-6"
         >
           <h3 className="text-gray-600 text-xl font-bold pb-3">
             General Information
@@ -78,63 +74,32 @@ const Profile = () => {
               <label className="pt-3 pb-2 block text-gray-600">
                 First Name
               </label>
-              <input
-                placeholder=" Enter your first name "
-                className="w-full p-2 border border-gray-300 rounded"
-                onChange={(e) => setFirstName(e.target.value)}
-                required
-              />
+              <p className="text-gray-700 font-semibold text-lg pb-1">Name</p>
+              
             </div>
             <div className="flex-grow">
               <label className="pt-3 pb-2 block text-gray-600">Last Name</label>
-              <input
-                placeholder="Also your last name"
-                className="w-full p-2 border border-gray-300 rounded"
-                onChange={(e) => setLastName(e.target.value)}
-                required
-              />
+              <p className="text-gray-700 font-semibold text-lg pb-1">Name</p>
             </div>
           </div>
           <div className="flex gap-5 flex-wrap">
             <div className="flex-grow">
               <label className="pt-3 pb-2 block text-gray-600">Birthday</label>
-              <input
-                type="date"
-                className="text-black w-full p-2 border border-gray-300 rounded"
-                onChange={(e) => setBrithday(e.target.value)}
-                required
-              />
+              <p className="text-gray-700 font-semibold text-lg pb-1">Date</p>
             </div>
             <div className="flex-grow">
               <label className="pt-3 pb-2 block text-gray-600">Gender</label>
-              <select
-                className="w-full p-2 text-black border border-gray-300 rounded"
-                onChange={handleGenderChange}
-              >
-                <option value="">Gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
+              <p className="text-gray-700 font-semibold text-lg pb-1">Gender</p>
             </div>
           </div>
           <div className="flex gap-5 flex-wrap">
             <div className="flex-grow">
               <label className="pt-3 pb-2 block text-gray-600">Email</label>
-              <input
-                className="w-full p-2 border border-gray-300 rounded"
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+              <p className="text-gray-700 font-semibold text-lg pb-1">Email</p>
             </div>
             <div className="flex-grow">
               <label className="pt-3 pb-2 block text-gray-600">Phone</label>
-              <input
-                placeholder="+8801*********"
-                className="w-full p-2 border border-gray-300 rounded"
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                required
-              />
+              <p className="text-gray-700 font-semibold text-lg pb-1">Phone</p>
             </div>
           </div>
 
@@ -142,53 +107,42 @@ const Profile = () => {
           <div className="flex gap-5 flex-wrap">
             <div className="flex-grow">
               <label className="pt-3 pb-2 block text-gray-600">Address</label>
-              <input
-                placeholder="  Enter your home address "
-                className="w-full p-2 border border-gray-300 rounded"
-                onChange={(e) => setAddress(e.target.value)}
-                required
-              />
+              <p className="text-gray-700 font-semibold text-lg pb-1">Address</p>
             </div>
             <div className="flex-grow flex-wrap">
               <label className="pt-3 pb-2 block text-gray-600">Number</label>
-              <input
-                placeholder=" No. "
-                className="w-full p-2 border border-gray-300 rounded"
-                onChange={(e) => setNumber(e.target.value)}
-                required
-              />
+              <p className="text-gray-700 font-semibold text-lg pb-1">Number</p>
             </div>
           </div>
           <div className="flex gap-5 flex-wrap">
             <div className="flex-grow">
               <label className="pt-3 pb-2 block text-gray-600">City</label>
-              <input
-                placeholder=" City "
-                className="w-full p-2 border border-gray-300 rounded"
-                onChange={(e) => setCity(e.target.value)}
-                required
-              />
+              <p className="text-gray-700 font-semibold text-lg pb-1">City</p>
             </div>
             <div className="flex-grow">
               <label className="pt-3 pb-2 block text-gray-600">ZIP</label>
-              <input
-                placeholder="ZIP "
-                className="w-full p-2  border border-gray-300 rounded"
-                onChange={(e) => setZip(e.target.value)}
-                required
-              />
+              <p className="text-gray-700 font-semibold text-lg pb-1">ZIP</p>
             </div>
           </div>
-          <button
-            type="submit"
-            className="my-4 p-2 bg-gray-900 text-white font-bold rounded hover:bg-blue-700"
-          >
-            Save All
-          </button>
+      
         </form>
+        <Link
+          href="/profile/edit"
+          className="py-3 px-6 bg-gray-900 text-white font-bold rounded hover:bg-gray-600"
+        >
+          Edit Profile
+        </Link>
+        {/* <button
+          type="submit"
+          className="my-4 py-3 px-6 bg-gray-900 text-white font-bold rounded hover:bg-gray-600"
+        >
+          Edit Profile
+        </button> */}
+        </div>
         {/* card and photo selection */}
+  
         <div className="flex flex-col gap-5">
-          <div className="flex flex-col gap-7 bg-white pt-20 pb-16 justify-center items-center text-center border rounded">
+          <div className="flex flex-col gap-5 bg-white pt-16 pb-16 justify-center items-center text-center border rounded-lg">
             <Image src={picture} width={120} height={50} className="round" />
             <div>
               <h4 className="text-gray-600 text-2xl font-bold py-1">name</h4>
@@ -196,11 +150,11 @@ const Profile = () => {
               <p className="text-gray-500 py-1">Address</p>
             </div>
           </div>
-          <div className="bg-white p-4 border rounded">
+          <div className="bg-white p-4 border rounded-lg">
             <label className="text-gray-600 text-lg">
               Select profile photo
             </label>
-            <div className="flex items-center gap-5 p-4">
+            <div className="flex items-center gap-4 px-2 py-3">
               <Image
                 src={picturePreview}
                 width={60}
@@ -217,7 +171,7 @@ const Profile = () => {
                     pointerEvents: "none",
                   }}
                 />
-                <div className="">
+                <div>
                   <label className="cursor-pointer text-gray-500">
                     <p>Choose Image</p>
                     <p className="text-sm">JPG, GIF or PNG. Max size of 800K</p>
@@ -234,6 +188,8 @@ const Profile = () => {
             </div>
           </div>
         </div>
+        
+      </div>
       </div>
     </div>
   );
