@@ -29,83 +29,137 @@ export default function register() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center sm:px-6 lg:px-8 text-blue-600 ">
-      <div className="sm:mx-auto ms:w-full sm:max-w-md mb-5">
-        <h1 className="text-2xl sm:text-3xl font-semibold">
-          Register to your acccount
-        </h1>
-      </div>
+    <div>
+      <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+          {/* Logo */}
+          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+            Sign up to your account
+          </h2>
+        </div>
 
-      <div className="bg-gray-200 shadow-lg w-80 sm:w-96 p-8 rounded-lg">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="name" className="block text-lg font-semibold mb-2">
-              Name:
-            </label>
-            <input
-              type="text"
-              name="name"
-              autoComplete="name"
-              required
-              placeholder="Enter your name..."
-              //onChange={(e) => setName(e.target.value)}
-              className="block border border-blue-600 w-full p-2 rounded-md shadow-sm placeholde-gray-400 focus:outline-none focus:ring-blue-600 focus:border-blue-600 focus:border-2 sm:text-lg font-semibold text-blue-600"
-            />
-          </div>
-          <div>
-            <label htmlFor="phone" className="block text-lg font-semibold mb-2">
-              Phone:
-            </label>
-            <input
-              type="tel"
-              name="mobile"
-              placeholder="Enter your mobile number..."
-              autoComplete="mobile"
-              required
-              //onChange={(e) => setMobile(e.target.value)}
-              className="block border border-blue-600 w-full p-2 rounded-md shadow-sm placeholde-gray-400 focus:outline-none focus:ring-blue-600 focus:border-blue-600 focus:border-2 sm:text-lg font-semibold text-blue-600"
-            />
-          </div>
-          <div>
-            <label htmlFor="email" className="block text-lg font-semibold mb-2">
-              Email:
-            </label>
-            <input
-              type="email"
-              name="email"
-              autoComplete="email"
-              required
-              placeholder="your@email.com"
-              //onChange={(e) => setEmail(e.target.value)}
-              className="block border border-blue-600 w-full p-2 rounded-md shadow-sm placeholde-gray-400 focus:outline-none focus:ring-blue-600 focus:border-blue-600 focus:border-2 sm:text-lg font-semibold text-blue-600"
-            />
-          </div>
-          <div className="relative">
-            <label
-              htmlFor="address"
-              className="block text-lg font-semibold mb-2"
+        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+          <form className="space-y-4">
+            <div>
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium leading-6 text-gray-900"
+              >
+                Full Name
+              </label>
+              <div className="mt-2">
+                <input
+                  id="name"
+                  name="name"
+                  type="string"
+                  autoComplete="full-name"
+                  required
+                  placeholder="Enter your full name"
+                  className="px-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium leading-6 text-gray-900"
+              >
+                Email address
+              </label>
+              <div className="mt-2">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  placeholder="Enter your email"
+                  className="px-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium leading-6 text-gray-900"
+              >
+                Password
+              </label>
+              <div className="mt-2">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="password"
+                  required
+                  placeholder="Enter a password"
+                  className="px-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="phone"
+                className="block text-sm font-medium leading-6 text-gray-900"
+              >
+                Phone Number
+              </label>
+              <div className="mt-2">
+                <input
+                  id="phone"
+                  name="phone"
+                  type="string"
+                  autoComplete="mobile-number"
+                  required
+                  placeholder="Enter your your mobile number"
+                  className="px-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="address"
+                className="block text-sm font-medium leading-6 text-gray-900"
+              >
+                Address
+              </label>
+              <div className="mt-2">
+                <input
+                  id="address"
+                  name="address"
+                  type="address"
+                  autoComplete="address"
+                  required
+                  placeholder="Enter your address"
+                  className="px-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
+              </div>
+            </div>
+
+            <div>
+              <button
+                type="submit"
+                className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              >
+                Sign in
+              </button>
+            </div>
+          </form>
+
+          <p className="mt-10 text-center text-sm text-gray-500">
+            Already have an account? &nbsp;
+            <a
+              href="#"
+              className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
             >
-              Address:
-            </label>
-            <input
-              type="address"
-              name="address"
-              autoComplete="address"
-              required
-              placeholder="Enter your address..."
-              //onChange={(e) => setAddress(e.target.value)}
-              className="block border border-blue-600 w-full p-2 rounded-md shadow-sm placeholde-gray-400 focus:outline-none focus:ring-blue-600 focus:border-blue-600 focus:border-2 sm:text-lg font-semibold text-blue-600"
-            />
-          </div>
-          <div>
-            <button
-              type="submit"
-              className="group relative w-full justify-center py-2 px-4 border border-transparent text-lg font-semibold rounded-md bg-blue-600 text-white hover:bg-blue-500 mt-5"
-            >
-              Submit
-            </button>
-          </div>
-        </form>
+              Sign in
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   );
