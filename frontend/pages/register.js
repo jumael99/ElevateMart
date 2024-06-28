@@ -11,6 +11,7 @@ const register = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState({});
 
   const onShowPassword = () => {
@@ -22,17 +23,16 @@ const register = () => {
   };
 
   async function handleSubmit(e) {
+    setIsVerifying(true);
     e.preventDefault();
     const form = e.target;
     const formObject = validate(e, setError);
     if (!formObject) {
       return;
     }
-
-    const url = "http://localhost:5001/api/auth/register";
-
+    const reqURL = "http://localhost:5001/api/auth/register";
     try {
-      const res = await Axios.post(url, formObject);
+      const res = await Axios.post(reqURL, formObject);
       toast.success(
         "User registered successfully, Check your email to verify!"
       );
@@ -40,12 +40,14 @@ const register = () => {
       const { url } = res.data.data;
       router.push(url);
     } catch (error) {
-      toast.error(error?.response?.data?.message);
+      toast.error(error?.message);
+    } finally {
+      setIsVerifying(false);
     }
   }
 
   return (
-    <div>
+    <div style={{ cursor: isVerifying ? "wait" : "default" }}>
       <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img

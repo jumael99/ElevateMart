@@ -1,14 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import Axios from "axios";
 import { useRouter } from "next/router";
+import { toast } from "react-toastify";
 
 const verify = () => {
   const router = useRouter();
+  const [isVerifying, setIsVerifying] = useState(false);
 
   const { email } = router.query;
 
   const verifyAccount = async (e) => {
     e.preventDefault();
+    setIsVerifying(true);
 
     const otp = e.target.otp.value;
 
@@ -19,28 +22,34 @@ const verify = () => {
           otp,
         }
       );
+      toast.success("Account verified successfully. You can now login!");
       if (res.data.status === "success") {
         router.push("/login");
       }
     } catch (error) {
-      alert(error.response.data.message);
+      toast.error(error?.response?.data?.message || error?.message);
+    } finally {
+      setIsVerifying(false);
     }
   };
 
   const resendOTP = async () => {
+    setIsVerifying(true);
     try {
       const res = await Axios.get(
         `http://localhost:5001/api/auth/verify/${email}`
       );
 
-      alert("A new otp has been sent. Check your email");
+      toast.success("A new otp has been sent. Check your email");
     } catch (error) {
-      console.log(error.response.data.message);
+      toast.error(error?.message);
+    } finally {
+      setIsVerifying(false);
     }
   };
 
   return (
-    <div>
+    <div style={{ cursor: isVerifying ? "wait" : "default" }}>
       <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img
@@ -86,7 +95,7 @@ const verify = () => {
           <p className="mt-10 text-center text-sm text-gray-500">
             Didn't receive an OTP? &nbsp;
             <a
-              className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
+              className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500 hover:cursor-pointer"
               onClick={resendOTP}
             >
               Resend OTP
