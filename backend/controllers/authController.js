@@ -9,6 +9,7 @@ import OTP from "../models/otpModel.js";
 // @route   POST /api/auth/register
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
+  console.log("Hello form registerUser");
   const { name, email, phone, address, password } = req.body;
 
   // Feilds check
@@ -41,7 +42,7 @@ const registerUser = asyncHandler(async (req, res) => {
   const hashedEmail = encryptedEmail.encryptedData + "-" + encryptedEmail.iv;
 
   // Create the verification URL
-  const verifyURL = `${req.protocol}://localhost:3000/auth/verify/${hashedEmail}`;
+  const verifyURL = `${process.env.FRONTEND_URL}/auth/verify/${hashedEmail}`;
 
   // Send the OTP
   await sendOTPEmail(user, otp, verifyURL);
@@ -50,6 +51,9 @@ const registerUser = asyncHandler(async (req, res) => {
   res.status(201).json({
     status: "success",
     message: "User created successfully. Please varify your email!",
+    data: {
+      url: verifyURL,
+    },
   });
 });
 
@@ -84,25 +88,20 @@ const verifyUser = asyncHandler(async (req, res) => {
   }
 
   // Find the OTP
-  const findOTP = await OTP.findOne({
+  const otpRecord = await OTP.findOne({
     email,
     active: true,
   });
 
-  if (!findOTP) {
-    res.status(400);
-    throw new Error("Invalid OTP!");
-  }
+  const isMatch = await otpRecord.isCorrect(otp);
 
-  // Check for validity
-  const isMatch = await findOTP.isCorrect(otp);
-  if (!isMatch) {
+  if (!otpRecord || !isMatch) {
     res.status(400);
-    throw new Error("Invalid OTP!");
+    throw new Error("Invalid OTP. Please try again!");
   }
 
   // Check for expiry
-  const isExpired = findOTP.isExpired();
+  const isExpired = otpRecord.isExpired();
   if (isExpired) {
     res.status(400);
     throw new Error("OTP has expired. Please request a new OTP!");
@@ -112,14 +111,13 @@ const verifyUser = asyncHandler(async (req, res) => {
   user.isVerified = true;
   await user.save();
 
-  // Update OTP
-  findOTP.active = false;
-  findOTP.used = true;
-  await findOTP.save();
+  // Delete the OTP
+  OTP.deleteOne({ _id: otpRecord._id });
 
   res.status(201).json({
     status: "success",
-    message: "User Varified",
+    message:
+      "Welcome to ElevateMart! Your account has been verified successfully!",
   });
 });
 
@@ -151,16 +149,16 @@ const requestOTP = asyncHandler(async (req, res) => {
     active: true,
   });
 
+  // Delete the active OTP
   if (activeOTP) {
-    activeOTP.active = false;
-    await activeOTP.save();
+    OTP.deleteOne({ _id: activeOTP._id });
   }
 
   // Create a new OTP
   const newOtp = await createOTP(email, "verify");
 
   // Create the verification URL
-  const verifyURL = `${req.protocol}://localhost:3000/auth/verify/${req.params.email}`;
+  const verifyURL = `${process.env.FRONTEND_URL}/auth/verify/${req.params.email}`;
 
   // Send OTP
   await sendOTPEmail(user, newOtp, verifyURL);
