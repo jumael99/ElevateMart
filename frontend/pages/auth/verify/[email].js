@@ -20,7 +20,7 @@ export default function verify() {
         }
       );
       if (res.data.status === "success") {
-        router.push("/");
+        router.push("/login");
       }
     } catch (error) {
       alert(error.response.data.message);

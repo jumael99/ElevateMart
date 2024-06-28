@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Axios from "axios";
 import { FaEye } from "react-icons/fa";
 import { IoEyeOffSharp } from "react-icons/io5";
+import { toast } from "react-toastify";
 
 export default function register() {
   const [showPassword, setShowPassword] = useState(false);
@@ -19,12 +20,13 @@ export default function register() {
     const url = "http://localhost:5001/api/auth/register";
 
     try {
-      const res = await Axios.post(url, formObject);
-      alert("User registered successfully");
+      await Axios.post(url, formObject);
+      toast.success(
+        "User registered successfully, Check your email to verify!"
+      );
       form.reset();
     } catch (error) {
-      console.log(error);
-      alert("An error occurred");
+      toast.error(error?.response?.data?.message);
     }
   }
 
@@ -235,7 +237,6 @@ export default function register() {
 
 const validate = (e, setError) => {
   e.preventDefault();
-  const form = e.target;
   const formData = new FormData(e.target);
   const name = formData.get("name");
   const mobile = formData.get("phone");
