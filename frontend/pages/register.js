@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { validate } from "../utils/auth.js";
 import { useRouter } from "next/dist/client/router";
 
-export default function register() {
+const register = () => {
   const router = useRouter();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -239,4 +239,6 @@ export default function register() {
       </div>
     </div>
   );
-}
+};
+
+export default register;

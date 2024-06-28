@@ -2,7 +2,7 @@ import React from "react";
 import Axios from "axios";
 import { useRouter } from "next/router";
 
-export default function verify() {
+const verify = () => {
   const router = useRouter();
 
   const { email } = router.query;
@@ -96,4 +96,6 @@ export default function verify() {
       </div>
     </div>
   );
-}
+};
+
+export default verify;
