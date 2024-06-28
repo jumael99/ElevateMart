@@ -3,6 +3,8 @@ import { Provider } from "react-redux";
 import { Poppins } from "next/font/google";
 import { store } from "@/store";
 import Layout from "@/components/Layout";
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -20,6 +22,7 @@ function MyApp({ Component, pageProps }) {
       `}</style>
       <Layout>
         <Component {...pageProps} />
+        <ToastContainer />
       </Layout>
     </Provider>
   );
