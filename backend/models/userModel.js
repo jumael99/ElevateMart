@@ -11,6 +11,12 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+      validate: {
+        validator: function (v) {
+          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+        },
+        message: (props) => `${props.value} is not a valid email!`,
+      },
     },
     phone: {
       type: String,
@@ -18,11 +24,17 @@ const userSchema = mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+      select: false,
+    },
+    address: {
+      type: String,
     },
     isAdmin: {
       type: Boolean,
-      required: true,
+      default: false,
+    },
+    isVerified: {
+      type: Boolean,
       default: false,
     },
   },
@@ -39,11 +51,12 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
 // Encrypt password using bcrypt
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
-    next();
+    return next();
   }
 
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+  next();
 });
 
 const User = mongoose.model("User", userSchema);
