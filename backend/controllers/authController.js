@@ -50,6 +50,9 @@ const registerUser = asyncHandler(async (req, res) => {
   res.status(201).json({
     status: "success",
     message: "User created successfully. Please varify your email!",
+    data: {
+      url: verifyURL,
+    },
   });
 });
 
@@ -84,21 +87,16 @@ const verifyUser = asyncHandler(async (req, res) => {
   }
 
   // Find the OTP
-  const findOTP = await OTP.findOne({
+  const otpRecord = await OTP.findOne({
     email,
     active: true,
   });
 
-  if (!findOTP) {
-    res.status(400);
-    throw new Error("Invalid OTP!");
-  }
-
-  // Check for validity
   const isMatch = await findOTP.isCorrect(otp);
-  if (!isMatch) {
+
+  if (!otpRecord || !isMatch) {
     res.status(400);
-    throw new Error("Invalid OTP!");
+    throw new Error("Invalid OTP. Please try again!");
   }
 
   // Check for expiry
@@ -112,14 +110,13 @@ const verifyUser = asyncHandler(async (req, res) => {
   user.isVerified = true;
   await user.save();
 
-  // Update OTP
-  findOTP.active = false;
-  findOTP.used = true;
-  await findOTP.save();
+  // Delete the OTP
+  OTP.deletebyId(otpRecord._id);
 
   res.status(201).json({
     status: "success",
-    message: "User Varified",
+    message:
+      "Welcome to ElevateMart! Your account has been verified successfully!",
   });
 });
 
@@ -151,9 +148,9 @@ const requestOTP = asyncHandler(async (req, res) => {
     active: true,
   });
 
+  // Delete the active OTP
   if (activeOTP) {
-    activeOTP.active = false;
-    await activeOTP.save();
+    OTP.deletebyId(activeOTP._id);
   }
 
   // Create a new OTP
