@@ -132,12 +132,6 @@ const Profile = () => {
         >
           Edit Profile
         </Link>
-        {/* <button
-          type="submit"
-          className="my-4 py-3 px-6 bg-gray-900 text-white font-bold rounded hover:bg-gray-600"
-        >
-          Edit Profile
-        </button> */}
         </div>
         {/* card and photo selection */}
   

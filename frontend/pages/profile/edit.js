@@ -1,11 +1,5 @@
 import { useRouter } from "next/router";
 import { React, useState } from "react";
-// import Image from "next/image";
-// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import {
-//   faMagnifyingGlass,
-//   faPaperclip,
-// } from "@fortawesome/free-solid-svg-icons";
 
 const Profile = () => {
   const router = useRouter();  
