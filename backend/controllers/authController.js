@@ -1,4 +1,3 @@
-import User from '../models/User.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import asyncHandler from "../middleware/asyncHandler.js";
@@ -9,7 +8,7 @@ import { encrypt, decryptEmail } from "../utils/textCypher.js";
 import OTP from "../models/otpModel.js";
 
 
-export const login = async (req, res) => {
+const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
