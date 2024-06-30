@@ -20,7 +20,7 @@ app.use(cookieParser());
 
 app.use('/api/users', userRoutes);
 // Add Profile routes
-app.use('/Profile', profileRoutes);
+app.use('/api/Profile', userRoutes);
 
 if (process.env.NODE_ENV === 'production') {
   const __dirname = path.resolve();

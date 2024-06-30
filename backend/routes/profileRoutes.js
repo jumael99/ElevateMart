@@ -1,12 +1,10 @@
-import * as profileController from '../controllers/profileController.js';
+import * as profileController from '../controllers/profileController_jak.js';
 import express from 'express';
 const router = express.Router();
 
 
 // GET Profile Route
-router.get('/', profileController.getProfile);
-
-// UPDATE Profile Route
-router.put('/', profileController.updateProfile);
+router.get('/', profileController.getProfile)
+    .put('/', profileController.updateProfile);
 
 export default router;
