@@ -41,7 +41,7 @@ const registerUser = asyncHandler(async (req, res) => {
 // @access  Public
 const getProfile = asyncHandler(async (req, res) => {
   // Assuming req.user contains the logged-in user's data
-  const profile = await User.findOne({ email: "alice@example.com" });
+  const profile = await User.findOne({ email: "johndoe@example.com" });
   if (!profile) {
     return res.status(404).json({ message: 'Profile not found' });
   }
@@ -58,7 +58,7 @@ const updateProfile = asyncHandler(async (req, res) => {
   // Find the Profile by the logged-in user's email and update it
   // Assuming req.user contains the logged-in user's data
   const profile = await User.findOneAndUpdate(
-      { email: "alice@example.com" },
+      { email: "johndoe@example.com" },
       updatedData,
       { new: true, runValidators: true }
   );
