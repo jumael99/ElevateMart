@@ -12,6 +12,14 @@ node_modules
 # production
 /build
 
+#.idea file ignored
+ .idea/
+
+#adding these file to ignore
+backend/controllers/profileController_jak.js
+backend/models/profileModel_jak.js
+backend/utils/seedProfile_jak.js
+
 # misc
 .DS_Store
 .env
