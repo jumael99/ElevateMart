@@ -43,7 +43,7 @@ const getProfile = asyncHandler(async (req, res) => {
   // Assuming req.user contains the logged-in user's data
   const profile = await User.findOne({ email: "johndoe@example.com" });
   if (!profile) {
-    return res.status(404).json({ message: 'Profile not found' });
+    return res.status(404).json({ message: 'Profile not found x' });
   }
   res.json(profile);
 });

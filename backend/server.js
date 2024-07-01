@@ -19,6 +19,8 @@ app.use(cookieParser());
 
 app.use('/api/users', userRoutes);
 
+app.use('/api/profile', userRoutes);
+
 if (process.env.NODE_ENV === 'production') {
   const __dirname = path.resolve();
   app.use('/uploads', express.static('/var/data/uploads'));
