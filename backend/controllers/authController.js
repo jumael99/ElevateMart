@@ -14,12 +14,14 @@ const login = async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      console.log('Username not matched');
+      return res.status(400).json({ message: 'Username not matched' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      console.log('Password not matched');
+      return res.status(400).json({ message: 'Password not matched' });
     }
 
     const payload = { userId: user.id };

@@ -18,6 +18,7 @@ export default function Login() {
       localStorage.setItem('token', res.data.token);
       console.log(res.data.token);
       router.push('/');
+      // console.log("object");
     } catch (error) {
       console.error(error);
       alert('Invalid credentials');

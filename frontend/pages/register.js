@@ -1,10 +1,10 @@
-import React, { useState } from "react";
 import Axios from "axios";
+import { useRouter } from "next/dist/client/router";
+import { useState } from "react";
 import { FaEye } from "react-icons/fa";
 import { IoEyeOffSharp } from "react-icons/io5";
 import { toast } from "react-toastify";
 import { validate } from "../utils/auth.js";
-import { useRouter } from "next/dist/client/router";
 
 const register = () => {
   const router = useRouter();
