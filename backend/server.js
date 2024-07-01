@@ -12,14 +12,12 @@ const port = process.env.PORT || 5001;
 
 connectDB();
 
-import cors from 'cors';
-
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.use(cors());
+
 
 app.use('/api/users', userRoutes);
 
