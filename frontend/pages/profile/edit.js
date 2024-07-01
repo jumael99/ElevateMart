@@ -2,21 +2,7 @@ import { useRouter } from "next/router";
 import { React, useState } from "react";
 
 const Profile = () => {
-  const router = useRouter();  
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [birthday, setBrithday] = useState("");
-  const [email, setEmail] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [gender, setGender] = useState("");
-  const [address, setAddress] = useState("");
-  const [number, setNumber] = useState("");
-  const [city, setCity] = useState("");
-  const [zip, setZip] = useState("");
-  const [picture, setpicture] = useState("/images/defaultUser.png");
-  const [picturePreview, setpicturePreview] = useState(
-    "/images/defaultUser.png"
-  );
+  const router = useRouter();
 
   const handleGenderChange = (e) => {
     setGender(e.target.value);
@@ -24,7 +10,7 @@ const Profile = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    router.push('/profile/view')
+    router.push("/profile/view");
   };
 
   return (
@@ -42,8 +28,13 @@ const Profile = () => {
         </h3>
         <div className="flex gap-5 flex-wrap">
           <div className="flex-grow">
-            <label className="py-2 block text-gray-600">First Name</label>
+            <label htmlFor="fname" className="py-2 block text-gray-600">
+              First Name
+            </label>
             <input
+              id="fname"
+              name="fname"
+              type="string"
               placeholder=" Enter your first name "
               className="w-full p-2 border border-gray-300 rounded"
               onChange={(e) => setFirstName(e.target.value)}
@@ -51,8 +42,13 @@ const Profile = () => {
             />
           </div>
           <div className="flex-grow">
-            <label className="py-2 block text-gray-600">Last Name</label>
+            <label htmlFor="lname" className="py-2 block text-gray-600">
+              Last Name
+            </label>
             <input
+              id="lname"
+              name="lname"
+              type="string"
               placeholder="Also your last name"
               className="w-full p-2 border border-gray-300 rounded"
               onChange={(e) => setLastName(e.target.value)}
@@ -62,8 +58,12 @@ const Profile = () => {
         </div>
         <div className="flex gap-5 flex-wrap">
           <div className="flex-grow">
-            <label className="py-2 block text-gray-600">Birthday</label>
+            <label htmlFor="bday" className="py-2 block text-gray-600">
+              Birthday
+            </label>
             <input
+              id="bday"
+              name="bday"
               type="date"
               className="text-black w-full p-2 border border-gray-300 rounded"
               onChange={(e) => setBrithday(e.target.value)}
@@ -71,8 +71,12 @@ const Profile = () => {
             />
           </div>
           <div className="flex-grow">
-            <label className="py-2 block text-gray-600">Gender</label>
+            <label htmlFor="gender" className="py-2 block text-gray-600">
+              Gender
+            </label>
             <select
+              id="gender"
+              name="gender"
               className="w-full py-2 px-8 text-black border border-gray-300 rounded"
               onChange={handleGenderChange}
             >
@@ -85,16 +89,26 @@ const Profile = () => {
         </div>
         <div className="flex gap-5 flex-wrap">
           <div className="flex-grow">
-            <label className="py-2 block text-gray-600">Email</label>
+            <label htmlFor="email" className="py-2 block text-gray-600">
+              Email
+            </label>
             <input
+              id="email"
+              name="email"
+              type="email"
               className="w-full p-2 border border-gray-300 rounded"
               onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
           <div className="flex-grow">
-            <label className="py-2 block text-gray-600">Phone</label>
+            <label htmlFor="phone" className="py-2 block text-gray-600">
+              Phone
+            </label>
             <input
+              id="phone"
+              name="phone"
+              type="number"
               placeholder="+8801*********"
               className="w-full p-2 border border-gray-300 rounded"
               onChange={(e) => setPhoneNumber(e.target.value)}
@@ -106,8 +120,13 @@ const Profile = () => {
         <h3 className="text-gray-600 text-lg font-bold pt-6">Address</h3>
         <div className="flex gap-5 flex-wrap">
           <div className="flex-grow">
-            <label className="py-2 block text-gray-600">Address</label>
+            <label htmlFor="address" className="py-2 block text-gray-600">
+              Address
+            </label>
             <input
+              id="address"
+              name="address"
+              type="string"
               placeholder="  Enter your home address "
               className="w-full p-2 border border-gray-300 rounded"
               onChange={(e) => setAddress(e.target.value)}
@@ -115,8 +134,13 @@ const Profile = () => {
             />
           </div>
           <div className=" flex-wrap">
-            <label className="py-2 block text-gray-600">Number</label>
+            <label htmlFor="number" className="py-2 block text-gray-600">
+              Number
+            </label>
             <input
+              id="number"
+              name="number"
+              type="string"
               placeholder=" No. "
               className="w-full p-2 border border-gray-300 rounded text-black"
               onChange={(e) => setNumber(e.target.value)}
@@ -126,8 +150,13 @@ const Profile = () => {
         </div>
         <div className="flex gap-5 flex-wrap">
           <div className="flex-grow">
-            <label className="py-2 block text-gray-600">City</label>
+            <label htmlFor="city" className="py-2 block text-gray-600">
+              City
+            </label>
             <input
+              id="city"
+              name="city"
+              type="string"
               placeholder=" City "
               className="w-full p-2 border border-gray-300 rounded"
               onChange={(e) => setCity(e.target.value)}
@@ -135,8 +164,13 @@ const Profile = () => {
             />
           </div>
           <div className="flex-grow">
-            <label className="py-2 block text-gray-600">ZIP</label>
+            <label htmlFor="zip" className="py-2 block text-gray-600">
+              ZIP
+            </label>
             <input
+              id="zip"
+              name="zip"
+              type="number"
               placeholder="ZIP "
               className="w-full p-2  border border-gray-300 rounded"
               onChange={(e) => setZip(e.target.value)}
