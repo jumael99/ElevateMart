@@ -2,6 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import styles from '../styles/Login.module.css';
+import { toast } from "react-toastify";
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -16,12 +17,15 @@ export default function Login() {
     try {
       const res = await axios.post('http://localhost:5001/api/auth/login', { email, password });
       localStorage.setItem('token', res.data.token);
+      
+      // Set cookie
+      document.cookie = `token=${res.data.token}; path=/`; 
       console.log(res.data.token);
+
       router.push('/');
-      // console.log("object");
     } catch (error) {
       console.error(error);
-      alert('Invalid credentials');
+      toast.error('Invalid UserName or Password');
     } finally {
       setLoading(false);
     }
