@@ -1,191 +1,143 @@
 import { useRouter } from "next/router";
-import { React, useState } from "react";
+import {React, useEffect, useState} from "react";
+import axios from "axios";
 
 const Profile = () => {
   const router = useRouter();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
 
-  const handleGenderChange = (e) => {
-    setGender(e.target.value);
+  const [userData, setUserData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+  });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get('http://localhost:5001/api/profile');
+        setUserData(response.data);
+        setName(response.data.name);
+        setEmail(response.data.email);
+        setPhone(response.data.phone);
+        setAddress(response.data.address);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.put('http://localhost:5001/api/profile', {
+        name,
+        email,
+        phone,
+        address
+      });
+      if (response.status === 200) {
+        await router.push("/profile/view");
+      } else {
+        console.error('Failed to update profile');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error.response ? error.response.data : error.message);
+    }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    router.push("/profile/view");
+  const fetchUserData = async () => {
+    try {
+      const response = await axios.get('http://localhost:5001/api/profile');
+      setUserData(response.data);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
   };
 
   return (
-    <div className="flex flex-col items-center px-10 py-6 bg-gray-100 min-h-screen">
-      <h1 className="text-gray-700 text-3xl font-semibold pb-3 text-center">
-        Edit Profile
-      </h1>
-      {/* form */}
-      <form
-        className="bg-white border rounded-lg p-8 max-w-lg"
-        onSubmit={handleSubmit}
-      >
-        <h3 className="text-gray-600 text-lg font-bold pb-3">
-          General Information
-        </h3>
-        <div className="flex gap-5 flex-wrap">
-          <div className="flex-grow">
-            <label htmlFor="fname" className="py-2 block text-gray-600">
-              First Name
+      <div className="text-black flex flex-col items-center px-10 py-6 bg-gray-100 min-h-screen">
+        <h1 className="text-gray-700 text-3xl font-semibold pb-3 text-center">
+          Edit Profile
+        </h1>
+        <form
+            className="bg-white border rounded-lg p-8 max-w-lg w-full"
+            onSubmit={handleSubmit}
+        >
+          <h3 className="text-gray-600 text-lg font-bold pb-3">
+            General Information
+          </h3>
+          <div className="mb-4">
+            <label htmlFor="name" className="block text-gray-600 mb-2">
+              Name
             </label>
             <input
-              id="fname"
-              name="fname"
-              type="string"
-              placeholder=" Enter your first name "
-              className="w-full p-2 border border-gray-300 rounded"
-              onChange={(e) => setFirstName(e.target.value)}
-              required
+                value={name}
+                id="name"
+                name="name"
+                type="text"
+                className="w-full p-2 border border-gray-300 rounded"
+                onChange={(e) => setName(e.target.value)}
+                required
             />
           </div>
-          <div className="flex-grow">
-            <label htmlFor="lname" className="py-2 block text-gray-600">
-              Last Name
-            </label>
-            <input
-              id="lname"
-              name="lname"
-              type="string"
-              placeholder="Also your last name"
-              className="w-full p-2 border border-gray-300 rounded"
-              onChange={(e) => setLastName(e.target.value)}
-              required
-            />
-          </div>
-        </div>
-        <div className="flex gap-5 flex-wrap">
-          <div className="flex-grow">
-            <label htmlFor="bday" className="py-2 block text-gray-600">
-              Birthday
-            </label>
-            <input
-              id="bday"
-              name="bday"
-              type="date"
-              className="text-black w-full p-2 border border-gray-300 rounded"
-              onChange={(e) => setBrithday(e.target.value)}
-              required
-            />
-          </div>
-          <div className="flex-grow">
-            <label htmlFor="gender" className="py-2 block text-gray-600">
-              Gender
-            </label>
-            <select
-              id="gender"
-              name="gender"
-              className="w-full py-2 px-8 text-black border border-gray-300 rounded"
-              onChange={handleGenderChange}
-            >
-              <option value="">Gender</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-        </div>
-        <div className="flex gap-5 flex-wrap">
-          <div className="flex-grow">
-            <label htmlFor="email" className="py-2 block text-gray-600">
+          <div className="mb-4">
+            <label htmlFor="email" className="block text-gray-600 mb-2">
               Email
             </label>
             <input
-              id="email"
-              name="email"
-              type="email"
-              className="w-full p-2 border border-gray-300 rounded"
-              onChange={(e) => setEmail(e.target.value)}
-              required
+                value={email}
+                id="email"
+                name="email"
+                type="email"
+                className="w-full p-2 border border-gray-300 rounded"
+                onChange={(e) => setEmail(e.target.value)}
+                required
             />
           </div>
-          <div className="flex-grow">
-            <label htmlFor="phone" className="py-2 block text-gray-600">
+          <div className="mb-4">
+            <label htmlFor="phone" className="block text-gray-600 mb-2">
               Phone
             </label>
             <input
-              id="phone"
-              name="phone"
-              type="number"
-              placeholder="+8801*********"
-              className="w-full p-2 border border-gray-300 rounded"
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              required
+                value={phone}
+                id="phone"
+                name="phone"
+                type="tel"
+                placeholder="+8801*********"
+                className="w-full p-2 border border-gray-300 rounded"
+                onChange={(e) => setPhone(e.target.value)}
+                required
             />
           </div>
-        </div>
-
-        <h3 className="text-gray-600 text-lg font-bold pt-6">Address</h3>
-        <div className="flex gap-5 flex-wrap">
-          <div className="flex-grow">
-            <label htmlFor="address" className="py-2 block text-gray-600">
+          <div className="mb-4">
+            <label htmlFor="address" className="block text-gray-600 mb-2">
               Address
             </label>
             <input
-              id="address"
-              name="address"
-              type="string"
-              placeholder="  Enter your home address "
-              className="w-full p-2 border border-gray-300 rounded"
-              onChange={(e) => setAddress(e.target.value)}
-              required
+                value={address}
+                id="address"
+                name="address"
+                type="text"
+                placeholder="Enter your address"
+                className="w-full p-2 border border-gray-300 rounded"
+                onChange={(e) => setAddress(e.target.value)}
             />
           </div>
-          <div className=" flex-wrap">
-            <label htmlFor="number" className="py-2 block text-gray-600">
-              Number
-            </label>
-            <input
-              id="number"
-              name="number"
-              type="string"
-              placeholder=" No. "
-              className="w-full p-2 border border-gray-300 rounded text-black"
-              onChange={(e) => setNumber(e.target.value)}
-              required
-            />
-          </div>
-        </div>
-        <div className="flex gap-5 flex-wrap">
-          <div className="flex-grow">
-            <label htmlFor="city" className="py-2 block text-gray-600">
-              City
-            </label>
-            <input
-              id="city"
-              name="city"
-              type="string"
-              placeholder=" City "
-              className="w-full p-2 border border-gray-300 rounded"
-              onChange={(e) => setCity(e.target.value)}
-              required
-            />
-          </div>
-          <div className="flex-grow">
-            <label htmlFor="zip" className="py-2 block text-gray-600">
-              ZIP
-            </label>
-            <input
-              id="zip"
-              name="zip"
-              type="number"
-              placeholder="ZIP "
-              className="w-full p-2  border border-gray-300 rounded"
-              onChange={(e) => setZip(e.target.value)}
-              required
-            />
-          </div>
-        </div>
-        <button
-          type="submit"
-          className="my-4 p-2 bg-gray-900 text-white font-bold rounded hover:bg-gray-600"
-        >
-          Save All
-        </button>
-      </form>
-    </div>
+          <button
+              type="submit"
+              className="w-full p-2 bg-gray-900 text-white font-bold rounded hover:bg-gray-700"
+          >
+            Save All
+          </button>
+        </form>
+      </div>
   );
 };
 

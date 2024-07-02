@@ -37,7 +37,7 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 // @desc    Get user profile
-// @route   GET /profile
+// @route   GET /api/profile
 // @access  Public
 const getProfile = asyncHandler(async (req, res) => {
   // Assuming req.user contains the logged-in user's data
@@ -50,7 +50,7 @@ const getProfile = asyncHandler(async (req, res) => {
 
 
 // @desc    Edit user profile
-// @route   PUT /profile
+// @route   PUT /api/profile
 // @access  Public
 const updateProfile = asyncHandler(async (req, res) => {
   const updatedData = req.body;
@@ -58,7 +58,7 @@ const updateProfile = asyncHandler(async (req, res) => {
   // Find the Profile by the logged-in user's email and update it
   // Assuming req.user contains the logged-in user's data
   const profile = await User.findOneAndUpdate(
-      { email: "johndoe@example.com" },
+      { email: "alice.smith@example.com" },
       updatedData,
       { new: true, runValidators: true }
   );
