@@ -1,6 +1,8 @@
-import React from 'react';
- 
+import React, { useState } from 'react';
+
 const Header = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
     <header>
       <nav className="bg-lightBlue-500 w-full shadow-md">
@@ -24,44 +26,29 @@ const Header = () => {
             </div>
             <button
               type="button"
-              data-collapse-toggle="navbar-search"
-              aria-controls="navbar-search"
-              aria-expanded="false"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="md:hidden text-gray-500 hover:bg-lightBlue-600 focus:outline-none focus:ring-4 focus:ring-lightBlue-300 rounded-lg text-sm p-2.5 ml-1"
             >
               <svg className="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 6h14M3 12h14M3 18h14" />
               </svg>
-              <span className="sr-only">Search</span>
+              <span className="sr-only">Open main menu</span>
             </button>
             <img
               src="https://via.placeholder.com/40"
               className="w-10 h-10 rounded-full ml-4"
               alt="Profile"
             />
-              <div className="flex gap-2 ml-4">
-    <button className="py-2 px-4 text-white bg-blue-500 rounded hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-300">
-      Login
-    </button>
-    <button className="py-2 px-4 text-white bg-blue-500 rounded hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-300">
-      Sign Up
-    </button>
-  </div>
-          </div>
-          <div className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-search">
-            <div className="relative mt-3 md:hidden">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <svg className="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                </svg>
-              </div>
-              <input
-                type="text"
-                id="search-navbar"
-                className="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Search..."
-              />
+            <div className="flex gap-2 ml-4">
+              <button className="py-2 px-4 text-white bg-blue-500 rounded hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                Login
+              </button>
+              <button className="py-2 px-4 text-white bg-blue-500 rounded hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                Sign Up
+              </button>
             </div>
+          </div>
+          <div className={`items-center justify-between w-full md:flex md:w-auto md:order-1 ${isMenuOpen ? 'block' : 'hidden'}`}>
             <ul className="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-lightBlue-500 md:flex-row md:space-x-8 md:mt-0 md:border-0">
               <li className="group relative">
                 <button className="flex items-center py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">
@@ -99,7 +86,6 @@ const Header = () => {
                   <a className="block px-4 py-2 text-sm hover:bg-gray-400" href="/">Subitem 2</a>
                 </div>
               </li>
-            
               <li className="ml-6">
                 <div className="relative py-2">
                   <div className="absolute top-0 left-3">
