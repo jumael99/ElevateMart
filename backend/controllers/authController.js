@@ -69,6 +69,8 @@ const registerUser = asyncHandler(async (req, res) => {
   // Encrypt the email
   const encryptedEmail = encrypt(email);
   const hashedEmail = encryptedEmail.encryptedData + "-" + encryptedEmail.iv;
+  console.log(hashedEmail);
+  
 
   // Create the verification URL
   const verifyURL = `${process.env.FRONTEND_URL}/auth/verify/${hashedEmail}`;
