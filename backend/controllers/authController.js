@@ -12,20 +12,23 @@ const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select('+password');
     if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      console.log('Username not matched');
+      return res.status(400).json({ message: 'Username not matched' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      console.log('Password not matched');
+      return res.status(400).json({ message: 'Password not matched' });
     }
 
     const payload = { userId: user.id };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    res.json({ token });
+     res.json({ token });
+     
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -66,6 +69,8 @@ const registerUser = asyncHandler(async (req, res) => {
   // Encrypt the email
   const encryptedEmail = encrypt(email);
   const hashedEmail = encryptedEmail.encryptedData + "-" + encryptedEmail.iv;
+  console.log(hashedEmail);
+  
 
   // Create the verification URL
   const verifyURL = `${process.env.FRONTEND_URL}/auth/verify/${hashedEmail}`;

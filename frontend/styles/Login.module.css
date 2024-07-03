@@ -21,6 +21,7 @@
   margin-bottom: 10px;
   font-weight: 600;
   color: #555;
+  text-align: left;
 }
 
 .loginContainer input {
@@ -62,8 +63,26 @@
 }
 
 .loginContainer .formGroup {
-  margin-bottom: 20px;
+  margin-bottom: 0px;
 }
+.registerLink{
+  margin-top: 20px;
+}
+.registerLink a{
+ 
+  color: #0070F3;
+}
+.eyeIcon {
+  /* position: absolute; */
+  /* right: 100px; */
+  /* top: 51%; */
+  /* transform: translateY(-50%); */
+  cursor: pointer;
+  margin-top: -52px;
+  margin-left: 93%;
+  padding-bottom: 12%;
+}
+
 
 @media (max-width: 480px) {
   .loginContainer {
