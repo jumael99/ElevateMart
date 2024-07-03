@@ -13,7 +13,7 @@ node_modules
 /build
 
 #.idea file ignored
- .idea/
+.idea/
 
 
 # misc
