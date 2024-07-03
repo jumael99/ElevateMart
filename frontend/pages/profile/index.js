@@ -9,7 +9,13 @@ import {
 import axios from "axios";
 
 const Profile = () => {
-    const [userData, setUserData] = useState({
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        phone: "",
+        address: "",
+    });
+    const [displayData, setDisplayData] = useState({
         name: "",
         email: "",
         phone: "",
@@ -26,7 +32,8 @@ const Profile = () => {
     const fetchUserData = async () => {
         try {
             const response = await axios.get('http://localhost:5001/api/profile');
-            setUserData(response.data);
+            setFormData(response.data);
+            setDisplayData(response.data);
         } catch (error) {
             console.error("Error fetching user data:", error);
         }
@@ -35,10 +42,10 @@ const Profile = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.put('http://localhost:5001/api/profile', userData);
+            const response = await axios.put('http://localhost:5001/api/profile', formData);
             if (response.status === 200) {
                 setIsEditing(false);
-                fetchUserData();
+                setDisplayData(formData); // Update display data after successful submission
             } else {
                 console.error('Failed to update profile');
             }
@@ -49,7 +56,7 @@ const Profile = () => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setUserData(prevData => ({
+        setFormData(prevData => ({
             ...prevData,
             [name]: value
         }));
@@ -60,10 +67,9 @@ const Profile = () => {
     };
 
     return (
-        <div className=" text-black flex justify-center px-5 pb-5 bg-gray-100 min-h-screen">
+        <div className="text-black flex justify-center px-5 pb-5 bg-gray-100 min-h-screen">
             <div className="w-11/12">
                 <div className="flex justify-between py-4">
-                    {/* search and search icon  */}
                     <div className="flex items-center">
                         <div className="relative">
                             <div className="absolute">
@@ -84,14 +90,12 @@ const Profile = () => {
                             />
                         </div>
                     </div>
-                    {/* profile pic and name */}
                     <div className="flex items-center gap-2">
                         <Image src={picture} width={35} height={20} alt="Profile" />
-                        <p className="text-gray-600">{userData.name}</p>
+                        <p className="text-gray-600">{displayData.name}</p>
                     </div>
                 </div>
                 <div className="flex flex-wrap justify-center gap-5">
-                    {/* form */}
                     <div className="flex-grow">
                         <form className="justify-center bg-white border rounded-lg p-10 mb-6" onSubmit={handleSubmit}>
                             <div className="flex justify-between items-center mb-4">
@@ -111,12 +115,12 @@ const Profile = () => {
                                         <input
                                             type="text"
                                             name="name"
-                                            value={userData.name}
+                                            value={formData.name}
                                             onChange={handleInputChange}
                                             className="w-full p-2 border border-gray-300 rounded"
                                         />
                                     ) : (
-                                        <p className="text-gray-700 font-semibold text-lg pb-1">{userData.name}</p>
+                                        <p className="text-gray-700 font-semibold text-lg pb-1">{formData.name}</p>
                                     )}
                                 </div>
                                 <div className="flex-grow">
@@ -125,12 +129,12 @@ const Profile = () => {
                                         <input
                                             type="email"
                                             name="email"
-                                            value={userData.email}
+                                            value={formData.email}
                                             onChange={handleInputChange}
                                             className="w-full p-2 border border-gray-300 rounded"
                                         />
                                     ) : (
-                                        <p className="text-gray-700 font-semibold text-lg pb-1">{userData.email}</p>
+                                        <p className="text-gray-700 font-semibold text-lg pb-1">{formData.email}</p>
                                     )}
                                 </div>
                             </div>
@@ -141,12 +145,12 @@ const Profile = () => {
                                         <input
                                             type="tel"
                                             name="phone"
-                                            value={userData.phone}
+                                            value={formData.phone}
                                             onChange={handleInputChange}
                                             className="w-full p-2 border border-gray-300 rounded"
                                         />
                                     ) : (
-                                        <p className="text-gray-700 font-semibold text-lg pb-1">{userData.phone}</p>
+                                        <p className="text-gray-700 font-semibold text-lg pb-1">{formData.phone}</p>
                                     )}
                                 </div>
                             </div>
@@ -158,12 +162,12 @@ const Profile = () => {
                                         <input
                                             type="text"
                                             name="address"
-                                            value={userData.address}
+                                            value={formData.address}
                                             onChange={handleInputChange}
                                             className="w-full p-2 border border-gray-300 rounded"
                                         />
                                     ) : (
-                                        <p className="text-gray-700 font-semibold text-lg pb-1">{userData.address}</p>
+                                        <p className="text-gray-700 font-semibold text-lg pb-1">{formData.address}</p>
                                     )}
                                 </div>
                             </div>
@@ -177,14 +181,13 @@ const Profile = () => {
                             )}
                         </form>
                     </div>
-                    {/* card and photo selection */}
                     <div className="flex flex-col gap-5">
                         <div className="flex flex-col gap-5 bg-white pt-16 pb-16 justify-center items-center text-center border rounded-lg">
                             <Image src={picture} width={120} height={50} className="round" alt="Profile" />
                             <div>
-                                <h4 className="text-gray-600 text-2xl font-bold py-1">{userData.name}</h4>
-                                <p className="text-gray-500  py-1">{userData.email}</p>
-                                <p className="text-gray-500 py-1">{userData.address}</p>
+                                <h4 className="text-gray-600 text-2xl font-bold py-1">{displayData.name}</h4>
+                                <p className="text-gray-500  py-1">{displayData.email}</p>
+                                <p className="text-gray-500 py-1">{displayData.address}</p>
                             </div>
                         </div>
                         <div className="bg-white p-4 border rounded-lg">
