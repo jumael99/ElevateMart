@@ -58,7 +58,7 @@ const Header = () => {
                   </svg>
                 </button>
                 <div className="absolute hidden text-gray-700 pt-1 group-hover:block">
-                  <a className="block px-4 py-2 text-sm hover:bg-gray-400" href="/">Subitem 1</a>
+                  <a className="block px-4 py-2 text-sm hover:bg-gray-400" href="/login">Subitem 1</a>
                   <a className="block px-4 py-2 text-sm hover:bg-gray-400" href="/">Subitem 2</a>
                 </div>
               </li>
