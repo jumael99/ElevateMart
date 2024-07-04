@@ -1,5 +1,5 @@
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import asyncHandler from "../middleware/asyncHandler.js";
 import User from "../models/userModel.js";
 import createOTP from "../utils/generateOTP.js";
@@ -7,28 +7,30 @@ import sendOTPEmail from "../utils/emailSender.js";
 import { encrypt, decryptEmail } from "../utils/textCypher.js";
 import OTP from "../models/otpModel.js";
 
-
 const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email }).select("+password");
     if (!user) {
-      console.log('Username not matched');
-      return res.status(400).json({ message: 'Username not matched' });
+      return res
+        .status(400)
+        .json({ message: "Username or Password didn't match!" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      console.log('Password not matched');
-      return res.status(400).json({ message: 'Password not matched' });
+      return res
+        .status(400)
+        .json({ message: "Username or Password didn't match!" });
     }
 
     const payload = { userId: user.id };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
 
-     res.json({ token });
-     
+    res.json({ token });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -69,8 +71,6 @@ const registerUser = asyncHandler(async (req, res) => {
   // Encrypt the email
   const encryptedEmail = encrypt(email);
   const hashedEmail = encryptedEmail.encryptedData + "-" + encryptedEmail.iv;
-  console.log(hashedEmail);
-  
 
   // Create the verification URL
   const verifyURL = `${process.env.FRONTEND_URL}/auth/verify/${hashedEmail}`;
