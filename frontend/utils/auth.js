@@ -124,4 +124,11 @@ const validateConfirmPassword = (password, passwordConfirm) => {
   return "";
 };
 
-export { validate };
+export {
+  validate,
+  validateEmail,
+  validatePassword,
+  validatePhone,
+  validateName,
+  validateConfirmPassword,
+};
