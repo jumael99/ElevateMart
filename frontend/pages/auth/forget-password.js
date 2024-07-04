@@ -1,60 +1,38 @@
-import React, { useState } from "react";
-import Axios from "axios";
-import { useRouter } from "next/router";
+import { useState } from "react";
+import { validateEmail } from "../../utils/auth";
 import { toast } from "react-toastify";
+import Axios from "axios";
 
-const verify = () => {
-  const router = useRouter();
-  const [isVerifying, setIsVerifying] = useState(false);
+const forgetpassword = () => {
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { email } = router.query;
-
-  const verifyAccount = async (e) => {
+  const forgetPassword = async (e) => {
     e.preventDefault();
-    setIsVerifying(true);
-
-    const otp = e.target.otp.value;
-    if (otp.length == 0) {
-      toast.error("Please provide the OTP!");
-      setIsVerifying(false);
+    setIsLoading(true);
+    const email = e.target.email.value;
+    const emailError = validateEmail(email);
+    if (emailError !== "") {
+      toast.error(emailError);
+      setIsLoading(false);
       return;
     }
-
     try {
       const res = await Axios.post(
-        `http://localhost:5001/api/auth/verify/${email}`,
+        `http://localhost:5001/api/auth/forget-password`,
         {
-          otp,
+          email,
         }
       );
-      toast.success("Account verified successfully. You can now login!");
-      if (res.data.status === "success") {
-        router.push("/login");
-      }
+      toast.success(res.data.message);
     } catch (error) {
       toast.error(error?.response?.data?.message || error?.message);
     } finally {
-      setIsVerifying(false);
-    }
-  };
-
-  const resendOTP = async () => {
-    setIsVerifying(true);
-    try {
-      const res = await Axios.get(
-        `http://localhost:5001/api/auth/verify/${email}`
-      );
-
-      toast.success("A new otp has been sent. Check your email");
-    } catch (error) {
-      toast.error(error?.message);
-    } finally {
-      setIsVerifying(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div style={{ cursor: isVerifying ? "wait" : "default" }}>
+    <div style={{ cursor: isLoading ? "wait" : "default" }}>
       <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img
@@ -63,25 +41,25 @@ const verify = () => {
             alt="elevateMart logo"
           />
           <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Verify your account
+            Reset password to your account
           </h2>
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form className="space-y-4" onSubmit={verifyAccount}>
+          <form className="space-y-4" onSubmit={forgetPassword}>
             <div>
               <label
                 htmlFor="otp"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
-                One Time Password
+                Email of your account
               </label>
               <div className="mt-2">
                 <input
-                  id="otp"
-                  name="otp"
-                  type="string"
-                  placeholder="Enter your otp from email"
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Enter your account email"
                   className="px-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-300 sm:text-sm sm:leading-6 focus:outline-none"
                 />
               </div>
@@ -92,24 +70,14 @@ const verify = () => {
                 type="submit"
                 className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
-                Verify
+                Reset Password
               </button>
             </div>
           </form>
-
-          <p className="mt-10 text-center text-sm text-gray-500">
-            Didn't receive an OTP? &nbsp;
-            <a
-              className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500 hover:cursor-pointer"
-              onClick={resendOTP}
-            >
-              Resend OTP
-            </a>
-          </p>
         </div>
       </div>
     </div>
   );
 };
 
-export default verify;
+export default forgetpassword;
