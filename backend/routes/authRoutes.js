@@ -9,7 +9,7 @@ import {
 const router = express.Router();
 
 router.route("/register").post(registerUser);
-router.post('/login', login);
+router.post("/login", login);
 router.route("/verify/:email").post(verifyUser).get(requestOTP);
 
 export default router;
