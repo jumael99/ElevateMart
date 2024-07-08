@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import asyncHandler from "../middleware/asyncHandler.js";
 import User from "../models/userModel.js";
 import createOTP from "../utils/generateOTP.js";
-import sendOTPEmail from "../utils/emailSender.js";
+import { sendPasswordResetEmail, sendOTPEmail } from "../utils/emailSender.js";
 import { encrypt, decryptEmail } from "../utils/textCypher.js";
 import OTP from "../models/otpModel.js";
 
@@ -40,10 +40,9 @@ const login = async (req, res) => {
 // @route   POST /api/auth/register
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
-  console.log("Hello form registerUser");
   const { name, email, phone, address, password } = req.body;
 
-  // Feilds check
+  // Fields check
   if (!name || !email || !phone || !password) {
     res.status(400);
     throw new Error("Please fill in name, email, password and phone fields!");
@@ -81,7 +80,7 @@ const registerUser = asyncHandler(async (req, res) => {
   // Send the response
   res.status(201).json({
     status: "success",
-    message: "User created successfully. Please varify your email!",
+    message: "User created successfully. Please verify your email!",
     data: {
       url: verifyURL,
     },
@@ -94,7 +93,7 @@ const registerUser = asyncHandler(async (req, res) => {
 const verifyUser = asyncHandler(async (req, res) => {
   const { otp } = req.body;
 
-  // Feild Check
+  // Field Check
   if (!otp) {
     res.status(400);
     throw new Error("Please provide the OTP!");
@@ -112,7 +111,7 @@ const verifyUser = asyncHandler(async (req, res) => {
     throw new Error("Invalid Token. No user found with this token!");
   }
 
-  // Check user is varified
+  // Check user is verified
   if (user.isVerified) {
     res.status(400);
     throw new Error("User already verified");
@@ -143,7 +142,7 @@ const verifyUser = asyncHandler(async (req, res) => {
   await user.save();
 
   // Delete the OTP
-  OTP.deleteOne({ _id: otpRecord._id });
+  await OTP.findByIdAndDelete(otpRecord._id);
 
   res.status(201).json({
     status: "success",
@@ -168,7 +167,7 @@ const requestOTP = asyncHandler(async (req, res) => {
     throw new Error("Invalid Token. No user found with this token!");
   }
 
-  // Check user is varified
+  // Check user is verified
   if (user.isVerified) {
     res.status(400);
     throw new Error("User already verified");
@@ -200,4 +199,118 @@ const requestOTP = asyncHandler(async (req, res) => {
   });
 });
 
-export { registerUser, verifyUser, requestOTP, login };
+// @desc   Forget Password
+// @route  POST /api/auth/forget-password
+// @access Public
+const forgetPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  // Finding the user
+  const existingUser = await User.findOne({ email });
+  if (!existingUser) {
+    res.status(400);
+    throw new Error("User not found! Please register to continue.");
+  }
+
+  // Generate an OTP
+  const otp = await createOTP(email, "reset");
+
+  // Encrypt the email
+  const encryptedEmail = encrypt(email);
+  const hashedEmail = encryptedEmail.encryptedData + "-" + encryptedEmail.iv;
+
+  // Reset URL
+  const resetURL = `${process.env.FRONTEND_URL}/auth/reset-password/${hashedEmail}/${otp}`;
+
+  // Send the email
+  await sendPasswordResetEmail(existingUser, resetURL);
+
+  res.status(201).json({
+    status: "success",
+    message: "OTP sent successfully. Please check your email!",
+  });
+});
+
+// @desc   Reset Password request verification
+// @route  GET /api/auth/reset-password/:email/:otp
+// @access Public
+const verifyResetPasswordRequest = asyncHandler(async (req, res) => {
+  const { email, token } = req.params;
+
+  // Decrypt the email
+  const decryptedEmail = decryptEmail(email);
+
+  // Find the user
+  const existingUser = await User.findOne({ email: decryptedEmail });
+
+  const otpRecord = await OTP.findOne({
+    email: decryptedEmail,
+    active: true,
+  });
+
+  if (!existingUser || !otpRecord) {
+    res.status(400);
+    throw new Error("Invalid OTP. Please try again!");
+  }
+
+  const isMatch = otpRecord.isCorrect(token);
+
+  if (!isMatch) {
+    res.status(400);
+    throw new Error("Invalid OTP. Please try again!");
+  }
+
+  // Check for expiry
+  const isExpired = otpRecord.isExpired();
+
+  if (isExpired) {
+    res.status(400);
+    throw new Error("OTP has expired. Please request a new OTP!");
+  }
+
+  // Delete otp
+  await OTP.findByIdAndDelete(otpRecord._id);
+
+  res.status(201).json({
+    status: "success",
+    message: "OTP verified successfully. You can reset your password now!",
+  });
+});
+
+// @desc   Reset Password
+// @route  POST /api/auth/reset-password/:email/
+// @access Public
+const resetPassword = asyncHandler(async (req, res) => {
+  const { email } = req.params;
+  const { password } = req.body;
+
+  // Decrypt the email
+  const decryptedEmail = decryptEmail(email);
+
+  // Find the user
+  const existingUser = await User.findOne({ email: decryptedEmail });
+
+  if (!existingUser) {
+    res.status(400);
+    throw new Error("User not found! Please register to continue.");
+  }
+
+  // Update the password
+  existingUser.password = password;
+  await existingUser.save();
+
+  res.status(201).json({
+    status: "success",
+    message: "Password reset successfully. Please login to continue!",
+  });
+});
+
+export {
+  login,
+  verifyUser,
+  requestOTP,
+  registerUser,
+  forgetPassword,
+  resetPassword,
+  verifyResetPasswordRequest,
+};

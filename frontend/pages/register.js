@@ -40,7 +40,7 @@ const register = () => {
       const { url } = res.data.data;
       router.push(url);
     } catch (error) {
-      toast.error(error?.message);
+      toast.error(error?.response.data.message);
     } finally {
       setIsVerifying(false);
     }

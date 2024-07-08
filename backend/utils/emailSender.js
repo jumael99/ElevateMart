@@ -1,5 +1,8 @@
 import nodemailer from "nodemailer";
-import emailTemplate from "./emailTemplate.js";
+import {
+  otpEmailTemplate,
+  passwordResetEmailTemplate,
+} from "./emailTemplate.js";
 
 // Transporter configuration gmail
 const createTransporter = () => {
@@ -15,19 +18,6 @@ const createTransporter = () => {
   return transport;
 };
 
-// Transporter configuration mailtrap
-// const createTransporter = () => {
-//   const transport = nodemailer.createTransport({
-//     host: "sandbox.smtp.mailtrap.io",
-//     port: 2525,
-//     auth: {
-//       user: process.env.EMAIL_USERNAME,
-//       pass: process.env.EMAIL_PASSWORD,
-//     },
-//   });
-//   return transport;
-// };
-
 // Send the OTP email
 const sendOTPEmail = async (user, otp, verifyURL) => {
   const transporter = createTransporter();
@@ -36,10 +26,23 @@ const sendOTPEmail = async (user, otp, verifyURL) => {
     from: "Welcome <system@elevatemart.com>",
     to: user.email,
     subject: "OTP for email verification",
-    html: emailTemplate(user, otp, verifyURL),
+    html: otpEmailTemplate(user, otp, verifyURL),
   };
 
   await transporter.sendMail(mailOptions);
 };
 
-export default sendOTPEmail;
+const sendPasswordResetEmail = async (user, url) => {
+  const transporter = createTransporter();
+
+  const mailOptions = {
+    from: "Welcome <system@elevatemart.com>",
+    to: user.email,
+    subject: "Password Reset Email",
+    html: passwordResetEmailTemplate(url),
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
+export { sendOTPEmail, sendPasswordResetEmail };
