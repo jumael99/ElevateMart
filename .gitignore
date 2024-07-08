@@ -12,6 +12,10 @@ node_modules
 # production
 /build
 
+#.idea file ignored
+.idea/
+
+
 # misc
 .DS_Store
 .env
