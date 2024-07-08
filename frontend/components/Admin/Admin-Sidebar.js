@@ -8,13 +8,13 @@ const Sidebar = () => {
     };
 
     const navItems = [
-        { to: '/user-dashboard/home', icon: HomeIcon, label: 'Home' },
+        { to: '/admin/dashboard', icon: HomeIcon, label: 'Home' },
         { to: '/user-dashboard/store', icon: StoreIcon, label: 'Product' },
+        { to: '/admin/Add-Product', icon: StoreIcon, label: 'Add-Product' },
+        { to: '/admin/Add-Catagories', icon: StoreIcon, label: 'Add-Catagories' },
         { to: '/user-dashboard/orders', icon: OrdersIcon, label: 'Orders' },
-        { to: '/user-dashboard/reseller-referrals', icon: ReferralsIcon, label: 'Referrals' },
-        { to: '/user-dashboard/balance', icon: BalanceIcon, label: 'Balance' },
-        { to: '/user-dashboard/boost-request', icon: BoostIcon, label: 'Boost Request' },
-        { to: '/user-dashboard/settings', icon: SettingsIcon, label: 'Settings' },
+         { to: '/user-dashboard/balance', icon: BalanceIcon, label: 'Balance' },
+         { to: '/user-dashboard/settings', icon: SettingsIcon, label: 'Settings' },
     ];
 
     return (

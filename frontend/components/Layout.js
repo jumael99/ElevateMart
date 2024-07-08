@@ -4,7 +4,7 @@ import Header from './Header';
 import Footer from './Footer';
 import AdminNavbar from './Admin/Admin-Nabvar';
 import AdminFooter from './Admin/Admin-Footer';
-import MyCarousel from './Carousel';  
+import MyCarousel from './Admin/Carousel';  
 import { useRouter } from 'next/router';
 
 const Layout = ({ children }) => {
