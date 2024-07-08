@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
+
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -7,7 +8,7 @@ const Header = () => {
     <header>
       <nav className="bg-lightBlue-500 w-full shadow-md">
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-          <a href="/" clLinkssName="flex items-center space-x-3 rtl:space-x-reverse">
+          <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
             <span className="self-center text-2xl font-semibold whitespace-nowrap text-black">ElevateMart</span>
           </a>
           <div className="flex md:order-2 items-center">
@@ -41,66 +42,40 @@ const Header = () => {
             />
             <div className="flex gap-2 ml-4">
               <button className="py-2 px-4 text-white bg-blue-500 rounded hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-300">
-                Login
+                 <Link href="/login" className="block py-2 px-3 text-white rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">Login</Link>
               </button>
               <button className="py-2 px-4 text-white bg-blue-500 rounded hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-300">
-                Sign Up
+                 <Link href="/register" className="block py-2 px-3 text-white rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">Sign Up</Link>
               </button>
             </div>
           </div>
-          <div className={`items-center justify-between w-full md:flex md:w-auto md:order-1 ${isMenuOpen ? 'block' : 'hidden'}`}>
+          <div className={`w-full md:flex md:w-auto md:order-1 ${isMenuOpen ? 'block' : 'hidden'}`}>
             <ul className="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-lightBlue-500 md:flex-row md:space-x-8 md:mt-0 md:border-0">
               <li className="group relative">
-                <button className="flex items-center py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">
+                <Link href="/" className="flex items-center py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">
                   Home
                   <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                   </svg>
-                </button>
-                <div className="absolute hidden text-gray-700 pt-1 group-hover:block">
-                  <a className="block px-4 py-2 text-sm hover:bg-gray-400" href="/login">Subitem 1</a>
-                  <a className="block px-4 py-2 text-sm hover:bg-gray-400" href="/">Subitem 2</a>
-                </div>
+                </Link>
               </li>
               <li className="group relative">
-                <button className="flex items-center py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">
+                <Link href="/products" className="flex items-center py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">
                   Products
                   <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                   </svg>
-                </button>
-                <div className="absolute hidden text-gray-700 pt-1 group-hover:block">
-                  <a className="block px-4 py-2 text-sm hover:bg-gray-400" href="/">Subitem 1</a>
-                  <a className="block px-4 py-2 text-sm hover:bg-gray-400" href="/">Subitem 2</a>
-                </div>
+                </Link>
               </li>
               <li className="group relative">
-                <button className="flex items-center py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">
+                <Link href="/services" className="flex items-center py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">
                   Services
                   <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                   </svg>
-                </button>
-                <div className="absolute hidden text-gray-700 pt-1 group-hover:block">
-                  <a className="block px-4 py-2 text-sm hover:bg-gray-400" href="/">Subitem 1</a>
-                  <a className="block px-4 py-2 text-sm hover:bg-gray-400" href="/">Subitem 2</a>
-                </div>
-                </li>
-              <li>
-                <Link href="/" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">Home</Link>
+                </Link>
               </li>
-              <li>
-                <Link href="/" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">Products</Link>
-              </li>
-              <li>
-                <Link href="/" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">Services</Link>
-              </li>
-              <li>
-                <Link href="/login" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">Login</Link>
-              </li>
-              <li>
-                <Link href="/register" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">Register</Link>
-              </li>
+             
               <li className="ml-6">
                 <div className="relative py-2">
                   <div className="absolute top-0 left-3">
