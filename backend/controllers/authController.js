@@ -1,9 +1,40 @@
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import asyncHandler from "../middleware/asyncHandler.js";
 import User from "../models/userModel.js";
 import createOTP from "../utils/generateOTP.js";
 import sendOTPEmail from "../utils/emailSender.js";
 import { encrypt, decryptEmail } from "../utils/textCypher.js";
 import OTP from "../models/otpModel.js";
+
+const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email }).select("+password");
+    if (!user) {
+      return res
+        .status(400)
+        .json({ message: "Username or Password didn't match!" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res
+        .status(400)
+        .json({ message: "Username or Password didn't match!" });
+    }
+
+    const payload = { userId: user.id };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    res.json({ token });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 // @desc    Register a new user
 // @route   POST /api/auth/register
@@ -169,4 +200,4 @@ const requestOTP = asyncHandler(async (req, res) => {
   });
 });
 
-export { registerUser, verifyUser, requestOTP };
+export { registerUser, verifyUser, requestOTP, login };

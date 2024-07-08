@@ -11,6 +11,7 @@ import cors from 'cors'
 const app = express();
 
 const port = process.env.PORT || 5001;
+const __dirname = path.resolve();
 
 connectDB();
 
@@ -40,9 +41,11 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
+// Error handling middleware
 app.use(notFound);
 app.use(errorHandler);
 
-app.listen(port, () =>
-  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${port}`)
-);
+// Start server
+app.listen(port, () => {
+  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${port}`);
+});
