@@ -7,6 +7,9 @@ import { sendPasswordResetEmail, sendOTPEmail } from "../utils/emailSender.js";
 import { encrypt, decryptEmail } from "../utils/textCypher.js";
 import OTP from "../models/otpModel.js";
 
+// @desc    Login user
+// @route   POST /api/auth/login
+// @access  Public
 const login = async (req, res) => {
   const { email, password } = req.body;
 

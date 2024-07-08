@@ -3,11 +3,13 @@ import generateToken from '../utils/generateToken.js';
 import User from '../models/userModel.js';
 
 // @desc    Get user profile
-// @route   GET /api/profile
-// @access  Public
+// @route   GET /api/users
+// @access  Protected
 const getProfile = asyncHandler(async (req, res) => {
-  // Assuming req.user contains the logged-in user's data
-  const profile = await User.findOne({ email: "alice.smith@example.com" });
+
+  const { email } = req.body;
+
+  const profile = await User.findOne({ email});
   if (!profile) {
     return res.status(404).json({ message: 'Profile not found x' });
   }
@@ -16,16 +18,14 @@ const getProfile = asyncHandler(async (req, res) => {
 
 
 // @desc    Edit user profile
-// @route   PUT /api/profile
-// @access  Public
+// @route   PUT /api/users
+// @access  Protected
 const updateProfile = asyncHandler(async (req, res) => {
-  const updatedData = req.body;
+  const { email, phone, address, name} = req.body;
 
-  // Find the Profile by the logged-in user's email and update it
-  // Assuming req.user contains the logged-in user's data
   const profile = await User.findOneAndUpdate(
-      { email: "alice.smith@example.com" },
-      updatedData,
+      { email },
+      { phone, address, name},
       { new: true, runValidators: true }
   );
 

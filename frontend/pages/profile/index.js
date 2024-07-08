@@ -31,7 +31,7 @@ const Profile = () => {
 
     const fetchUserData = async () => {
         try {
-            const response = await axios.get('http://localhost:5001/api/profile');
+            const response = await axios.get('http://localhost:5001/api/users');
             setFormData(response.data);
             setDisplayData(response.data);
         } catch (error) {
@@ -42,7 +42,7 @@ const Profile = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.put('http://localhost:5001/api/profile', formData);
+            const response = await axios.put('http://localhost:5001/api/users', formData);
             if (response.status === 200) {
                 setIsEditing(false);
                 setDisplayData(formData); // Update display data after successful submission

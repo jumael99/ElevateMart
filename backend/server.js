@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 dotenv.config();
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import { corsOptions } from './middleware/corsOptions.js'
 import cors from 'cors'
@@ -22,8 +23,7 @@ app.use(cors(corsOptions));
 
 
 app.use('/api/users', userRoutes);
-
-app.use('/api/profile', userRoutes);
+app.use('/api/auth', authRoutes);
 
 if (process.env.NODE_ENV === 'production') {
   const __dirname = path.resolve();
