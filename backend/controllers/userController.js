@@ -37,7 +37,6 @@ const updateProfile = asyncHandler(async (req, res) => {
 });
 
 export {
-  registerUser,
   getProfile,
   updateProfile
 };
