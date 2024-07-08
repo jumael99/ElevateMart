@@ -6,12 +6,13 @@ import {
   forgetPassword,
   verifyResetPasswordRequest,
   resetPassword,
+  login,
 } from "../controllers/authController.js";
 
 const router = express.Router();
 
 router.route("/register").post(registerUser);
-
+router.post("/login", login);
 router.route("/verify/:email").post(verifyUser).get(requestOTP);
 
 router.route("/forget-password").post(forgetPassword);

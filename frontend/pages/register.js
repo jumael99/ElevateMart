@@ -1,10 +1,10 @@
-import React, { useState } from "react";
 import Axios from "axios";
+import { useRouter } from "next/dist/client/router";
+import { useState } from "react";
 import { FaEye } from "react-icons/fa";
 import { IoEyeOffSharp } from "react-icons/io5";
 import { toast } from "react-toastify";
 import { validate } from "../utils/auth.js";
-import { useRouter } from "next/dist/client/router";
 
 const register = () => {
   const router = useRouter();
@@ -231,7 +231,7 @@ const register = () => {
           <p className="mt-10 text-center text-sm text-gray-500">
             Already have an account? &nbsp;
             <a
-              href="#"
+              href="/login"
               className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
             >
               Sign in
