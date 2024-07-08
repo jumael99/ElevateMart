@@ -7,6 +7,7 @@ import AdminFooter from './Admin/Admin-Footer';
 import MyCarousel from './Carousel'; // Import the carousel component
 import { useRouter } from 'next/router';
 
+
 const Layout = ({ children }) => {
   const router = useRouter();
   const isAdminPage = router.pathname.startsWith('/admin');

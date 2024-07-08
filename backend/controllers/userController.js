@@ -2,40 +2,41 @@ import asyncHandler from '../middleware/asyncHandler.js';
 import generateToken from '../utils/generateToken.js';
 import User from '../models/userModel.js';
 
-// @desc    Register a new user
-// @route   POST /api/users
-// @access  Public
-const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
+// @desc    Get user profile
+// @route   GET /api/users
+// @access  Protected
+const getProfile = asyncHandler(async (req, res) => {
 
-  const userExists = await User.findOne({ email });
+  const { email } = req.body;
 
-  if (userExists) {
-    res.status(400);
-    throw new Error('User already exists');
+  const profile = await User.findOne({ email});
+  if (!profile) {
+    return res.status(404).json({ message: 'Profile not found x' });
+  }
+  res.json(profile);
+});
+
+
+// @desc    Edit user profile
+// @route   PUT /api/users
+// @access  Protected
+const updateProfile = asyncHandler(async (req, res) => {
+  const { email, phone, address, name} = req.body;
+
+  const profile = await User.findOneAndUpdate(
+      { email },
+      { phone, address, name},
+      { new: true, runValidators: true }
+  );
+
+  if (!profile) {
+    return res.status(404).json({ message: 'Profile not found' });
   }
 
-  const user = await User.create({
-    name,
-    email,
-    password,
-  });
-
-  if (user) {
-    generateToken(res, user._id);
-
-    res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      isAdmin: user.isAdmin,
-    });
-  } else {
-    res.status(400);
-    throw new Error('Invalid user data');
-  }
+  res.json(profile);
 });
 
 export {
-  registerUser,
+  getProfile,
+  updateProfile
 };

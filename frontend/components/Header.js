@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import Link from 'next/link';
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -7,7 +7,7 @@ const Header = () => {
     <header>
       <nav className="bg-lightBlue-500 w-full shadow-md">
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-          <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
+          <a href="/" clLinkssName="flex items-center space-x-3 rtl:space-x-reverse">
             <span className="self-center text-2xl font-semibold whitespace-nowrap text-black">ElevateMart</span>
           </a>
           <div className="flex md:order-2 items-center">
@@ -85,6 +85,21 @@ const Header = () => {
                   <a className="block px-4 py-2 text-sm hover:bg-gray-400" href="/">Subitem 1</a>
                   <a className="block px-4 py-2 text-sm hover:bg-gray-400" href="/">Subitem 2</a>
                 </div>
+                </li>
+              <li>
+                <Link href="/" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">Home</Link>
+              </li>
+              <li>
+                <Link href="/" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">Products</Link>
+              </li>
+              <li>
+                <Link href="/" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">Services</Link>
+              </li>
+              <li>
+                <Link href="/login" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">Login</Link>
+              </li>
+              <li>
+                <Link href="/register" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">Register</Link>
               </li>
               <li className="ml-6">
                 <div className="relative py-2">
