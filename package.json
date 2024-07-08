@@ -30,6 +30,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.4.3",
     "nodemailer": "^6.9.14",
+    "react-icons": "^5.2.1",
     "react-toastify": "^10.0.5"
   },
   "devDependencies": {
