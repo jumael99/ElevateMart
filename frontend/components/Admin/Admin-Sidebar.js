@@ -9,9 +9,9 @@ const Sidebar = () => {
 
     const navItems = [
         { to: '/user-dashboard/home', icon: HomeIcon, label: 'Home' },
-        { to: '/user-dashboard/store', icon: StoreIcon, label: 'Store' },
+        { to: '/user-dashboard/store', icon: StoreIcon, label: 'Product' },
         { to: '/user-dashboard/orders', icon: OrdersIcon, label: 'Orders' },
-        { to: '/user-dashboard/reseller-referrals', icon: ReferralsIcon, label: 'Reseller Referrals' },
+        { to: '/user-dashboard/reseller-referrals', icon: ReferralsIcon, label: 'Referrals' },
         { to: '/user-dashboard/balance', icon: BalanceIcon, label: 'Balance' },
         { to: '/user-dashboard/boost-request', icon: BoostIcon, label: 'Boost Request' },
         { to: '/user-dashboard/settings', icon: SettingsIcon, label: 'Settings' },
@@ -19,17 +19,13 @@ const Sidebar = () => {
 
     return (
         <aside className='bg-[#f8fafc] col-span-2 h-screen sticky left-0 top-0 overflow-auto p-4 lg:p-5'>
-            {/* Hamburger Menu Button for Mobile View */}
-            <div className="lg:hidden flex justify-center mb-4">
+             <div className="lg:hidden flex justify-center mb-4">
                 <button onClick={toggleSidebar} className="text-gray-600 focus:outline-none">
                     {isOpen ? <CloseIcon className="text-2xl" /> : <MenuIcon className="text-2xl" />}
                 </button>
             </div>
             <div className={`lg:block ${isOpen ? 'block' : 'hidden'}`}>
-                {/* company name ------------ */}
-                <div className='mb-10 hidden md:block'>
-                    <a href='/' className='text-2xl font-semibold text-gray-800'>Elevate Mart</a>
-                </div>
+                 
                 <nav className="flex flex-col gap-2">
                     {navItems.map(({ to, icon: Icon, label }) => (
                         <a

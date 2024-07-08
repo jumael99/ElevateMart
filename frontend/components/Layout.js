@@ -1,6 +1,8 @@
 // components/Layout.js
 import Header from "./Header";
 import Footer from "./Footer";
+import AdminNavbar from "./Admin/Admin-Nabvar";
+import AdminFooter from "./Admin/Admin-Footer";
 import { useRouter } from 'next/router';
 
 const Layout = ({ children }) => {
@@ -10,7 +12,9 @@ const Layout = ({ children }) => {
   if (isAdminPage) {
     return (
       <div className="flex flex-col min-h-screen">
+        <AdminNavbar />
         <main className="flex-grow">{children}</main>
+        <AdminFooter />
       </div>
     );
   }
