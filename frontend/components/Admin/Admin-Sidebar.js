@@ -12,6 +12,7 @@ const Sidebar = () => {
         { to: '/user-dashboard/store', icon: StoreIcon, label: 'Product' },
         { to: '/admin/Add-Product', icon: StoreIcon, label: 'Add-Product' },
         { to: '/admin/Add-Catagories', icon: StoreIcon, label: 'Add-Catagories' },
+        { to: '/admin/Sub-Catagories', icon: StoreIcon, label: 'Sub-Catagories' },
         { to: '/user-dashboard/orders', icon: OrdersIcon, label: 'Orders' },
          { to: '/user-dashboard/balance', icon: BalanceIcon, label: 'Balance' },
          { to: '/user-dashboard/settings', icon: SettingsIcon, label: 'Settings' },

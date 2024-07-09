@@ -52,8 +52,7 @@ const Dashboard = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validate()) {
-      // Handle form submission
-      console.log('Form submitted', formData);
+       console.log('Form submitted', formData);
     }
   };
 
