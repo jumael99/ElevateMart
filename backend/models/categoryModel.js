@@ -1,14 +1,39 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
-const categorySchema = new mongoose.Schema({
+const categorySchema = new mongoose.Schema(
+  {
     name: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
+      unique: true,
+    },
+    slug: {
+      type: String,
+      unique: true,
     },
     description: {
-        type: String,
+      type: String,
     },
-    ref: 'subCategory'
-}, { timestamps: true });
+    subCategories: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "SubCategory",
+      },
+    ],
+  },
+  { timestamps: true }
+);
 
-module.exports = mongoose.model('Category', categorySchema);
+categorySchema.pre("save", function (next) {
+  this.slug = this.name.toLowerCase().split(" ").join("-");
+  next();
+});
+
+categorySchema.pre("updateOne", function (next) {
+  this._update.slug = this._update.name.toLowerCase().split(" ").join("-");
+  next();
+});
+
+const Category = mongoose.model("Category", categorySchema);
+
+export default Category;
