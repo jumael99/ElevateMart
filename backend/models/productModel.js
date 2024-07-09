@@ -8,6 +8,7 @@ const productSchema = new mongoose.Schema(
     },
     slug: {
       type: String,
+      unique: true,
     },
     price: {
       type: Number,
@@ -50,6 +51,19 @@ const productSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    quantity: {
+      type: Number,
+      required: true,
+      select: false,
+      validate: [
+        {
+          validator: function (value) {
+            return value >= 0;
+          },
+          message: "Quantity cannot be negative",
+        },
+      ],
+    },
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
@@ -62,29 +76,35 @@ const productSchema = new mongoose.Schema(
     ],
   },
   {
+    toObject: { virtuals: true },
+    toJSON: { virtuals: true },
     timestamps: true,
   }
 );
 
-// Slug creation
 productSchema.pre("save", function (next) {
-  this.slug = this.name.toLowerCase().split(" ").join("-");
+  this.slug = this.name.toLowerCase().match(/\w+/g).join("-");
   next();
 });
 
-// Slug update
 productSchema.pre("updateOne", function (next) {
-  this._update.slug = this._update.name.toLowerCase().split(" ").join("-");
+  if (this._update.name) {
+    this._update.slug = this._update.name.toLowerCase().match(/\w+/g).join("-");
+  }
   next();
 });
-
-productSchema.methods.calculateDiscountedPrice = function () {
-  return this.price - this.discount;
-};
 
 productSchema.methods.isDiscountValid = function () {
   return this.discountValidTime > Date.now();
 };
+
+productSchema.virtual("updatedPrice").get(function () {
+  if (this.isDiscountValid()) {
+    return this.price - this.discount;
+  }
+
+  return this.price;
+});
 
 const Product = mongoose.model("Product", productSchema);
 
