@@ -28,7 +28,6 @@ const userSchema = mongoose.Schema(
     },
     passwordUpdated: {
       type: Date,
-      default: Date.now,
     },
     address: {
       type: String,
