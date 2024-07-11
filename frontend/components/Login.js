@@ -27,10 +27,10 @@ export default function Login() {
         email,
         password,
       });
-      localStorage.setItem("token", res.data.token);
+      // localStorage.setItem("token", res.data.token);
 
       // Set cookie
-      document.cookie = `token=${res.data.token}; path=/`;
+      // document.cookie = `token=${res.data.token}; path=/`;
       router.push("/");
     } catch (error) {
       toast.error("Invalid username or password!");
