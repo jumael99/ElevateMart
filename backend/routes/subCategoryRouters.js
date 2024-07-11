@@ -1,10 +1,20 @@
-import router from "express";
-import protect from "../middleware/protectMiddleware.js";
-import { createNewSubCategory, getSubCategory } from "../controllers/subCategoryController.js"
-const subCategoryRouter = router.Router();
+import express from 'express';
+import protect from '../middleware/protectMiddleware.js'
+import {
+  getSubCategory,
+  createNewSubCategory,
+  updateSubCategory,
+  deleteSubCategory,
+} from '../controllers/subCategoryController.js';
 
+const router = express.Router();
 
-subCategoryRouter.route("/").get(getSubCategory);
-subCategoryRouter.route("/").post(createNewSubCategory);
+router.route('/')
+  .get(getSubCategory)
+  .post(protect("admin"), createNewSubCategory);
 
-export default subCategoryRouter;
+router.route('/:id')
+  .patch(protect("admin"), updateSubCategory)
+  .delete(protect("admin"), deleteSubCategory);
+
+export default router;
