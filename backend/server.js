@@ -12,6 +12,7 @@ import authMiddleware from "./middleware/authMiddleware.js";
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import { corsOptions } from "./middleware/corsOptions.js";
 import cors from "cors";
+import categoryRoutes from "./routes/categoryRoutes.js";
 const app = express();
 
 const port = process.env.PORT || 5001;
@@ -30,6 +31,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/subCategory", subCategoryRouter)
+app.use("/api/categories", categoryRoutes);
 
 if (process.env.NODE_ENV === "production") {
   const __dirname = path.resolve();

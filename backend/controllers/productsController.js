@@ -61,10 +61,58 @@ const createProduct = asyncHandler(async (req, res) => {
 // @access  Private/Admin
 const updateProduct = asyncHandler(async (req, res) => {
   const product = await productModel.findOne({ slug: req.params.slug });
-  const updatedFields = req.body;
-  const updatedProductDetails = Object.keys(updatedFields);
 
-  console.log(updatedProductDetails);
+  if (!product) {
+    res.status(404);
+    throw new Error("Product not found");
+  }
+
+  const allowedUpdates = [
+    "name",
+    "description",
+    "price",
+    "category",
+    "subCategory",
+    "quantity",
+    "images",
+    "discount",
+    "discountValidTime",
+  ];
+
+  const updatedProduct = allowedUpdates.reduce((acc, update) => {
+    if (req.body[update]) {
+      acc[update] = req.body[update];
+    }
+    return acc;
+  }, {});
+
+  if (!Object.keys(updatedProduct).length) {
+    res.status(400);
+    throw new Error("No updates provided");
+  }
+
+  if (updatedProduct.discount || updatedProduct.price) {
+    const price = updatedProduct.price || product.price;
+    const discount = updatedProduct.discount || product.discount;
+    if (discount > price) {
+      res.status(400);
+      throw new Error("Discount cannot be greater than price");
+    }
+  }
+
+  await productModel.findByIdAndUpdate(product._id, updatedProduct);
+
+  res.status(200).json({
+    status: "success",
+    message: "Product updated successfully",
+  });
+});
+
+// @desc    Delete a product
+// @route   DELETE /api/products/:slug
+// @access  Private/Admin
+const deleteProduct = asyncHandler(async (req, res) => {
+  const product = await productModel.findOne({ slug: req.params.slug });
 
   if (!product) {
     return res
@@ -72,9 +120,18 @@ const updateProduct = asyncHandler(async (req, res) => {
       .json({ status: "error", message: "Product not found" });
   }
 
+  await productModel.findByIdAndDelete(product._id);
+
   res.status(200).json({
     status: "success",
-    message: "Product updated successfully",
+    message: "Product deleted successfully",
   });
 });
-export { getProducts, getProductBySlug, createProduct, updateProduct };
+
+export {
+  getProducts,
+  getProductBySlug,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+};
