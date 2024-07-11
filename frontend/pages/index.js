@@ -1,4 +1,4 @@
-
+import PromotionCard from "@/components/PromotionCard";
 
 // const Home = () => {
 //     return (
@@ -6,14 +6,12 @@
 //     )
 // }
 
-import PromotionCard from "@/components/PromotionCard";
-
-// export default Home
-
-const LandingPage = () => {
+ const LandingPage = () => {
     return (
       <PromotionCard />
     )
-  }
-  
-  export default LandingPage;
+}
+
+ const Home = LandingPage;
+
+export default Home;

@@ -42,10 +42,10 @@ const Header = () => {
             />
             <div className="flex gap-2 ml-4">
               <button className="py-2 px-4 text-white bg-blue-500 rounded hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-300">
-                 <Link href="/login" className="block py-2 px-3 text-white rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">Login</Link>
+                <Link href="/login" className="block text-white">Login</Link>
               </button>
               <button className="py-2 px-4 text-white bg-blue-500 rounded hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-300">
-                 <Link href="/register" className="block py-2 px-3 text-white rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">Sign Up</Link>
+                <Link href="/register" className="block text-white">Sign Up</Link>
               </button>
             </div>
           </div>
@@ -75,7 +75,6 @@ const Header = () => {
                   </svg>
                 </Link>
               </li>
-             
               <li className="ml-6">
                 <div className="relative py-2">
                   <div className="absolute top-0 left-3">
