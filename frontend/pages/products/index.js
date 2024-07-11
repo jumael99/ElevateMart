@@ -39,14 +39,14 @@ const Products = () => {
                 <button
                     onClick={prevPage}
                     disabled={currentPage === 1}
-                    className="px-4 py-2 rounded-full bg-gradient-to-r from-blue-600 to-blue-800 text-white font-semibold shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                    className="px-4 py-2 rounded-full bg-slate-700 text-white font-semibold shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                 >
                     <span className="mr-1"></span> Previous
                 </button>
 
                 <div className="flex items-center bg-white rounded-full shadow-md px-4 py-2">
-                    <span className="text-blue-800 font-bold mr-2">Page</span>
-                    <span className="bg-blue-100 text-blue-800 font-bold rounded-full px-3 py-1">
+                    <span className="text-slate-700 font-bold mr-2">Page</span>
+                    <span className="bg-blue-100 bg-slate-700 font-bold rounded-full px-3 py-1">
                         {currentPage}
                     </span>
                     <span className="text-gray-600 mx-2">of</span>
@@ -58,7 +58,7 @@ const Products = () => {
                 <button
                     onClick={nextPage}
                     disabled={currentPage === totalPages}
-                    className="px-4 py-2 rounded-full bg-gradient-to-r from-blue-600 to-blue-800 text-white font-semibold shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                    className="px-4 py-2 rounded-full bg-slate-700 text-white font-semibold shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                 >
                     Next <span className="ml-1"></span>
                 </button>
