@@ -13,33 +13,6 @@ const getSubCategory = asyncHandler(async (req,res)=>{
 // @desc    Create New SubCategories
 // @route   POST /api/subCategory
 // @access  Admin
-
-
-// const createNewSubCategory = async (req,res)=>{
-
-//     const newSubCategory = new subCategoryModel(req.body);
-//      await newSubCategory.save()
-//         .then(result=>{
-//             return result._id;
-//         })
-//         .then(subCategoryId =>{
-//             return CategoryModel.updateOne({
-//                 _id : req.body.categoryId,
-//             },{
-//                 $push:{
-//                     subCategories:subCategoryId,
-//                 }
-//             })
-//         })
-//         .then(result=>{
-//             res.status(200).send("SubCategory Has been Added");
-//         })
-//         .catch(err=>{
-//             res.status(500).send(err.message);
-//         })
-
-// }
-
 const createNewSubCategory = asyncHandler(async (req, res) => {
     try {
         const { categoryId, ...subCategoryData } = req.body;
