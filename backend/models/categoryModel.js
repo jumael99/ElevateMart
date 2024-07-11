@@ -29,11 +29,6 @@ categorySchema.pre("save", function (next) {
   next();
 });
 
-categorySchema.pre("updateOne", function (next) {
-  this._update.slug = this._update.name.toLowerCase().split(" ").join("-");
-  next();
-});
-
 const Category = mongoose.model("Category", categorySchema);
 
 export default Category;
