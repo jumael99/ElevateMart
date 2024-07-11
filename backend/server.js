@@ -7,6 +7,7 @@ import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
+import subCategoryRouter from "./routes/subCategoryRouters.js"
 import authMiddleware from "./middleware/authMiddleware.js";
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import { corsOptions } from "./middleware/corsOptions.js";
@@ -28,6 +29,7 @@ app.use(authMiddleware);
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/subCategory", subCategoryRouter)
 
 if (process.env.NODE_ENV === "production") {
   const __dirname = path.resolve();
