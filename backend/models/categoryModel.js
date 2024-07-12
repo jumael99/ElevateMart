@@ -27,7 +27,7 @@ const categorySchema = new mongoose.Schema(
 categorySchema.pre("save", function (next) {
   this.slug = this.name.toLowerCase().split(" ").join("-");
   next();
-});
+})
 
 const Category = mongoose.model("Category", categorySchema);
 

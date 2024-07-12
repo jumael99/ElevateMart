@@ -7,18 +7,20 @@ const authMiddleware = asyncHandler(async (req, res, next) => {
   if (!token) {
     return next();
   }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const existingUser = await User.findById(decoded.userId);
 
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-  const existingUser = await User.findById(decoded.userId);
-
-  const passwordUpdated = existingUser.hasUpdatedPassword(decoded.iat);
-
-  if (passwordUpdated) {
-    return next();
+    if (existingUser) {
+      const passwordUpdated = existingUser.hasUpdatedPassword(decoded.iat);
+      if (!passwordUpdated) {
+        req.user = existingUser;
+      }
+    }
+  } catch (error) {
+    // Log the error or handle it as needed
+    console.error("Token verification failed:", error.message);
   }
-
-  req.user = existingUser;
 
   next();
 });
