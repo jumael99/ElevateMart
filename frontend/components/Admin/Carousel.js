@@ -5,7 +5,7 @@ import 'react-responsive-carousel/lib/styles/carousel.min.css';
 const MyCarousel = () => {
   const carouselItems = [
     {
-      imageUrl: 'https://via.placeholder.com/600x400?text=Slide+1',
+      imageUrl: '/images/70432.jpg',   
     },
     {
       imageUrl: 'https://via.placeholder.com/600x400?text=Slide+2',
