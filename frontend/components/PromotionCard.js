@@ -1,16 +1,13 @@
-import { React, useState } from "react";
+import { React } from "react";
 import Image from "next/image";
 
-const PromotionCard = () => {
-  const [offerImg, setOfferImg] = useState("/images/defaultOfferImg.jpg");
-  const [offerText, setofferText] = useState("Unlock 15% off your first order");
-
+const PromotionCard = ({ offer }) => {
   return (
     <div className="flex items-center justify-center p-4">
       <div className="flex flex-wrap md:flex-nowrap w-11/12 sm:w-4/5 lg:w-3/5 xl:w-2/3 bg-white rounded-lg overflow-hidden shadow-md lg-h-1/2">
         <div className="w-full md:w-1/2">
           <Image
-            src={offerImg}
+            // src={offerImg}
             alt="offer"
             width={300}
             height={300}
@@ -21,7 +18,7 @@ const PromotionCard = () => {
         </div>
         <div className="bg-yellow-500  md:w-1/2 py-4 px-10 flex flex-col justify-center items-center   md:rounded-tr-lg md:rounded-br-lg">
           <h2 className="text-lg md:text-2xl font-bold text-gray-900 pb-2 text-center md:text-left lg:text-center">
-            {offerText}
+            {/* {offerText} */}
           </h2>
           <p className="text-gray-800 pb-4 text-center md:text-left">
             Sign up for special offers and updates
