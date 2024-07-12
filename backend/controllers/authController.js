@@ -1,43 +1,46 @@
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import asyncHandler from "../middleware/asyncHandler.js";
 import User from "../models/userModel.js";
 import createOTP from "../utils/generateOTP.js";
 import { sendPasswordResetEmail, sendOTPEmail } from "../utils/emailSender.js";
-import { encrypt, decryptEmail } from "../utils/textCypher.js";
+import { encrypt, decryptEmail } from "../utils/textCipher.js";
 import OTP from "../models/otpModel.js";
+import generateToken from "../utils/generateToken.js";
 
 // @desc    Login user
 // @route   POST /api/auth/login
 // @access  Public
-const login = async (req, res) => {
+const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  try {
-    const user = await User.findOne({ email }).select("+password");
-    if (!user) {
-      return res
-        .status(400)
-        .json({ message: "Username or Password didn't match!" });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res
-        .status(400)
-        .json({ message: "Username or Password didn't match!" });
-    }
-
-    const payload = { userId: user.id };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
-
-    res.json({ token });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  if (!email || !password) {
+    res.status(400);
+    throw new Error("Please provide email and password!");
   }
-};
+
+  const existingUser = await User.findOne({
+    email,
+  }).select("+password");
+
+  const isValid = await existingUser.matchPassword(password);
+
+  if (!isValid) {
+    res.status(401);
+    throw new Error("Invalid email or password!");
+  }
+
+  if (!existingUser.isVerified) {
+    res.status(401);
+    throw new Error("Please verify your email to login!");
+  }
+
+  const token = generateToken(res, existingUser._id, existingUser.isAdmin);
+
+  res.status(200).json({
+    status: "success",
+    message: "Login successful",
+    token,
+  });
+});
 
 // @desc    Register a new user
 // @route   POST /api/auth/register
@@ -45,23 +48,19 @@ const login = async (req, res) => {
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, phone, address, password } = req.body;
 
-  // Fields check
   if (!name || !email || !phone || !password) {
     res.status(400);
     throw new Error("Please fill in name, email, password and phone fields!");
   }
 
-  // User Check
   const prevUser = await User.findOne({ email });
   if (prevUser) {
     res.status(400);
     throw new Error("User already exists! Please login to continue.");
   }
 
-  // Generate an OTP
   const otp = await createOTP(email, "verify");
 
-  // Create a new user
   const user = await User.create({
     name,
     email,
@@ -70,17 +69,13 @@ const registerUser = asyncHandler(async (req, res) => {
     password,
   });
 
-  // Encrypt the email
   const encryptedEmail = encrypt(email);
   const hashedEmail = encryptedEmail.encryptedData + "-" + encryptedEmail.iv;
 
-  // Create the verification URL
   const verifyURL = `${process.env.FRONTEND_URL}/auth/verify/${hashedEmail}`;
 
-  // Send the OTP
   await sendOTPEmail(user, otp, verifyURL);
 
-  // Send the response
   res.status(201).json({
     status: "success",
     message: "User created successfully. Please verify your email!",
@@ -96,7 +91,6 @@ const registerUser = asyncHandler(async (req, res) => {
 const verifyUser = asyncHandler(async (req, res) => {
   const { otp } = req.body;
 
-  // Field Check
   if (!otp) {
     res.status(400);
     throw new Error("Please provide the OTP!");
@@ -104,7 +98,6 @@ const verifyUser = asyncHandler(async (req, res) => {
 
   const email = decryptEmail(req.params.email);
 
-  // Get User
   const user = await User.findOne({
     email,
   });
@@ -114,13 +107,11 @@ const verifyUser = asyncHandler(async (req, res) => {
     throw new Error("Invalid Token. No user found with this token!");
   }
 
-  // Check user is verified
   if (user.isVerified) {
     res.status(400);
     throw new Error("User already verified");
   }
 
-  // Find the OTP
   const otpRecord = await OTP.findOne({
     email,
     active: true,
@@ -133,18 +124,15 @@ const verifyUser = asyncHandler(async (req, res) => {
     throw new Error("Invalid OTP. Please try again!");
   }
 
-  // Check for expiry
   const isExpired = otpRecord.isExpired();
   if (isExpired) {
     res.status(400);
     throw new Error("OTP has expired. Please request a new OTP!");
   }
 
-  // Update user
   user.isVerified = true;
   await user.save();
 
-  // Delete the OTP
   await OTP.findByIdAndDelete(otpRecord._id);
 
   res.status(201).json({
@@ -160,7 +148,6 @@ const verifyUser = asyncHandler(async (req, res) => {
 const requestOTP = asyncHandler(async (req, res) => {
   const email = decryptEmail(req.params.email);
 
-  // Get the user from email
   const user = await User.findOne({
     email,
   });
@@ -170,30 +157,24 @@ const requestOTP = asyncHandler(async (req, res) => {
     throw new Error("Invalid Token. No user found with this token!");
   }
 
-  // Check user is verified
   if (user.isVerified) {
     res.status(400);
     throw new Error("User already verified");
   }
 
-  // Deactivate the active OTP
   const activeOTP = await OTP.findOne({
     email,
     active: true,
   });
 
-  // Delete the active OTP
   if (activeOTP) {
     OTP.deleteOne({ _id: activeOTP._id });
   }
 
-  // Create a new OTP
   const newOtp = await createOTP(email, "verify");
 
-  // Create the verification URL
   const verifyURL = `${process.env.FRONTEND_URL}/auth/verify/${req.params.email}`;
 
-  // Send OTP
   await sendOTPEmail(user, newOtp, verifyURL);
 
   res.status(201).json({
@@ -208,24 +189,19 @@ const requestOTP = asyncHandler(async (req, res) => {
 const forgetPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
 
-  // Finding the user
   const existingUser = await User.findOne({ email });
   if (!existingUser) {
     res.status(400);
     throw new Error("User not found! Please register to continue.");
   }
 
-  // Generate an OTP
   const otp = await createOTP(email, "reset");
 
-  // Encrypt the email
   const encryptedEmail = encrypt(email);
   const hashedEmail = encryptedEmail.encryptedData + "-" + encryptedEmail.iv;
 
-  // Reset URL
   const resetURL = `${process.env.FRONTEND_URL}/auth/reset-password/${hashedEmail}/${otp}`;
 
-  // Send the email
   await sendPasswordResetEmail(existingUser, resetURL);
 
   res.status(201).json({
@@ -240,10 +216,8 @@ const forgetPassword = asyncHandler(async (req, res) => {
 const verifyResetPasswordRequest = asyncHandler(async (req, res) => {
   const { email, token } = req.params;
 
-  // Decrypt the email
   const decryptedEmail = decryptEmail(email);
 
-  // Find the user
   const existingUser = await User.findOne({ email: decryptedEmail });
 
   const otpRecord = await OTP.findOne({
@@ -263,7 +237,6 @@ const verifyResetPasswordRequest = asyncHandler(async (req, res) => {
     throw new Error("Invalid OTP. Please try again!");
   }
 
-  // Check for expiry
   const isExpired = otpRecord.isExpired();
 
   if (isExpired) {
@@ -271,7 +244,6 @@ const verifyResetPasswordRequest = asyncHandler(async (req, res) => {
     throw new Error("OTP has expired. Please request a new OTP!");
   }
 
-  // Delete otp
   await OTP.findByIdAndDelete(otpRecord._id);
 
   res.status(201).json({
@@ -287,10 +259,8 @@ const resetPassword = asyncHandler(async (req, res) => {
   const { email } = req.params;
   const { password } = req.body;
 
-  // Decrypt the email
   const decryptedEmail = decryptEmail(email);
 
-  // Find the user
   const existingUser = await User.findOne({ email: decryptedEmail });
 
   if (!existingUser) {
@@ -298,7 +268,6 @@ const resetPassword = asyncHandler(async (req, res) => {
     throw new Error("User not found! Please register to continue.");
   }
 
-  // Update the password
   existingUser.password = password;
   await existingUser.save();
 
@@ -308,8 +277,21 @@ const resetPassword = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc   logout
+// @route  POST /api/auth/logout
+// @access Public
+const logout = asyncHandler(async (req, res) => {
+  res.clearCookie("jwt");
+
+  res.status(200).json({
+    status: "success",
+    message: "Logged out successfully",
+  });
+});
+
 export {
   login,
+  logout,
   verifyUser,
   requestOTP,
   registerUser,

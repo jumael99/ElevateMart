@@ -1,19 +1,28 @@
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
+import User from "../models/userModel.js";
+import asyncHandler from "./asyncHandler.js";
 
-const authMiddleware = (req, res, next) => {
-  const token = req.header('x-auth-token');
-
+const authMiddleware = asyncHandler(async (req, res, next) => {
+  const token = req.cookies.jwt;
   if (!token) {
-    return res.status(401).json({ message: 'No token, authorization denied' });
+    return next();
   }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded.userId;
+    const existingUser = await User.findById(decoded.userId);
+
+    if (existingUser) {
+      const passwordUpdated = existingUser.hasUpdatedPassword(decoded.iat);
+      if (!passwordUpdated) {
+        req.user = existingUser;
+      }
+    }
+  } catch (error) {
     next();
-  } catch (err) {
-    res.status(401).json({ message: 'Token is not valid' });
   }
-};
+
+  next();
+});
 
 export default authMiddleware;

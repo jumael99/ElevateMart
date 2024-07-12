@@ -2,26 +2,40 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  user: null,
-  token: null,
+  userInfo:
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("elevateMart-userInfo"))
+      : null,
 };
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setUser: (state, action) => {
-      state.user = action.payload;
+    setCredentials: (state, action) => {
+      state.userInfo = action.payload;
+      if (typeof window !== "undefined") {
+        localStorage.setItem(
+          "elevateMart-userInfo",
+          JSON.stringify(action.payload)
+        );
+      }
     },
-    setToken: (state, action) => {
-      state.token = action.payload;
+
+    setTemporaryCredentials: (state, action) => {
+      state.userInfo = action.payload;
     },
-    clearAuth: (state) => {
-      state.user = null;
-      state.token = null;
+
+    clearCredentials: (state) => {
+      state.userInfo = null;
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("elevateMart-userInfo");
+      }
     },
   },
 });
 
-export const { setUser, setToken, clearAuth } = authSlice.actions;
+export const { setCredentials, setTemporaryCredentials, clearCredentials } =
+  authSlice.actions;
+
 export default authSlice.reducer;
