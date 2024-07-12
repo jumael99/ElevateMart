@@ -8,17 +8,19 @@ const authMiddleware = asyncHandler(async (req, res, next) => {
     return next();
   }
 
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const existingUser = await User.findById(decoded.userId);
 
-  const existingUser = await User.findById(decoded.userId);
-
-  const passwordUpdated = existingUser.hasUpdatedPassword(decoded.iat);
-
-  if (passwordUpdated) {
-    return next();
+    if (existingUser) {
+      const passwordUpdated = existingUser.hasUpdatedPassword(decoded.iat);
+      if (!passwordUpdated) {
+        req.user = existingUser;
+      }
+    }
+  } catch (error) {
+    next();
   }
-
-  req.user = existingUser;
 
   next();
 });

@@ -33,11 +33,12 @@ const login = asyncHandler(async (req, res) => {
     throw new Error("Please verify your email to login!");
   }
 
-  generateToken(res, existingUser._id, existingUser.isAdmin);
+  const token = generateToken(res, existingUser._id, existingUser.isAdmin);
 
   res.status(200).json({
     status: "success",
     message: "Login successful",
+    token,
   });
 });
 
