@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import Sidebar from '@/components/Admin/Admin-Sidebar';
+import Sidebar from '@/components/Admin/Admin-Sidebar';  
 import axios from 'axios';
 import dynamic from 'next/dynamic';
 
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 import 'react-quill/dist/quill.snow.css';
+
+// Set the base URL for axios
+axios.defaults.baseURL = 'http://localhost:5001/api';  
 
 const Categories = () => {
   const [formData, setFormData] = useState({
@@ -21,16 +24,17 @@ const Categories = () => {
     fetchCategories();
   }, []);
 
+  // Fetch categories from the API
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('/api/categories');
+      const response = await axios.get('/categories');
       setCategories(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
   };
 
-  const handleChange = (e) => {
+   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -38,14 +42,14 @@ const Categories = () => {
     });
   };
 
-  const handleDescriptionChange = (value) => {
+   const handleDescriptionChange = (value) => {
     setFormData({
       ...formData,
       categoryDescription: value
     });
   };
 
-  const validate = () => {
+   const validate = () => {
     let tempErrors = {};
     if (!formData.categoryName) tempErrors.categoryName = 'Category Name is required';
     if (!formData.categoryDescription) tempErrors.categoryDescription = 'Category Description is required';
@@ -53,24 +57,32 @@ const Categories = () => {
     return Object.keys(tempErrors).length === 0;
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validate()) {
       try {
+        const { categoryName, categoryDescription } = formData;
+        const newCategory = { name: categoryName, description: categoryDescription };
+
         if (isEditing) {
-          await axios.put(`/api/categories/${currentCategoryId}`, formData);
+           await axios.put(`/categories/${currentCategoryId}`, newCategory);
+          console.log('Category updated:', newCategory);
         } else {
-          await axios.post('/api/categories', formData);
+          // Add new category
+          const response = await axios.post('/categories', newCategory);
+          console.log('New category added:', response.data);
         }
-        fetchCategories();
-        resetForm();
+        
+        fetchCategories();  
+        resetForm(); 
       } catch (error) {
         console.error('Error saving category:', error);
       }
     }
   };
 
-  const handleEdit = (category) => {
+   const handleEdit = (category) => {
     setFormData({
       categoryName: category.name,
       categoryDescription: category.description
@@ -79,16 +91,16 @@ const Categories = () => {
     setCurrentCategoryId(category._id);
   };
 
-  const handleDelete = async (id) => {
+   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/api/categories/${id}`);
-      fetchCategories();
+      await axios.delete(`/categories/${id}`);
+      fetchCategories();  
     } catch (error) {
       console.error('Error deleting category:', error);
     }
   };
 
-  const resetForm = () => {
+   const resetForm = () => {
     setFormData({
       categoryName: '',
       categoryDescription: ''
@@ -100,14 +112,14 @@ const Categories = () => {
 
   return (
     <div className="flex">
-      <Sidebar />
+      <Sidebar /> {/* Assuming Sidebar component is correctly implemented */}
       <div className="flex-1 p-10 text-black">
         <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-4">
-  <span className="text-green-500 border-b-2 border-black-500 pb-1">
-    Add-Catagories :
-  </span>
-</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            <span className="text-green-500 border-b-2 border-black-500 pb-1">
+              {isEditing ? 'Edit Category' : 'Add Category'}
+            </span>
+          </h2>
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-2 gap-4">
               <div className="mb-4">
@@ -145,15 +157,25 @@ const Categories = () => {
               >
                 {isEditing ? 'Update Category' : 'Add Category'}
               </button>
+              {isEditing && (
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ml-2"
+                >
+                  Cancel
+                </button>
+              )}
             </div>
           </form>
         </div>
         <div className="bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-xl font-semibold mb-4">
-  <span className="text-green-500 border-b-2 border-black-500 pb-1">
-    Catagories-List :
-  </span>
-</h2>          <table className="min-w-full leading-normal">
+          <h2 className="text-xl font-semibold mb-4">
+            <span className="text-green-500 border-b-2 border-black-500 pb-1">
+              Categories-List :
+            </span>
+          </h2>
+          <table className="min-w-full leading-normal">
             <thead>
               <tr>
                 <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Name</th>

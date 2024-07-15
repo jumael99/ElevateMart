@@ -17,11 +17,17 @@ const login = asyncHandler(async (req, res) => {
     throw new Error("Please provide email and password!");
   }
 
-  const existingUser = await User.findOne({
-    email,
-  }).select("+password");
+  const existingUser = await User.findOne({ email }).select("+password +isAdmin");
+
+  if (!existingUser) {
+    res.status(401);
+    throw new Error("Invalid email or password!");
+  }
+
+  console.log("Found User:", existingUser);
 
   const isValid = await existingUser.matchPassword(password);
+  console.log("Password Match:", isValid);
 
   if (!isValid) {
     res.status(401);
@@ -35,12 +41,22 @@ const login = asyncHandler(async (req, res) => {
 
   const token = generateToken(res, existingUser._id, existingUser.isAdmin);
 
+  let redirectPath = "/"; // Default redirect path for non-admin users
+
+  if (existingUser.isAdmin) {
+    redirectPath = "/admin/dashboard"; 
+  }
+
   res.status(200).json({
     status: "success",
     message: "Login successful",
     token,
+    redirectPath, 
   });
 });
+
+
+
 
 // @desc    Register a new user
 // @route   POST /api/auth/register

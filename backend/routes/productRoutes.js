@@ -1,5 +1,4 @@
 import router from "express";
-import protect from "../middleware/protectMiddleware.js";
 
 import {
   getProducts,
@@ -10,10 +9,7 @@ import {
 
 const productRouter = router.Router();
 
-productRouter.route("/").get(getProducts).post(protect("admin"), createProduct);
-productRouter
-  .route("/:slug")
-  .get(getProductBySlug)
-  .patch(protect("admin"), updateProduct);
+productRouter.route("/").get(getProducts).post(createProduct);
+productRouter.route("/:slug").get(getProductBySlug).patch(updateProduct);
 
 export default productRouter;

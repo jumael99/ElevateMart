@@ -3,14 +3,16 @@ import Sidebar from '@/components/Admin/Admin-Sidebar';
 import axios from 'axios';
 import dynamic from 'next/dynamic';
 
- const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
-import 'react-quill/dist/quill.snow.css'; 
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+import 'react-quill/dist/quill.snow.css';
 
-const SubCategories = () => {
+axios.defaults.baseURL = 'http://localhost:5001/api';
+
+const SubCategory = () => {
   const [formData, setFormData] = useState({
-    subCategoryName: '',
-    subCategoryDescription: '',
-    categoryId: ''
+    name: '',
+    description: '',
+    category_id: ''
   });
 
   const [errors, setErrors] = useState({});
@@ -26,7 +28,7 @@ const SubCategories = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('/api/categories'); 
+      const response = await axios.get('/categories');
       setCategories(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -35,7 +37,7 @@ const SubCategories = () => {
 
   const fetchSubCategories = async () => {
     try {
-      const response = await axios.get('/api/subcategories');  
+      const response = await axios.get('/subCategory');
       setSubCategories(response.data);
     } catch (error) {
       console.error('Error fetching subcategories:', error);
@@ -52,9 +54,9 @@ const SubCategories = () => {
 
   const validate = () => {
     let tempErrors = {};
-    if (!formData.subCategoryName) tempErrors.subCategoryName = 'SubCategory Name is required';
-    if (!formData.subCategoryDescription) tempErrors.subCategoryDescription = 'SubCategory Description is required';
-    if (!formData.categoryId) tempErrors.categoryId = 'Category is required';
+    if (!formData.name) tempErrors.name = 'SubCategory Name is required';
+    if (!formData.description) tempErrors.description = 'SubCategory Description is required';
+    if (!formData.category_id) tempErrors.category_id = 'Category is required';
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
@@ -64,9 +66,9 @@ const SubCategories = () => {
     if (validate()) {
       try {
         if (isEditing) {
-          await axios.put(`/api/subcategories/${currentSubCategoryId}`, formData); 
+          await axios.patch(`/subCategory/${currentSubCategoryId}`, formData);
         } else {
-          await axios.post('/api/subcategories', formData);  
+          await axios.post('/subCategory', formData);
         }
         fetchSubCategories();
         resetForm();
@@ -78,9 +80,9 @@ const SubCategories = () => {
 
   const handleEdit = (subCategory) => {
     setFormData({
-      subCategoryName: subCategory.name,
-      subCategoryDescription: subCategory.description,
-      categoryId: subCategory.categoryId
+      name: subCategory.name,
+      description: subCategory.description,
+      category_id: subCategory.category_id._id  
     });
     setIsEditing(true);
     setCurrentSubCategoryId(subCategory._id);
@@ -88,7 +90,7 @@ const SubCategories = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/api/subcategories/${id}`);  
+      await axios.delete(`/subCategory/${id}`);
       fetchSubCategories();
     } catch (error) {
       console.error('Error deleting subcategory:', error);
@@ -97,49 +99,50 @@ const SubCategories = () => {
 
   const resetForm = () => {
     setFormData({
-      subCategoryName: '',
-      subCategoryDescription: '',
-      categoryId: ''
+      name: '',
+      description: '',
+      category_id: ''
     });
     setErrors({});
     setIsEditing(false);
     setCurrentSubCategoryId(null);
   };
 
+  console.log('Subcategories:', subCategories);  
+
   return (
     <div className="flex">
       <Sidebar />
       <div className="flex-1 p-10 text-black">
         <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-4">
-  <span className="text-green-500 border-b-2 border-black-500 pb-1">
-Add-Subcatagory :  </span>
-</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            <span className="text-green-500 border-b-2 border-black-500 pb-1">Add Subcategory:</span>
+          </h2>
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-2 gap-4">
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="subCategoryName">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
                   SubCategory Name
                 </label>
                 <input
-                  id="subCategoryName"
-                  name="subCategoryName"
+                  id="name"
+                  name="name"
                   type="text"
-                  value={formData.subCategoryName}
+                  value={formData.name}
                   onChange={handleChange}
                   placeholder="Enter subcategory name"
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 />
-                {errors.subCategoryName && <p className="text-red-500 text-xs italic">{errors.subCategoryName}</p>}
+                {errors.name && <p className="text-red-500 text-xs italic">{errors.name}</p>}
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="categoryId">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="category_id">
                   Category
                 </label>
                 <select
-                  id="categoryId"
-                  name="categoryId"
-                  value={formData.categoryId}
+                  id="category_id"
+                  name="category_id"
+                  value={formData.category_id}
                   onChange={handleChange}
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 >
@@ -150,20 +153,20 @@ Add-Subcatagory :  </span>
                     </option>
                   ))}
                 </select>
-                {errors.categoryId && <p className="text-red-500 text-xs italic">{errors.categoryId}</p>}
+                {errors.category_id && <p className="text-red-500 text-xs italic">{errors.category_id}</p>}
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="subCategoryDescription">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
                   SubCategory Description
                 </label>
                 <ReactQuill
-                  id="subCategoryDescription"
-                  value={formData.subCategoryDescription}
-                  onChange={(value) => setFormData({ ...formData, subCategoryDescription: value })}
+                  id="description"
+                  value={formData.description}
+                  onChange={(value) => setFormData({ ...formData, description: value })}
                   placeholder="Enter subcategory description"
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 />
-                {errors.subCategoryDescription && <p className="text-red-500 text-xs italic">{errors.subCategoryDescription}</p>}
+                {errors.description && <p className="text-red-500 text-xs italic">{errors.description}</p>}
               </div>
             </div>
             <div className="flex items-center justify-between">
@@ -177,11 +180,10 @@ Add-Subcatagory :  </span>
           </form>
         </div>
         <div className="bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-xl font-semibold mb-4">
-  <span className="text-green-500 border-b-2 border-black-500 pb-1">
-    Subcatagory List :
-  </span>
-</h2>        <table className="min-w-full leading-normal">
+          <h2 className="text-xl font-semibold mb-4">
+            <span className="text-green-500 border-b-2 border-black-500 pb-1">Subcategory List:</span>
+          </h2>
+          <table className="min-w-full leading-normal">
             <thead>
               <tr>
                 <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Name</th>
@@ -190,29 +192,32 @@ Add-Subcatagory :  </span>
                 <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody>
-              {subCategories.map((subCategory, index) => (
-                <tr key={index}>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{subCategory.name}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{subCategory.description}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{categories.find(cat => cat._id === subCategory.categoryId)?.name}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                    <button
-                      onClick={() => handleEdit(subCategory)}
-                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded focus:outline-none focus:shadow-outline mr-2"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(subCategory._id)}
-                      className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded focus:outline-none focus:shadow-outline"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+              <tbody>
+                {subCategories.map((subCategory, index) => (
+                  <tr key={index}>
+                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{subCategory.name}</td>
+                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm" dangerouslySetInnerHTML={{ __html: subCategory.description }}></td>
+                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      {subCategory.category ? subCategory.categorry.name : 'No Category'}
+                    </td>
+                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <button
+                        onClick={() => handleEdit(subCategory)}
+                        className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded focus:outline-none focus:shadow-outline mr-2"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(subCategory._id)}
+                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded focus:outline-none focus:shadow-outline"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+
           </table>
         </div>
       </div>
@@ -220,4 +225,4 @@ Add-Subcatagory :  </span>
   );
 };
 
-export default SubCategories;
+export default SubCategory;

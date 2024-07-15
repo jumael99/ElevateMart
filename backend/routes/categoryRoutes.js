@@ -17,7 +17,7 @@ router.route('/')
 
 router.route('/:id')
     .get(getCategoryById)
-    .patch(updateCategory)
+    .put(updateCategory)
     .delete(deleteCategory);
 
 export default router;

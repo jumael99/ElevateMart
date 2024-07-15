@@ -3,25 +3,27 @@ import Sidebar from '@/components/Admin/Admin-Sidebar';
 import axios from 'axios';
 import dynamic from 'next/dynamic';
 
- const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
-import 'react-quill/dist/quill.snow.css'; 
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+import 'react-quill/dist/quill.snow.css';
+
+
+axios.defaults.baseURL = 'http://localhost:5001/api';  
+
 
 const Products = () => {
   const [formData, setFormData] = useState({
-    productName: '',
-    productSlug: '',
-    productPrice: '',
-    productDescription: '',
-    productImage: null,
-    productImagePreview: '',
-    productQuantity: '',
-    productDiscount: '',
-    productDiscountValidTime: '',
+    name: '',
+    price: '',
+    description: '',
+    image: null,
+    imagePreview: '',
+    quantity: '',
+    discount: '',
+    discountValidTime: '',  
     categoryId: '',
     subCategoryId: ''
   });
 
-  const [errors, setErrors] = useState({});
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
@@ -36,7 +38,7 @@ const Products = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('/api/categories');  
+      const response = await axios.get('/categories');
       setCategories(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -45,7 +47,7 @@ const Products = () => {
 
   const fetchSubCategories = async () => {
     try {
-      const response = await axios.get('/api/subcategories'); 
+      const response = await axios.get('/subCategory');
       setSubCategories(response.data);
     } catch (error) {
       console.error('Error fetching subcategories:', error);
@@ -54,7 +56,7 @@ const Products = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('/api/products');  
+      const response = await axios.get('/products');
       setProducts(response.data);
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -73,63 +75,51 @@ const Products = () => {
     const file = e.target.files[0];
     setFormData({
       ...formData,
-      productImage: file,
-      productImagePreview: URL.createObjectURL(file)
+      image: file,
+      imagePreview: URL.createObjectURL(file)
     });
-  };
-
-  const validate = () => {
-    let tempErrors = {};
-    if (!formData.productName) tempErrors.productName = 'Product Name is required';
-    if (!formData.productPrice) tempErrors.productPrice = 'Product Price is required';
-    if (!formData.productDescription) tempErrors.productDescription = 'Product Description is required';
-    setErrors(tempErrors);
-    return Object.keys(tempErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validate()) {
-      try {
-        const formDataToSend = new FormData();
-        for (const key in formData) {
-          formDataToSend.append(key, formData[key]);
-        }
-
-        if (isEditing) {
-          await axios.put(`/api/products/${currentProductId}`, formDataToSend, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          });  
-        } else {
-          await axios.post('/api/products', formDataToSend, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          }); 
-        }
-        fetchProducts();
-        resetForm();
-      } catch (error) {
-        console.error('Error saving product:', error);
+    try {
+      const formDataToSend = new FormData();
+      for (const key in formData) {
+        formDataToSend.append(key, formData[key]);
       }
+
+      if (isEditing) {
+        await axios.put(`/products/${currentProductId}`, formDataToSend, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+      } else {
+        await axios.post('/products', formDataToSend, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+      }
+      fetchProducts();
+      resetForm();
+    } catch (error) {
+      console.error('Error saving product:', error);
     }
   };
 
   const handleEdit = (product) => {
     setFormData({
-      productName: product.name,
-      productSlug: product.slug,
-      productPrice: product.price,
-      productDescription: product.description,
-      productImage: null,
-      productImagePreview: product.image,
-      productQuantity: product.quantity,
-      productDiscount: product.discount,
-      productDiscountValidTime: product.discountValidTime,
-      categoryId: product.categoryId,
-      subCategoryId: product.subCategoryId
+      name: product.name,
+      price: product.price.toString(),
+      description: product.description,
+      image: null,
+      imagePreview: product.image,
+      quantity: product.quantity.toString(),
+      discount: product.discount.toString(),
+      discountValidTime: new Date(product.discountValidTime).toISOString().slice(0, 16),
+      categoryId: product.category._id,
+      subCategoryId: product.subCategory[0]._id
     });
     setIsEditing(true);
     setCurrentProductId(product._id);
@@ -137,7 +127,7 @@ const Products = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/api/products/${id}`);  
+      await axios.delete(`/products/${id}`);
       fetchProducts();
     } catch (error) {
       console.error('Error deleting product:', error);
@@ -146,19 +136,17 @@ const Products = () => {
 
   const resetForm = () => {
     setFormData({
-      productName: '',
-      productSlug: '',
-      productPrice: '',
-      productDescription: '',
-      productImage: null,
-      productImagePreview: '',
-      productQuantity: '',
-      productDiscount: '',
-      productDiscountValidTime: '',
+      name: '',
+      price: '',
+      description: '',
+      image: null,
+      imagePreview: '',
+      quantity: '',
+      discount: '',
+      discountValidTime: '',
       categoryId: '',
       subCategoryId: ''
     });
-    setErrors({});
     setIsEditing(false);
     setCurrentProductId(null);
   };
@@ -168,83 +156,79 @@ const Products = () => {
       <Sidebar />
       <div className="flex-1 p-10 text-black">
         <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-        <h2 className={`text-xl font-semibold mb-4 ${isEditing ? 'text-blue-500' : 'text-green-500'}`}>
-  <span className={`border-b-2 border-green pb-1`}>
-    {isEditing ? 'Edit Product' : 'Add Product :'}
-  </span>
-</h2>
-
+          <h2 className={`text-xl font-semibold mb-4 ${isEditing ? 'text-blue-500' : 'text-green-500'}`}>
+            <span className={`border-b-2 border-green pb-1`}>
+              {isEditing ? 'Edit Product' : 'Add Product'}
+            </span>
+          </h2>
 
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-2 gap-4">
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="productName">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
                   Product Name
                 </label>
                 <input
-                  id="productName"
-                  name="productName"
+                  id="name"
+                  name="name"
                   type="text"
-                  value={formData.productName}
+                  value={formData.name}
                   onChange={handleChange}
                   placeholder="Enter product name"
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 />
-                {errors.productName && <p className="text-red-500 text-xs italic">{errors.productName}</p>}
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="productPrice">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="price">
                   Product Price
                 </label>
                 <input
-                  id="productPrice"
-                  name="productPrice"
+                  id="price"
+                  name="price"
                   type="number"
-                  value={formData.productPrice}
+                  value={formData.price}
                   onChange={handleChange}
                   placeholder="Enter product price"
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 />
-                {errors.productPrice && <p className="text-red-500 text-xs italic">{errors.productPrice}</p>}
               </div>
-             
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="productQuantity">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="quantity">
                   Product Quantity
                 </label>
                 <input
-                  id="productQuantity"
-                  name="productQuantity"
+                  id="quantity"
+                  name="quantity"
                   type="number"
-                  value={formData.productQuantity}
+                  value={formData.quantity}
                   onChange={handleChange}
                   placeholder="Enter product quantity"
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="productDiscount">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="discount">
                   Product Discount
                 </label>
                 <input
-                  id="productDiscount"
-                  name="productDiscount"
+                  id="discount"
+                  name="discount"
                   type="number"
-                  value={formData.productDiscount}
+                  value={formData.discount}
                   onChange={handleChange}
                   placeholder="Enter product discount"
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="productDiscountValidTime">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="discountValidTime">
                   Discount Valid Time
                 </label>
                 <input
-                  id="productDiscountValidTime"
-                  name="productDiscountValidTime"
+                  id="discountValidTime"
+                  name="discountValidTime"
                   type="datetime-local"
-                  value={formData.productDiscountValidTime}
+                  value={formData.discountValidTime}
                   onChange={handleChange}
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 />
@@ -270,7 +254,7 @@ const Products = () => {
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="subCategoryId">
-                  Sub-Category
+                  Sub Category
                 </label>
                 <select
                   id="subCategoryId"
@@ -279,50 +263,48 @@ const Products = () => {
                   onChange={handleChange}
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 >
-                  <option value="">Select Sub-Category</option>
+                  <option value="">Select Sub Category</option>
                   {subCategories.map((subCategory) => (
                     <option key={subCategory._id} value={subCategory._id}>
                       {subCategory.name}
                     </option>
                   ))}
                 </select>
-            
               </div>
+             
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="productImage">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="image">
                   Product Image
                 </label>
                 <input
-                  id="productImage"
-                  name="productImage"
+                  id="image"
+                  name="image"
                   type="file"
+                  accept="image/*"
                   onChange={handleImageChange}
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 />
-                {errors.productImage && <p className="text-red-500 text-xs italic">{errors.productImage}</p>}
-                {formData.productImagePreview && (
-                  <img src={formData.productImagePreview} alt="Product Preview" className="mt-4 w-32 h-32 object-cover" />
+                {formData.imagePreview && (
+                  <img src={formData.imagePreview} alt="Product Preview" className="h-32 w-32 object-cover mt-2" />
                 )}
               </div>
-               <div className="mb-4">
-                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="productDescription">
-                   Product Description
-                 </label>
-                 <ReactQuill
-                   id="productDescription"
-                   name="productDescription"
-                   value={formData.productDescription}
-                   onChange={(value) => setFormData({ ...formData, productDescription: value })}
-                   placeholder="Enter product description"
-                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                 />
-                 {errors.productDescription && <p className="text-red-500 text-xs italic">{errors.productDescription}</p>}
-               </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
+                  Product Description
+                </label>
+                <ReactQuill
+                  id="description"
+                  value={formData.description}
+                  onChange={(value) => setFormData({ ...formData, description: value })}
+                  placeholder="Enter product description"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                />
+              </div>
             </div>
             <div className="flex items-center justify-between">
               <button
                 type="submit"
-                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                className={`bg-${isEditing ? 'blue' : 'green'}-500 hover:bg-${isEditing ? 'blue' : 'green'}-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
               >
                 {isEditing ? 'Update Product' : 'Add Product'}
               </button>
@@ -337,46 +319,52 @@ const Products = () => {
               )}
             </div>
           </form>
+
         </div>
 
         <div className="bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-xl font-semibold mb-4">
-  <span className="text-green-500 border-b-2 border-black-500 pb-1">
-    Products :
-  </span>
-</h2>
-
+          <h2 className="text-xl font-semibold mb-4">Product List</h2>
           <table className="min-w-full bg-white">
             <thead>
               <tr>
-                <th className="py-2 px-4 border-b border-gray-200">Name</th>
-                <th className="py-2 px-4 border-b border-gray-200">Price</th>
-                <th className="py-2 px-4 border-b border-gray-200">Category</th>
-                <th className="py-2 px-4 border-b border-gray-200">Actions</th>
+                <th className="py-2">Image</th>
+                <th className="py-2">Name</th>
+                <th className="py-2">Price</th>
+                <th className="py-2">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {products.map((product) => (
-                <tr key={product._id}>
-                  <td className="py-2 px-4 border-b border-gray-200">{product.name}</td>
-                  <td className="py-2 px-4 border-b border-gray-200">{product.price}</td>
-                  <td className="py-2 px-4 border-b border-gray-200">{product.categoryId?.name}</td>
-                  <td className="py-2 px-4 border-b border-gray-200">
-                    <button
-                      onClick={() => handleEdit(product)}
-                      className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded mr-2"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(product._id)}
-                      className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-                    >
-                      Delete
-                    </button>
+              {Array.isArray(products) && products.length > 0 ? (
+                products.map((product) => (
+                  <tr key={product._id}>
+                    <td className="py-2">
+                      <img src={product.image} alt={product.name} className="h-16 w-16 object-cover" />
+                    </td>
+                    <td className="py-2">{product.name}</td>
+                    <td className="py-2">{product.price}</td>
+                    <td className="py-2">
+                      <button
+                        onClick={() => handleEdit(product)}
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(product._id)}
+                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ml-2"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="py-2 text-center">
+                    No products found.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

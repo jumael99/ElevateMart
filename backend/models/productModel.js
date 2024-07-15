@@ -13,39 +13,25 @@ const productSchema = new mongoose.Schema(
     price: {
       type: Number,
       required: true,
-      validate: [
-        {
-          validator: function (value) {
-            return value >= 0;
-          },
-          message: "Price cannot be negative",
-        },
-      ],
+      min: 0,
     },
     description: {
       type: String,
       required: true,
     },
     image: {
-      type: String,
+      type: String, // Assuming storing URL of the image
     },
     discount: {
       type: Number,
       default: 0,
-      validate: [
-        {
-          validator: function (value) {
-            return value >= 0;
-          },
-          message: "Discount cannot be negative",
+      min: 0,
+      validate: {
+        validator: function (value) {
+          return value <= this.price;
         },
-        {
-          validator: function (value) {
-            return value <= this.price;
-          },
-          message: "Discount cannot be greater than the price",
-        },
-      ],
+        message: "Discount cannot be greater than the price",
+      },
     },
     discountValidTime: {
       type: Date,
@@ -54,55 +40,33 @@ const productSchema = new mongoose.Schema(
     quantity: {
       type: Number,
       required: true,
-      select: false,
-      validate: [
-        {
-          validator: function (value) {
-            return value >= 0;
-          },
-          message: "Quantity cannot be negative",
-        },
-      ],
+      min: 0,
     },
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
     },
-    subCategory: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "SubCategory",
-      },
-    ],
+    subCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SubCategory",
+    },
   },
   {
-    toObject: { virtuals: true },
-    toJSON: { virtuals: true },
     timestamps: true,
   }
 );
 
 productSchema.pre("save", function (next) {
-  this.slug = this.name.toLowerCase().match(/\w+/g).join("-");
-  next();
-});
-
-productSchema.pre("updateOne", function (next) {
-  if (this._update.name) {
-    this._update.slug = this._update.name.toLowerCase().match(/\w+/g).join("-");
+  if (!this.slug) {
+    this.slug = this.name.toLowerCase().replace(/[^a-zA-Z0-9]/g, "-");
   }
   next();
 });
-
-productSchema.methods.isDiscountValid = function () {
-  return this.discountValidTime > Date.now();
-};
 
 productSchema.virtual("updatedPrice").get(function () {
-  if (this.isDiscountValid()) {
+  if (this.discountValidTime > Date.now()) {
     return this.price - this.discount;
   }
-
   return this.price;
 });
 
