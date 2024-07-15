@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '@/components/Admin/Admin-Sidebar';
 import axios from 'axios';
+import dynamic from 'next/dynamic';
+
+ const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+import 'react-quill/dist/quill.snow.css'; 
 
 const SubCategories = () => {
   const [formData, setFormData] = useState({
@@ -107,7 +111,10 @@ const SubCategories = () => {
       <Sidebar />
       <div className="flex-1 p-10 text-black">
         <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">{isEditing ? 'Edit SubCategory' : 'Add SubCategory'}</h2>
+        <h2 className="text-xl font-semibold mb-4">
+  <span className="text-green-500 border-b-2 border-black-500 pb-1">
+Add-Subcatagory :  </span>
+</h2>
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-2 gap-4">
               <div className="mb-4">
@@ -125,7 +132,6 @@ const SubCategories = () => {
                 />
                 {errors.subCategoryName && <p className="text-red-500 text-xs italic">{errors.subCategoryName}</p>}
               </div>
-            
               <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="categoryId">
                   Category
@@ -150,11 +156,10 @@ const SubCategories = () => {
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="subCategoryDescription">
                   SubCategory Description
                 </label>
-                <textarea
+                <ReactQuill
                   id="subCategoryDescription"
-                  name="subCategoryDescription"
                   value={formData.subCategoryDescription}
-                  onChange={handleChange}
+                  onChange={(value) => setFormData({ ...formData, subCategoryDescription: value })}
                   placeholder="Enter subcategory description"
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 />
@@ -164,17 +169,19 @@ const SubCategories = () => {
             <div className="flex items-center justify-between">
               <button
                 type="submit"
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
               >
                 {isEditing ? 'Update SubCategory' : 'Add SubCategory'}
               </button>
-             
             </div>
           </form>
         </div>
         <div className="bg-white shadow-md rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">SubCategory List</h2>
-          <table className="min-w-full leading-normal">
+        <h2 className="text-xl font-semibold mb-4">
+  <span className="text-green-500 border-b-2 border-black-500 pb-1">
+    Subcatagory List :
+  </span>
+</h2>        <table className="min-w-full leading-normal">
             <thead>
               <tr>
                 <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Name</th>

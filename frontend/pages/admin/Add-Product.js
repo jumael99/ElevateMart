@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '@/components/Admin/Admin-Sidebar';
 import axios from 'axios';
+import dynamic from 'next/dynamic';
+
+ const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+import 'react-quill/dist/quill.snow.css'; 
 
 const Products = () => {
   const [formData, setFormData] = useState({
@@ -164,7 +168,13 @@ const Products = () => {
       <Sidebar />
       <div className="flex-1 p-10 text-black">
         <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">{isEditing ? 'Edit Product' : 'Add Product'}</h2>
+        <h2 className={`text-xl font-semibold mb-4 ${isEditing ? 'text-blue-500' : 'text-green-500'}`}>
+  <span className={`border-b-2 border-green pb-1`}>
+    {isEditing ? 'Edit Product' : 'Add Product :'}
+  </span>
+</h2>
+
+
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-2 gap-4">
               <div className="mb-4">
@@ -294,25 +304,25 @@ const Products = () => {
                   <img src={formData.productImagePreview} alt="Product Preview" className="mt-4 w-32 h-32 object-cover" />
                 )}
               </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="productDescription">
-                  Product Description
-                </label>
-                <textarea
-                  id="productDescription"
-                  name="productDescription"
-                  value={formData.productDescription}
-                  onChange={handleChange}
-                  placeholder="Enter product description"
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                />
-                {errors.productDescription && <p className="text-red-500 text-xs italic">{errors.productDescription}</p>}
-              </div>
+               <div className="mb-4">
+                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="productDescription">
+                   Product Description
+                 </label>
+                 <ReactQuill
+                   id="productDescription"
+                   name="productDescription"
+                   value={formData.productDescription}
+                   onChange={(value) => setFormData({ ...formData, productDescription: value })}
+                   placeholder="Enter product description"
+                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                 />
+                 {errors.productDescription && <p className="text-red-500 text-xs italic">{errors.productDescription}</p>}
+               </div>
             </div>
             <div className="flex items-center justify-between">
               <button
                 type="submit"
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
               >
                 {isEditing ? 'Update Product' : 'Add Product'}
               </button>
@@ -330,7 +340,12 @@ const Products = () => {
         </div>
 
         <div className="bg-white shadow-md rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">Products</h2>
+        <h2 className="text-xl font-semibold mb-4">
+  <span className="text-green-500 border-b-2 border-black-500 pb-1">
+    Products :
+  </span>
+</h2>
+
           <table className="min-w-full bg-white">
             <thead>
               <tr>

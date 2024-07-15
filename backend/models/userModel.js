@@ -26,6 +26,9 @@ const userSchema = mongoose.Schema(
       type: String,
       select: false,
     },
+    passwordUpdated: {
+      type: Date,
+    },
     address: {
       type: String,
     },
@@ -43,12 +46,11 @@ const userSchema = mongoose.Schema(
   }
 );
 
-// Match user entered password to hashed password in database
+// Match password
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// Encrypt password using bcrypt
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     return next();
@@ -56,8 +58,20 @@ userSchema.pre("save", async function (next) {
 
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+  this.passwordUpdated = Date.now();
   next();
 });
+
+userSchema.methods.hasUpdatedPassword = function (JWTTimeStamp) {
+  if (this.passwordUpdated) {
+    const changedTimeStamp = parseInt(
+      this.passwordUpdated.getTime() / 1000,
+      10
+    );
+    return JWTTimeStamp < changedTimeStamp;
+  }
+  return false;
+};
 
 const User = mongoose.model("User", userSchema);
 
