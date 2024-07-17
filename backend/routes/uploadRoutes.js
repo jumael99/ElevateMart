@@ -32,7 +32,7 @@ router.post("/user", (req, res) => {
 
     try {
       await sharp(req.file.buffer)
-        .resize(500, 500)
+        .resize(600, 600)
         .toFormat("png")
         .png({ quality: 90 })
         .toFile(outputPath);
@@ -58,7 +58,7 @@ router.post("/product", (req, res) => {
 
     try {
       await sharp(req.file.buffer)
-        .resize(704, 528)
+        .resize(1200, 800)
         .toFormat("png")
         .png({ quality: 90 })
         .toFile(outputPath);
