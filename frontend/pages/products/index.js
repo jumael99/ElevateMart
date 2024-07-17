@@ -5,6 +5,14 @@ import React, { useEffect, useState } from "react";
 import { useFetchAllProductsQuery } from "@/store/slices/api/productApiSlice";
 
 const Products = () => {
+  const { data, error, isLoading } = useFetchAllProductsQuery();
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    if (data) {
+      setProducts(data);
+    }
+  }, [data]);
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 8;
   const showProducts = products.slice(0, 25);
@@ -52,7 +60,7 @@ const Products = () => {
 
         <div className="flex items-center bg-white rounded-full shadow-md px-4 py-2">
           <span className="text-slate-700 font-bold mr-2">Page</span>
-          <span className="bg-blue-100 bg-slate-700 font-bold rounded-full px-3 py-1">
+          <span className=" bg-slate-700 font-bold rounded-full px-3 py-1">
             {currentPage}
           </span>
           <span className="text-gray-600 mx-2">of</span>
@@ -71,14 +79,6 @@ const Products = () => {
       </div>
     </>
   );
-  const { data, error, isLoading } = useFetchAllProductsQuery();
-  const [products, setProducts] = useState([]);
-
-  useEffect(() => {
-    if (data) {
-      setProducts(data);
-    }
-  }, [data]);
 
   return (
     <>

@@ -15,7 +15,6 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const router = useRouter();
   const dispatch = useDispatch();
-  const router = useRouter();
   const { userInfo } = useSelector((state) => state.auth);
   const [login, { isLoading }] = useLoginMutation();
 
