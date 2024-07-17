@@ -4,35 +4,50 @@ import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/router";
 import { useLogoutMutation } from "@/store/slices/api/authApiSlice";
-import { toast } from "react-toastify";
 import { clearCredentials } from "@/store/slices/authSlice";
+import { toastManager } from "@/utils/toastManager";
+import { useFetchMyProfileQuery } from "@/store/slices/api/userApiSlice";
+import { setUser, deleteUser } from "@/store/slices/userSlice";
 
 const Header = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+  const { data: userInformation, isError } = useFetchMyProfileQuery();
 
   const [logout, { isLoading }] = useLogoutMutation();
   const dispatch = useDispatch();
+
   const router = useRouter();
 
   useEffect(() => {
     if (userInfo) {
       setIsUserLoggedIn(true);
+      dispatch(setUser(userInformation));
     } else {
       setIsUserLoggedIn(false);
     }
-  }, [userInfo]);
+  }, [userInfo, userInformation]);
 
   const handleLogout = async (e) => {
+    const toastId = toastManager.loading("Logging out...");
     e.preventDefault();
     try {
       await logout().unwrap();
+      setIsUserLoggedIn(false);
+      dispatch(deleteUser());
       dispatch(clearCredentials());
-      toast.success("Logged out successfully!");
+
+      toastManager.updateStatus(toastId, {
+        render: "Logged out successfully",
+        type: "success",
+      });
     } catch (error) {
       const message = error?.data?.message || "Something went wrong";
-      toast.error(message);
+      toastManager.updateStatus(toastId, {
+        render: message,
+        type: "error",
+      });
     }
   };
 
@@ -162,29 +177,31 @@ const Header = () => {
                   </Link>
                 </li>
               )}
-              <li className="ml-6">
-                <div className="relative py-2">
-                  <div className="absolute top-0 left-3">
-                    <p className="flex h-2 w-2 items-center justify-center rounded-full bg-red-500 p-3 text-xs text-white">
-                      3
-                    </p>
+              {isUserLoggedIn && (
+                <li className="ml-6">
+                  <div className="relative py-2">
+                    <div className="absolute top-0 left-3">
+                      <p className="flex h-2 w-2 items-center justify-center rounded-full bg-red-500 p-3 text-xs text-white">
+                        3
+                      </p>
+                    </div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className="h-6 w-6 text-black"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+                      />
+                    </svg>
                   </div>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="h-6 w-6 text-black"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
-                    />
-                  </svg>
-                </div>
-              </li>
+                </li>
+              )}
             </ul>
           </div>
         </div>

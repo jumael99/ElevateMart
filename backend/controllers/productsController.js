@@ -1,11 +1,18 @@
 import productModel from "../models/productModel.js";
 import asyncHandler from "../middleware/asyncHandler.js";
 
-// @desc    Fetch all products
+// @desc    Fetch all products or filter by category
 // @route   GET /api/products
 // @access  Public
 const getProducts = asyncHandler(async (req, res) => {
-  const products = await productModel.find({});
+  const { category } = req.query;
+  let filter = {};
+
+  if (category) {
+    filter.category = category;
+  }
+
+  const products = await productModel.find(filter);
   res.status(200).json(products);
 });
 
