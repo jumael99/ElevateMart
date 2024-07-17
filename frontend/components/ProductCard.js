@@ -8,7 +8,7 @@ const ProductCard = (data) => {
     return (
         <div className="w-[90%] mx-auto bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden shadow-lg">
             <div className="relative">
-                <Link href={`/products/${productName}`} className="block">
+                <Link href={`/products/${_id}`} className="block">
                     <img
                         src={image}
                         alt={_id}

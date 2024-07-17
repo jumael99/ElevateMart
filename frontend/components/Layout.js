@@ -6,6 +6,7 @@ import AdminNavbar from './Admin/Admin-Nabvar';
 import AdminFooter from './Admin/Admin-Footer';
 import MyCarousel from './Admin/Carousel';  
 import { useRouter } from 'next/router';
+import HomePageProducts from './HomePageProducts';
 
 const Layout = ({ children }) => {
   const router = useRouter();
@@ -25,7 +26,8 @@ const Layout = ({ children }) => {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      {isHomePage && <MyCarousel />}  {/* Render MyCarousel only on the home page */}
+      {isHomePage && <MyCarousel />} 
+      {isHomePage && <HomePageProducts/>} {/* Render MyCarousel only on the home page */}
       <main className="flex-grow">
         {children}
       </main>
