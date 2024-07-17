@@ -21,8 +21,8 @@ const Products = () => {
         <>
             <div className="w-[100%] mx-auto text-center py-10">
                 <div className="text-black">
-                    <h1 className="text-3xl font-semibold">Your Desired Products</h1>
-                    <p className="text-lg p-3">Fulfilling Wishes, Delivering Quality</p>
+                    <h1 className="text-3xl font-semibold">Discover Your Dream Products</h1>
+                    <p className="text-lg p-3">Turning Aspirations into Reality with Excellence</p>
                 </div>
             </div>
             <div className="w-[80%] h-min-screen mx-auto text-center">
