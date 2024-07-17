@@ -1,5 +1,4 @@
 import express from 'express';
-import protect from '../middleware/protectMiddleware.js'
 import {
   getSubCategory,
   createNewSubCategory,
@@ -11,10 +10,10 @@ const router = express.Router();
 
 router.route('/')
   .get(getSubCategory)
-  .post(protect("admin"), createNewSubCategory);
+  .post(createNewSubCategory);
 
 router.route('/:id')
-  .patch(protect("admin"), updateSubCategory)
-  .delete(protect("admin"), deleteSubCategory);
+  .put(updateSubCategory)
+  .delete(deleteSubCategory);
 
 export default router;

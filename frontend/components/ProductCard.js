@@ -4,61 +4,59 @@ import Link from "next/link";
 const ProductCard = (data) => {
   const { name, image, _id, price, countInStock } = data.productData;
   const productName = name.replace(/\s+/g, " ");
+
   return (
-    <div className="w-full h-[430px] bg-white rounded-lg shadow-md p-3  relative cursor-pointer text-black transition-all duration-300 ease-in hover:translate-y-1.5">
-      <Link href={`/products/${productName}`}>
-        <img src={image} alt={name} className="w-full h-[200px] object-full" />
-      </Link>
-      <Link href={`/products/${productName}`}>
-        <h4 className="py-3 font-semibold text-start">
-          <span className="hidden sm:inline">
-            {name.length > 30 ? name.slice(0, 30) + "..." : name}
+    <div className="w-[90%] mx-auto bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden shadow-lg">
+      <div className="relative">
+        <Link href={`/products/${_id}`} className="block">
+          <img
+            src={image}
+            alt={_id}
+            className="w-full h-64 object-full transition-transform duration-300 hover:scale-105"
+          />
+        </Link>
+        <div className="absolute top-0 right-0 bg-white px-2 py-1 m-2 rounded-full shadow-md">
+          <span className="text-sm font-bold text-gray-700">
+            {countInStock} left
           </span>
-          <span className="inline sm:hidden ">{name}</span>
-        </h4>
-      </Link>
-      <div className="flex justify-between items-center mt-2">
-        <h4>
-          {price && countInStock > 0 ? (
-            <div className="font-semibold">
-              <span className="text-2xl">{price}</span>
-              <span className="text-3xl ml-1">৳</span>
-            </div>
-          ) : (
-            <div className="font-semibold text-red-600">
-              <del className="text-2xl">{price}</del>
-              <span className="text-3xl ml-1">৳</span>
-            </div>
-          )}
-        </h4>
-        <h4 className="px-2 text-xl">
-          {countInStock === 0 ? (
-            <span className="text-red-600 text-base font-semibold">
-              Out of stock
-            </span>
-          ) : countInStock < 10 ? (
-            <div>
-              <span className="text-red-600 text-base font-semibold pr-2">
-                Low Stock
-              </span>
-              <span className="text-xl font-semibold">{countInStock}</span>
-            </div>
-          ) : (
-            <div>
-              <span className="text-green-600 text-base font-semibold pr-2">
-                In Stock
-              </span>
-              <span className="text-xl font-semibold">{countInStock}</span>
-            </div>
-          )}
-        </h4>
+        </div>
       </div>
-      <div className="flex justify-end mt-4 sm:mt-6">
+      <div className="p-4">
+        <Link href={`/products/${productName}`} className="block">
+          <h4 className="text-xl font-bold text-gray-800 mb-2">
+            {name.length > 30 ? name.slice(0, 30) + "..." : name}
+          </h4>
+        </Link>
+        <div className="flex justify-between items-end mb-4">
+          <div className="text-2xl font-extrabold text-gray-800">
+            {price}
+            <span className="ml-1 text-sm">৳</span>
+          </div>
+          <div
+            className={`text-sm font-semibold ${
+              countInStock === 0
+                ? "text-red-500"
+                : countInStock < 10
+                ? "text-orange-500"
+                : "text-green-500"
+            }`}
+          >
+            {countInStock === 0
+              ? "Out of stock"
+              : countInStock < 10
+              ? "Low stock"
+              : "In stock"}
+          </div>
+        </div>
         <button
-          className="w-[30%] py-2 px-4 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors duration-300 disabled:bg-slate-300"
+          className={`w-full py-2 px-4 rounded-full font-bold text-white transition-all duration-300 ${
+            countInStock === 0
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-slate-700 hover:bg-slate-500 hover:shadow-lg"
+          }`}
           disabled={countInStock === 0}
         >
-          Add to Cart
+          {countInStock === 0 ? "Out of Stock" : "Add to Cart"}
         </button>
       </div>
     </div>

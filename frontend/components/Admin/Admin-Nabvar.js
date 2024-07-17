@@ -1,11 +1,33 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { useRouter } from "next/router"; // Import useRouter from Next.js
+import { useLogoutMutation } from "@/store/slices/api/authApiSlice"; // Adjust the path as per your project structure
+import { toast } from "react-toastify";
+import { clearCredentials } from "@/store/slices/authSlice"; // Adjust the path as per your project structure
+
 import SearchBar from "../SearchBar";
 
 const AdminNavbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dispatch = useDispatch();
+  const router = useRouter(); // Get the router instance
+  const [logout] = useLogoutMutation(); // useLogoutMutation hook from your API slice
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleLogout = async (e) => {
+    e.preventDefault();
+    try {
+      await logout().unwrap(); // Calling the logout mutation
+      dispatch(clearCredentials()); // Dispatching action to clear credentials from Redux store
+      toast.success("Logged out successfully!"); // Showing success message
+      router.push('/'); // Redirect to the root route after logout
+    } catch (error) {
+      const message = error?.data?.message || "Something went wrong"; // Handling error message
+      toast.error(message); // Showing error message
+    }
   };
 
   return (
@@ -43,7 +65,8 @@ const AdminNavbar = () => {
                 Settings
               </a>
               <a
-                href="/logout"
+                href="#"
+                onClick={handleLogout}
                 className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
               >
                 Logout

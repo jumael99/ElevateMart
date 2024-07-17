@@ -6,7 +6,9 @@ import CategoryModel from "../models/categoryModel.js";
 // @route   GET /api/subCategory
 // @access  Public
 const getSubCategory = asyncHandler(async (req, res) => {
-  const subCategories = await subCategoryModel.find({});
+  const subCategories = await subCategoryModel.find({}).populate('category_id', 'name');
+  console.log(subCategories);  
+
   res.status(200).json(subCategories);
 });
 
@@ -15,9 +17,9 @@ const getSubCategory = asyncHandler(async (req, res) => {
 // @access  Admin
 const createNewSubCategory = asyncHandler(async (req, res) => {
   try {
-    const { categoryId, ...subCategoryData } = req.body;
+    const { category_id, ...subCategoryData } = req.body;
 
-    if (!categoryId) {
+    if (!category_id) {
       return res.status(400).send("Category ID is required");
     }
 
@@ -25,7 +27,7 @@ const createNewSubCategory = asyncHandler(async (req, res) => {
     const savedSubCategory = await newSubCategory.save();
 
     await CategoryModel.updateOne(
-      { _id: categoryId },
+      { _id: category_id },
       { $push: { subCategories: savedSubCategory._id } }
     );
 
@@ -87,7 +89,7 @@ const deleteSubCategory = asyncHandler(async (req, res) => {
     { $pull: { subCategories: subCategory._id } }
   );
 
-  await subCategory.remove();
+  await subCategory.deleteOne();
 
   res.status(200).send("SubCategory has been deleted");
 });

@@ -15,18 +15,15 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const router = useRouter();
   const dispatch = useDispatch();
-  const [login, { isLoading }] = useLoginMutation();
+  const router = useRouter();
   const { userInfo } = useSelector((state) => state.auth);
+  const [login, { isLoading }] = useLoginMutation();
 
   useEffect(() => {
     if (userInfo) {
       router.push("/");
     }
   }, [userInfo]);
-
-  const onShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -49,13 +46,6 @@ export default function Login() {
     }
   };
 
-  const onChangeEmail = (email) => {
-    setEmail(email.target.value);
-  };
-
-  const onChangePassword = (password) => {
-    setPassword(password.target.value);
-  };
   return (
     <div className={styles.loginContainer}>
       <h1>Login</h1>
@@ -65,29 +55,21 @@ export default function Login() {
           <input
             type="email"
             value={email}
-            onChange={(e) => onChangeEmail(e)}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
         </div>
         <div className={styles.formGroup}>
           <label>Password:</label>
           <input
-            type={showPassword ? "text" : "password"}
+            type="password"
             value={password}
-            onChange={(e) => onChangePassword(e)}
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <div className={styles.eyeIcon} onClick={onShowPassword}>
-            {showPassword ? <FaEye /> : <IoEyeOffSharp />}
-          </div>
         </div>
         <button type="submit">{isLoading ? "Logging in..." : "Login"}</button>
       </form>
-      <div className={styles.registerLink}>
-        <p>
-          Don't have an account? <Link href="/register">Register</Link>
-        </p>
-      </div>
     </div>
   );
 }
