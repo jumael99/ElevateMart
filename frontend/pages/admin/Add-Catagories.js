@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import Sidebar from '@/components/Admin/Admin-Sidebar';  
-import axios from 'axios';
-import dynamic from 'next/dynamic';
+import React, { useState, useEffect } from "react";
+import Sidebar from "@/components/Admin/Admin-Sidebar";
+import axios from "axios";
+import dynamic from "next/dynamic";
 
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
-import 'react-quill/dist/quill.snow.css';
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+import "react-quill/dist/quill.snow.css";
 
 // Set the base URL for axios
-axios.defaults.baseURL = 'http://localhost:5001/api';  
+axios.defaults.baseURL = "http://localhost:5001/api";
 
 const Categories = () => {
   const [formData, setFormData] = useState({
-    categoryName: '',
-    categoryDescription: ''
+    categoryName: "",
+    categoryDescription: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -27,32 +27,34 @@ const Categories = () => {
   // Fetch categories from the API
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('/categories');
+      const response = await axios.get("/categories");
       setCategories(response.data);
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      console.error("Error fetching categories:", error);
     }
   };
 
-   const handleChange = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
   };
 
-   const handleDescriptionChange = (value) => {
+  const handleDescriptionChange = (value) => {
     setFormData({
       ...formData,
-      categoryDescription: value
+      categoryDescription: value,
     });
   };
 
-   const validate = () => {
+  const validate = () => {
     let tempErrors = {};
-    if (!formData.categoryName) tempErrors.categoryName = 'Category Name is required';
-    if (!formData.categoryDescription) tempErrors.categoryDescription = 'Category Description is required';
+    if (!formData.categoryName)
+      tempErrors.categoryName = "Category Name is required";
+    if (!formData.categoryDescription)
+      tempErrors.categoryDescription = "Category Description is required";
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
@@ -63,47 +65,49 @@ const Categories = () => {
     if (validate()) {
       try {
         const { categoryName, categoryDescription } = formData;
-        const newCategory = { name: categoryName, description: categoryDescription };
+        const newCategory = {
+          name: categoryName,
+          description: categoryDescription,
+        };
 
         if (isEditing) {
-           await axios.put(`/categories/${currentCategoryId}`, newCategory);
-          console.log('Category updated:', newCategory);
+          await axios.put(`/categories/${currentCategoryId}`, newCategory);
         } else {
           // Add new category
-          const response = await axios.post('/categories', newCategory);
-          console.log('New category added:', response.data);
+          const response = await axios.post("/categories", newCategory);
+          console.log("New category added:", response.data);
         }
-        
-        fetchCategories();  
-        resetForm(); 
+
+        fetchCategories();
+        resetForm();
       } catch (error) {
-        console.error('Error saving category:', error);
+        console.error("Error saving category:", error);
       }
     }
   };
 
-   const handleEdit = (category) => {
+  const handleEdit = (category) => {
     setFormData({
       categoryName: category.name,
-      categoryDescription: category.description
+      categoryDescription: category.description,
     });
     setIsEditing(true);
     setCurrentCategoryId(category._id);
   };
 
-   const handleDelete = async (id) => {
+  const handleDelete = async (id) => {
     try {
       await axios.delete(`/categories/${id}`);
-      fetchCategories();  
+      fetchCategories();
     } catch (error) {
-      console.error('Error deleting category:', error);
+      console.error("Error deleting category:", error);
     }
   };
 
-   const resetForm = () => {
+  const resetForm = () => {
     setFormData({
-      categoryName: '',
-      categoryDescription: ''
+      categoryName: "",
+      categoryDescription: "",
     });
     setErrors({});
     setIsEditing(false);
@@ -117,13 +121,16 @@ const Categories = () => {
         <div className="bg-white shadow-md rounded-lg p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4">
             <span className="text-green-500 border-b-2 border-black-500 pb-1">
-              {isEditing ? 'Edit Category' : 'Add Category'}
+              {isEditing ? "Edit Category" : "Add Category"}
             </span>
           </h2>
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-2 gap-4">
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="categoryName">
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="categoryName"
+                >
                   Category Name
                 </label>
                 <input
@@ -135,10 +142,17 @@ const Categories = () => {
                   placeholder="Enter category name"
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 />
-                {errors.categoryName && <p className="text-red-500 text-xs italic">{errors.categoryName}</p>}
+                {errors.categoryName && (
+                  <p className="text-red-500 text-xs italic">
+                    {errors.categoryName}
+                  </p>
+                )}
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="categoryDescription">
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="categoryDescription"
+                >
                   Category Description
                 </label>
                 <ReactQuill
@@ -147,7 +161,11 @@ const Categories = () => {
                   placeholder="Enter category description"
                   className="bg-white mb-4"
                 />
-                {errors.categoryDescription && <p className="text-red-500 text-xs italic">{errors.categoryDescription}</p>}
+                {errors.categoryDescription && (
+                  <p className="text-red-500 text-xs italic">
+                    {errors.categoryDescription}
+                  </p>
+                )}
               </div>
             </div>
             <div className="flex items-center justify-between">
@@ -155,7 +173,7 @@ const Categories = () => {
                 type="submit"
                 className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
               >
-                {isEditing ? 'Update Category' : 'Add Category'}
+                {isEditing ? "Update Category" : "Add Category"}
               </button>
               {isEditing && (
                 <button
@@ -178,16 +196,27 @@ const Categories = () => {
           <table className="min-w-full leading-normal">
             <thead>
               <tr>
-                <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Name</th>
-                <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Description</th>
-                <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Name
+                </th>
+                <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Description
+                </th>
+                <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
               {categories.map((category, index) => (
                 <tr key={index}>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{category.name}</td>
-                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm" dangerouslySetInnerHTML={{ __html: category.description }}></td>
+                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                    {category.name}
+                  </td>
+                  <td
+                    className="px-5 py-5 border-b border-gray-200 bg-white text-sm"
+                    dangerouslySetInnerHTML={{ __html: category.description }}
+                  ></td>
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                     <button
                       onClick={() => handleEdit(category)}

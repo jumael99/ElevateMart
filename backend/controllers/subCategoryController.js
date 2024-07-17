@@ -6,8 +6,9 @@ import CategoryModel from "../models/categoryModel.js";
 // @route   GET /api/subCategory
 // @access  Public
 const getSubCategory = asyncHandler(async (req, res) => {
-  const subCategories = await subCategoryModel.find({}).populate('category_id', 'name');
-  console.log(subCategories);  
+  const subCategories = await subCategoryModel
+    .find({})
+    .populate("category_id", "name");
 
   res.status(200).json(subCategories);
 });
@@ -94,4 +95,9 @@ const deleteSubCategory = asyncHandler(async (req, res) => {
   res.status(200).send("SubCategory has been deleted");
 });
 
-export { getSubCategory, createNewSubCategory, updateSubCategory, deleteSubCategory };
+export {
+  getSubCategory,
+  createNewSubCategory,
+  updateSubCategory,
+  deleteSubCategory,
+};

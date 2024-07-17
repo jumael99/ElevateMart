@@ -3,6 +3,8 @@ import { BASE_URL } from "./constantURL";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: BASE_URL,
+  credentials: "include",
+  mode: "cors",
 });
 
 const apiSlice = createApi({
