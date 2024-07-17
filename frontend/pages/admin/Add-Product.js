@@ -4,6 +4,7 @@ import axios from "axios";
 import dynamic from "next/dynamic";
 import { useUploadProductImageMutation } from "@/store/slices/api/uploadsApiSlice";
 import { useCreateNewProductMutation } from "@/store/slices/api/productApiSlice";
+import { useFetchAllCategoriesQuery } from "@/store/slices/api/categoryApiSlice";
 import { toastManager } from "@/utils/toastManager";
 
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
@@ -33,12 +34,15 @@ const Products = () => {
   const [subCategories, setSubCategories] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [currentProductId, setCurrentProductId] = useState(null);
+  const { data: categoriesData } = useFetchAllCategoriesQuery();
 
   useEffect(() => {
-    fetchCategories();
+    if (categoriesData) {
+      setCategories(categoriesData);
+    }
     fetchSubCategories();
     fetchProducts();
-  }, []);
+  }, [categoriesData]);
 
   const fetchCategories = async () => {
     try {
@@ -90,7 +94,7 @@ const Products = () => {
       "Submitting.Creating a new product..."
     );
     try {
-       const imageForm = new FormData();
+      const imageForm = new FormData();
       imageForm.append("image", formData.image);
       const data = await uploadProductImage(imageForm).unwrap();
       const productData = {
@@ -109,30 +113,7 @@ const Products = () => {
         render: "Product created successfully",
         type: "success",
       });
- 
-      const formDataToSend = new FormData();
-      for (const key in formData) {
-        formDataToSend.append(key, formData[key]);
-      }
-    //   for (let pair of formDataToSend.entries()) {
-    //     console.log(pair[0] + ': ' + pair[1]);
-    // }
-
-      if (isEditing) {
-        await axios.put(`/products/${currentProductId}`, formDataToSend, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
-      } else {
-        await axios.post('/products', formDataToSend, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
-      }
-      fetchProducts();
-       resetForm();
+      resetForm();
       fetchProducts();
     } catch (error) {
       toastManager.updateStatus(toastID, {
