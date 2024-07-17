@@ -12,6 +12,7 @@ import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import { corsOptions } from "./middleware/corsOptions.js";
 import cors from "cors";
 import categoryRoutes from "./routes/categoryRoutes.js";
+import uploadRoutes from "./routes/uploadRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -32,6 +33,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/subCategory", subCategoryRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/upload", uploadRoutes);
 
 if (process.env.NODE_ENV === "production") {
   app.use("/uploads", express.static("/var/data/uploads"));

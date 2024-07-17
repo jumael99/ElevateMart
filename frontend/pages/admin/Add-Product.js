@@ -1,28 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import Sidebar from '@/components/Admin/Admin-Sidebar';
-import axios from 'axios';
-import dynamic from 'next/dynamic';
+import React, { useState, useEffect } from "react";
+import Sidebar from "@/components/Admin/Admin-Sidebar";
+import axios from "axios";
+import dynamic from "next/dynamic";
+import { useUploadProductImageMutation } from "@/store/slices/api/uploadsApiSlice";
+import { useCreateNewProductMutation } from "@/store/slices/api/productApiSlice";
+import { toastManager } from "@/utils/toastManager";
 
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
-import 'react-quill/dist/quill.snow.css';
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+import "react-quill/dist/quill.snow.css";
 
-
-axios.defaults.baseURL = 'http://localhost:5001/api';  
-
+axios.defaults.baseURL = "http://localhost:5001/api";
 
 const Products = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    price: '',
-    description: '',
+    name: "",
+    price: "",
+    description: "",
     image: null,
-    imagePreview: '',
-    quantity: '',
-    discount: '',
-    discountValidTime: '',  
-    categoryId: '',
-    subCategoryId: ''
+    imagePreview: "",
+    quantity: "",
+    discount: "",
+    discountValidTime: "",
+    categoryId: "",
+    subCategoryId: "",
   });
+
+  const [uploadProductImage] = useUploadProductImageMutation();
+  const [createNewProduct] = useCreateNewProductMutation();
 
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -38,28 +42,28 @@ const Products = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('/categories');
+      const response = await axios.get("/categories");
       setCategories(response.data);
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      console.error("Error fetching categories:", error);
     }
   };
 
   const fetchSubCategories = async () => {
     try {
-      const response = await axios.get('/subCategory');
+      const response = await axios.get("/subCategory");
       setSubCategories(response.data);
     } catch (error) {
-      console.error('Error fetching subcategories:', error);
+      console.error("Error fetching subcategories:", error);
     }
   };
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('/products');
+      const response = await axios.get("/products");
       setProducts(response.data);
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error("Error fetching products:", error);
     }
   };
 
@@ -67,7 +71,7 @@ const Products = () => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
   };
 
@@ -76,35 +80,42 @@ const Products = () => {
     setFormData({
       ...formData,
       image: file,
-      imagePreview: URL.createObjectURL(file)
+      imagePreview: URL.createObjectURL(file),
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const toastID = toastManager.loading(
+      "Submitting.Creating a new product..."
+    );
     try {
-      const formDataToSend = new FormData();
-      for (const key in formData) {
-        formDataToSend.append(key, formData[key]);
-      }
-
-      if (isEditing) {
-        await axios.put(`/products/${currentProductId}`, formDataToSend, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
-      } else {
-        await axios.post('/products', formDataToSend, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
-      }
-      fetchProducts();
+      const imageForm = new FormData();
+      imageForm.append("image", formData.image);
+      const data = await uploadProductImage(imageForm).unwrap();
+      const productData = {
+        name: formData.name,
+        price: formData.price,
+        description: formData.description,
+        image: data.image,
+        quantity: formData.quantity,
+        discount: formData.discount,
+        discountValidTime: formData.discountValidTime,
+        categoryId: formData.categoryId,
+        subCategoryId: formData.subCategoryId,
+      };
+      await createNewProduct(productData).unwrap();
+      toastManager.updateStatus(toastID, {
+        render: "Product created successfully",
+        type: "success",
+      });
       resetForm();
+      fetchProducts();
     } catch (error) {
-      console.error('Error saving product:', error);
+      toastManager.updateStatus(toastID, {
+        render: error?.data?.message || "Error creating product",
+        type: "error",
+      });
     }
   };
 
@@ -117,9 +128,11 @@ const Products = () => {
       imagePreview: product.image,
       quantity: product.quantity.toString(),
       discount: product.discount.toString(),
-      discountValidTime: new Date(product.discountValidTime).toISOString().slice(0, 16),
+      discountValidTime: new Date(product.discountValidTime)
+        .toISOString()
+        .slice(0, 16),
       categoryId: product.category._id,
-      subCategoryId: product.subCategory[0]._id
+      subCategoryId: product.subCategory[0]._id,
     });
     setIsEditing(true);
     setCurrentProductId(product._id);
@@ -130,22 +143,22 @@ const Products = () => {
       await axios.delete(`/products/${id}`);
       fetchProducts();
     } catch (error) {
-      console.error('Error deleting product:', error);
+      console.error("Error deleting product:", error);
     }
   };
 
   const resetForm = () => {
     setFormData({
-      name: '',
-      price: '',
-      description: '',
+      name: "",
+      price: "",
+      description: "",
       image: null,
-      imagePreview: '',
-      quantity: '',
-      discount: '',
-      discountValidTime: '',
-      categoryId: '',
-      subCategoryId: ''
+      imagePreview: "",
+      quantity: "",
+      discount: "",
+      discountValidTime: "",
+      categoryId: "",
+      subCategoryId: "",
     });
     setIsEditing(false);
     setCurrentProductId(null);
@@ -156,16 +169,23 @@ const Products = () => {
       <Sidebar />
       <div className="flex-1 p-10 text-black">
         <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-          <h2 className={`text-xl font-semibold mb-4 ${isEditing ? 'text-blue-500' : 'text-green-500'}`}>
+          <h2
+            className={`text-xl font-semibold mb-4 ${
+              isEditing ? "text-blue-500" : "text-green-500"
+            }`}
+          >
             <span className={`border-b-2 border-green pb-1`}>
-              {isEditing ? 'Edit Product' : 'Add Product'}
+              {isEditing ? "Edit Product" : "Add Product"}
             </span>
           </h2>
 
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-2 gap-4">
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="name"
+                >
                   Product Name
                 </label>
                 <input
@@ -179,7 +199,10 @@ const Products = () => {
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="price">
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="price"
+                >
                   Product Price
                 </label>
                 <input
@@ -193,7 +216,10 @@ const Products = () => {
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="quantity">
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="quantity"
+                >
                   Product Quantity
                 </label>
                 <input
@@ -207,7 +233,10 @@ const Products = () => {
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="discount">
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="discount"
+                >
                   Product Discount
                 </label>
                 <input
@@ -221,7 +250,10 @@ const Products = () => {
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="discountValidTime">
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="discountValidTime"
+                >
                   Discount Valid Time
                 </label>
                 <input
@@ -234,7 +266,10 @@ const Products = () => {
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="categoryId">
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="categoryId"
+                >
                   Category
                 </label>
                 <select
@@ -253,7 +288,10 @@ const Products = () => {
                 </select>
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="subCategoryId">
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="subCategoryId"
+                >
                   Sub Category
                 </label>
                 <select
@@ -271,9 +309,12 @@ const Products = () => {
                   ))}
                 </select>
               </div>
-             
+
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="image">
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="image"
+                >
                   Product Image
                 </label>
                 <input
@@ -285,17 +326,26 @@ const Products = () => {
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 />
                 {formData.imagePreview && (
-                  <img src={formData.imagePreview} alt="Product Preview" className="h-32 w-32 object-cover mt-2" />
+                  <img
+                    src={formData.imagePreview}
+                    alt="Product Preview"
+                    className="h-32 w-32 object-cover mt-2"
+                  />
                 )}
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="description"
+                >
                   Product Description
                 </label>
                 <ReactQuill
                   id="description"
                   value={formData.description}
-                  onChange={(value) => setFormData({ ...formData, description: value })}
+                  onChange={(value) =>
+                    setFormData({ ...formData, description: value })
+                  }
                   placeholder="Enter product description"
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 />
@@ -304,9 +354,11 @@ const Products = () => {
             <div className="flex items-center justify-between">
               <button
                 type="submit"
-                className={`bg-${isEditing ? 'blue' : 'green'}-500 hover:bg-${isEditing ? 'blue' : 'green'}-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
+                className={`bg-${isEditing ? "blue" : "green"}-500 hover:bg-${
+                  isEditing ? "blue" : "green"
+                }-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline`}
               >
-                {isEditing ? 'Update Product' : 'Add Product'}
+                {isEditing ? "Update Product" : "Add Product"}
               </button>
               {isEditing && (
                 <button
@@ -319,7 +371,6 @@ const Products = () => {
               )}
             </div>
           </form>
-
         </div>
 
         <div className="bg-white shadow-md rounded-lg p-6">
@@ -338,7 +389,11 @@ const Products = () => {
                 products.map((product) => (
                   <tr key={product._id}>
                     <td className="py-2">
-                      <img src={product.image} alt={product.name} className="h-16 w-16 object-cover" />
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="h-16 w-16 object-cover"
+                      />
                     </td>
                     <td className="py-2">{product.name}</td>
                     <td className="py-2">{product.price}</td>

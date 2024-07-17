@@ -15,8 +15,18 @@ export const productApi = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+    createNewProduct: builder.mutation({
+      query: (product) => ({
+        url: PRODUCT_URL,
+        method: "POST",
+        body: product,
+      }),
+    }),
   }),
 });
 
-export const { useFetchAllProductsQuery, useFetchProductBySlugQuery } =
-  productApi;
+export const {
+  useFetchAllProductsQuery,
+  useFetchProductBySlugQuery,
+  useCreateNewProductMutation,
+} = productApi;
