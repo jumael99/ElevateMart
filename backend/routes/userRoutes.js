@@ -4,7 +4,8 @@ import protect from "../middleware/protectMiddleware.js";
 
 const router = express.Router();
 
-router.use(protect);
+router.use(protect());
+
 router.route("/").get(getProfile).put(updateProfile);
 
 export default router;

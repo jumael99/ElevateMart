@@ -30,8 +30,8 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    const toastId = toastManager.loading("Logging in...");
     try {
-      const toastId = toastManager.loading("Logging in...");
       const { token } = await login({ email, password }).unwrap();
       dispatch(setCredentials(token));
       router.push("/");

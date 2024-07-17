@@ -83,13 +83,8 @@ const productSchema = new mongoose.Schema(
 );
 
 productSchema.pre("save", function (next) {
-  this.slug = this.name.toLowerCase().match(/\w+/g).join("-");
-  next();
-});
-
-productSchema.pre("updateOne", function (next) {
-  if (this._update.name) {
-    this._update.slug = this._update.name.toLowerCase().match(/\w+/g).join("-");
+  if (this.isModified("name")) {
+    this.slug = this.name.toLowerCase().split(" ").join("-");
   }
   next();
 });
