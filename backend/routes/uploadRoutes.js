@@ -32,7 +32,7 @@ router.post("/user", (req, res) => {
 
     try {
       await sharp(req.file.buffer)
-        .resize(500, 500)
+        .resize(600, 600)
         .toFormat("png")
         .png({ quality: 90 })
         .toFile(outputPath);
@@ -46,7 +46,7 @@ router.post("/user", (req, res) => {
   });
 });
 
-router.post("/products", (req, res) => {
+router.post("/product", (req, res) => {
   uploadSingleImage(req, res, async function (err) {
     if (err) {
       return res.status(400).send({ message: err.message });
@@ -58,7 +58,7 @@ router.post("/products", (req, res) => {
 
     try {
       await sharp(req.file.buffer)
-        .resize(704, 528)
+        .resize(1200, 800)
         .toFormat("png")
         .png({ quality: 90 })
         .toFile(outputPath);
