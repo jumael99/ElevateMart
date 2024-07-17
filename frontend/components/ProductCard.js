@@ -1,5 +1,3 @@
-import getImageURL from "@/utils/image";
-import { get } from "mongoose";
 import { useRouter } from "next/router";
 
 const ProductCard = ({ productData }) => {
@@ -13,7 +11,7 @@ const ProductCard = ({ productData }) => {
   return (
     <div className="w-[90%] mx-auto bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden shadow-lg">
       <img
-        src="../../uploads/products/image-1721234261294.png"
+        src={image}
         alt={name}
         className="w-full h-64 object-cover"
         onClick={handleViewProduct}
