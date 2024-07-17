@@ -3,8 +3,8 @@ import { useRouter } from "next/dist/client/router";
 import { useState } from "react";
 import { FaEye } from "react-icons/fa";
 import { IoEyeOffSharp } from "react-icons/io5";
-import { toast } from "react-toastify";
 import { validate } from "../utils/auth.js";
+import { toastManager } from "@/utils/toastManager.js";
 
 const register = () => {
   const router = useRouter();
@@ -30,17 +30,26 @@ const register = () => {
     if (!formObject) {
       return;
     }
+    const toastId = toastManager.loading("Registering...");
     const reqURL = "http://localhost:5001/api/auth/register";
     try {
       const res = await Axios.post(reqURL, formObject);
-      toast.success(
-        "User registered successfully, Check your email to verify!"
-      );
       form.reset();
       const { url } = res.data.data;
-      router.push(url);
+      toastManager.updateStatus(toastId, {
+        render: "Registered successfully",
+        type: "success",
+      });
+
+      setTimeout(() => {
+        router.push(url);
+      }, 2000);
     } catch (error) {
-      toast.error(error?.response.data.message);
+      const message = error?.response?.data?.message || "Something went wrong";
+      toastManager.updateStatus(toastId, {
+        render: message,
+        type: "error",
+      });
     } finally {
       setIsVerifying(false);
     }

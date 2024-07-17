@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import styles from "../styles/Login.module.css";
-import { toast } from "react-toastify";
 import { IoEyeOffSharp } from "react-icons/io5";
 import { FaEye } from "react-icons/fa";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { setCredentials } from "../store/slices/authSlice";
 import { useLoginMutation } from "../store/slices/api/authApiSlice";
+import { toastManager } from "@/utils/toastManager";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -31,14 +31,21 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
+      const toastId = toastManager.loading("Logging in...");
       const { token } = await login({ email, password }).unwrap();
-      toast.success("Logged in successfully!");
       dispatch(setCredentials(token));
       router.push("/");
+      toastManager.updateStatus(toastId, {
+        render: "Logged in successfully",
+        type: "success",
+      });
     } catch (error) {
       const errorMessage =
         error?.data?.message || error?.message || "Something went wrong!";
-      toast.error(errorMessage);
+      toastManager.updateStatus(toastId, {
+        render: errorMessage,
+        type: "error",
+      });
     }
   };
 

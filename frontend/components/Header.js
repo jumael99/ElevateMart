@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/router";
 import { useLogoutMutation } from "@/store/slices/api/authApiSlice";
-import { toast } from "react-toastify";
 import { clearCredentials } from "@/store/slices/authSlice";
+import { toastManager } from "@/utils/toastManager";
 
 const Header = () => {
   const { userInfo } = useSelector((state) => state.auth);
@@ -25,14 +25,21 @@ const Header = () => {
   }, [userInfo]);
 
   const handleLogout = async (e) => {
+    const toastId = toastManager.loading("Logging out...");
     e.preventDefault();
     try {
       await logout().unwrap();
       dispatch(clearCredentials());
-      toast.success("Logged out successfully!");
+      toastManager.updateStatus(toastId, {
+        render: "Logged out successfully",
+        type: "success",
+      });
     } catch (error) {
       const message = error?.data?.message || "Something went wrong";
-      toast.error(message);
+      toastManager.updateStatus(toastId, {
+        render: message,
+        type: "error",
+      });
     }
   };
 
