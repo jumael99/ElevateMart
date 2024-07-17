@@ -41,7 +41,7 @@ const login = asyncHandler(async (req, res) => {
 
   const token = generateToken(res, existingUser._id, existingUser.isAdmin);
 
-  let redirectPath = "/"; // Default redirect path for non-admin users
+  let redirectPath = "/";  
 
   if (existingUser.isAdmin) {
     redirectPath = "/admin/dashboard"; 

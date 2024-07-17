@@ -1,15 +1,22 @@
-import router from "express";
-
+import express from 'express';
 import {
   getProducts,
   getProductBySlug,
-  createProduct,
+  createNewProduct,
   updateProduct,
-} from "../controllers/productsController.js";
+} from '../controllers/productController.js';
 
-const productRouter = router.Router();
+const productRouter = express.Router();
 
-productRouter.route("/").get(getProducts).post(createProduct);
-productRouter.route("/:slug").get(getProductBySlug).patch(updateProduct);
+// Define routes
+productRouter
+  .route('/')
+  .get(getProducts)
+  .post(createNewProduct);
+
+productRouter
+  .route('/:slug')
+  .get(getProductBySlug)
+  .patch(updateProduct);
 
 export default productRouter;

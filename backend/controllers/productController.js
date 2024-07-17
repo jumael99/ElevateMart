@@ -22,39 +22,35 @@ const getProductBySlug = asyncHandler(async (req, res) => {
   res.status(200).json(product);
 });
 
-// @desc    Create a product
-// @route   POST /api/products
-// @access  Private/Admin
-const createProduct = asyncHandler(async (req, res) => {
-  const {
-    name,
-    description,
-    price,
-    category,
-    subCategory,
-    quantity,
-    images,
-    discount = 0,
-    discountValidTime = Date.now(),
-  } = req.body;
+ 
+const createNewProduct = asyncHandler(async (req, res) => {
+  const { name, price, description, quantity, discount, discountValidTime, category, subCategory } = req.body;
+  const image = req.file ? req.file.path : '';
 
-  await productModel.create({
-    name,
-    description,
-    price,
-    category,
-    subCategory,
-    quantity,
-    images,
-    discount,
-    discountValidTime,
-  });
+  console.log('Received product data:', req.body);
 
-  res.status(201).json({
-    status: "success",
-    message: "Product created successfully",
-  });
+  try {
+    const newProduct = new productModel({
+      name,
+      price,
+      description,
+      // image,
+      quantity,
+      discount,
+      discountValidTime,
+      category,
+      subCategory
+    });
+
+    const savedProduct = await newProduct.save();
+    res.status(201).json(savedProduct);
+  } catch (error) {
+    console.error('Error saving product:', error.message);
+    res.status(500).json({ error: error.message });
+  }
 });
+
+
 
 // @desc    Update a product
 // @route   PATCH /api/products/:slug
@@ -131,7 +127,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
 export {
   getProducts,
   getProductBySlug,
-  createProduct,
+  createNewProduct,
   updateProduct,
   deleteProduct,
 };

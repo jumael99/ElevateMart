@@ -87,6 +87,9 @@ const Products = () => {
       for (const key in formData) {
         formDataToSend.append(key, formData[key]);
       }
+    //   for (let pair of formDataToSend.entries()) {
+    //     console.log(pair[0] + ': ' + pair[1]);
+    // }
 
       if (isEditing) {
         await axios.put(`/products/${currentProductId}`, formDataToSend, {
