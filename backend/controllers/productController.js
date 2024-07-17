@@ -29,35 +29,35 @@ const getProductBySlug = asyncHandler(async (req, res) => {
   res.status(200).json(product);
 });
 
- 
 const createNewProduct = asyncHandler(async (req, res) => {
-  const { name, price, description, quantity, discount, discountValidTime, category, subCategory } = req.body;
-  const image = req.file ? req.file.path : '';
+  const {
+    name,
+    price,
+    description,
+    quantity,
+    discount,
+    discountValidTime,
+    category,
+    subCategory,
+    image,
+  } = req.body;
 
-  console.log('Received product data:', req.body);
+  console.log("Received product data:", req.body);
 
-  try {
-    const newProduct = new productModel({
-      name,
-      price,
-      description,
-      // image,
-      quantity,
-      discount,
-      discountValidTime,
-      category,
-      subCategory
-    });
+  const newProduct = productModel.create({
+    name,
+    price,
+    description,
+    image,
+    quantity,
+    discount,
+    discountValidTime,
+    category,
+    subCategory,
+  });
 
-    const savedProduct = await newProduct.save();
-    res.status(201).json(savedProduct);
-  } catch (error) {
-    console.error('Error saving product:', error.message);
-    res.status(500).json({ error: error.message });
-  }
+  res.status(201).json(newProduct);
 });
-
-
 
 // @desc    Update a product
 // @route   PATCH /api/products/:slug
