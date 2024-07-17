@@ -90,7 +90,7 @@ const Products = () => {
       "Submitting.Creating a new product..."
     );
     try {
-      const imageForm = new FormData();
+       const imageForm = new FormData();
       imageForm.append("image", formData.image);
       const data = await uploadProductImage(imageForm).unwrap();
       const productData = {
@@ -109,7 +109,30 @@ const Products = () => {
         render: "Product created successfully",
         type: "success",
       });
-      resetForm();
+ 
+      const formDataToSend = new FormData();
+      for (const key in formData) {
+        formDataToSend.append(key, formData[key]);
+      }
+    //   for (let pair of formDataToSend.entries()) {
+    //     console.log(pair[0] + ': ' + pair[1]);
+    // }
+
+      if (isEditing) {
+        await axios.put(`/products/${currentProductId}`, formDataToSend, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+      } else {
+        await axios.post('/products', formDataToSend, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+      }
+      fetchProducts();
+       resetForm();
       fetchProducts();
     } catch (error) {
       toastManager.updateStatus(toastID, {

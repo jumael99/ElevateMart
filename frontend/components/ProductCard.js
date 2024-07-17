@@ -1,63 +1,33 @@
-import React from "react";
-import Link from "next/link";
+import { useRouter } from "next/router";
 
-const ProductCard = (data) => {
-  const { name, image, _id, price, countInStock } = data.productData;
-  const productName = name.replace(/\s+/g, " ");
+const ProductCard = ({ productData }) => {
+  const { name, image, _id, price, countInStock } = productData || {};
+  const router = useRouter();
+
+  const handleViewProduct = () => {
+    router.push(`/products/${_id}`);
+  };
 
   return (
     <div className="w-[90%] mx-auto bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden shadow-lg">
-      <div className="relative">
-        <Link href={`/products/${_id}`} className="block">
-          <img
-            src={image}
-            alt={_id}
-            className="w-full h-64 object-full transition-transform duration-300 hover:scale-105"
-          />
-        </Link>
-        <div className="absolute top-0 right-0 bg-white px-2 py-1 m-2 rounded-full shadow-md">
-          <span className="text-sm font-bold text-gray-700">
-            {countInStock} left
-          </span>
-        </div>
-      </div>
+      <img
+        src={image}
+        alt={name}
+        className="w-full h-64 object-cover"
+        onClick={handleViewProduct}
+        style={{ cursor: "pointer" }}
+      />
       <div className="p-4">
-        <Link href={`/products/${productName}`} className="block">
-          <h4 className="text-xl font-bold text-gray-800 mb-2">
-            {name.length > 30 ? name.slice(0, 30) + "..." : name}
-          </h4>
-        </Link>
-        <div className="flex justify-between items-end mb-4">
-          <div className="text-2xl font-extrabold text-gray-800">
-            {price}
-            <span className="ml-1 text-sm">৳</span>
-          </div>
-          <div
-            className={`text-sm font-semibold ${
-              countInStock === 0
-                ? "text-red-500"
-                : countInStock < 10
-                ? "text-orange-500"
-                : "text-green-500"
-            }`}
-          >
-            {countInStock === 0
-              ? "Out of stock"
-              : countInStock < 10
-              ? "Low stock"
-              : "In stock"}
-          </div>
-        </div>
-        <button
-          className={`w-full py-2 px-4 rounded-full font-bold text-white transition-all duration-300 ${
-            countInStock === 0
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-slate-700 hover:bg-slate-500 hover:shadow-lg"
-          }`}
-          disabled={countInStock === 0}
+        <h3 className="text-lg font-bold">{name}</h3>
+        <p className="text-gray-700">${price}</p>
+        <p className="text-gray-500">In stock: {countInStock}</p>
+        <div
+          className="mt-4 inline-block bg-gray-700 text-white py-2 px-4 rounded hover:bg-gray-600"
+          onClick={handleViewProduct}
+          style={{ cursor: "pointer" }}
         >
-          {countInStock === 0 ? "Out of Stock" : "Add to Cart"}
-        </button>
+          View Product
+        </div>
       </div>
     </div>
   );
