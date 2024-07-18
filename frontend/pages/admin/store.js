@@ -3,6 +3,7 @@ import AdminNavbar from "@/components/Admin/Admin-Nabvar";
 import Sidebar from "@/components/Admin/Admin-Sidebar";
 import React from "react";
 import products from "@/static/products";
+import { withAuth } from "@/utils/withAuth";
 
 const store = () => {
     const editHandler = (p_name) => {
@@ -101,4 +102,4 @@ const store = () => {
     );
 };
 
-export default store;
+export default withAuth(store, { requireLogin: true, requireAdmin: true });

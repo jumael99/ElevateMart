@@ -8,12 +8,14 @@ export const productApi = apiSlice.injectEndpoints({
         url: PRODUCT_URL,
         method: "GET",
       }),
+      providesTags: ["Product"],
     }),
     fetchProductBySlug: builder.query({
       query: (slug) => ({
         url: `${PRODUCT_URL}/${slug}`,
         method: "GET",
       }),
+      providesTags: ["Product"],
     }),
     createNewProduct: builder.mutation({
       query: (product) => ({
@@ -21,6 +23,14 @@ export const productApi = apiSlice.injectEndpoints({
         method: "POST",
         body: product,
       }),
+      invalidatesTags: ["Product"],
+    }),
+    deleteProduct: builder.mutation({
+      query: (id) => ({
+        url: `${PRODUCT_URL}/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Product"],
     }),
   }),
 });
@@ -29,4 +39,5 @@ export const {
   useFetchAllProductsQuery,
   useFetchProductBySlugQuery,
   useCreateNewProductMutation,
+  useDeleteProductMutation,
 } = productApi;

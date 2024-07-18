@@ -1,5 +1,6 @@
 import Sidebar from "@/components/Admin/Admin-Sidebar";
 import { React, useState } from "react";
+import { withAuth } from "@/utils/withAuth";
 
 const OfferForm = () => {
   const [offerImg, setOfferImg] = useState("");
@@ -89,4 +90,4 @@ const OfferForm = () => {
   );
 };
 
-export default OfferForm;
+export default withAuth(OfferForm, { requireLogin: true, requireAdmin: true });

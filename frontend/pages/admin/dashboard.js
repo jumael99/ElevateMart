@@ -1,17 +1,33 @@
-import { useState } from 'react';
-import Sidebar from '@/components/Admin/Admin-Sidebar';
-import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { useState } from "react";
+import Sidebar from "@/components/Admin/Admin-Sidebar";
+import { Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { withAuth } from "@/utils/withAuth";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 const Dashboard = () => {
   const [formData, setFormData] = useState({
-    productName: '',
-    productDescription: '',
-    productPrice: '',
+    productName: "",
+    productDescription: "",
+    productPrice: "",
     productImage: null,
-    productImagePreview: ''
+    productImagePreview: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -20,7 +36,7 @@ const Dashboard = () => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
   };
 
@@ -32,7 +48,7 @@ const Dashboard = () => {
         setFormData({
           ...formData,
           productImage: file,
-          productImagePreview: reader.result
+          productImagePreview: reader.result,
         });
       };
       reader.readAsDataURL(file);
@@ -41,10 +57,14 @@ const Dashboard = () => {
 
   const validate = () => {
     let tempErrors = {};
-    if (!formData.productName) tempErrors.productName = 'Product Name is required';
-    if (!formData.productDescription) tempErrors.productDescription = 'Product Description is required';
-    if (!formData.productPrice) tempErrors.productPrice = 'Product Price is required';
-    if (!formData.productImage) tempErrors.productImage = 'Product Image is required';
+    if (!formData.productName)
+      tempErrors.productName = "Product Name is required";
+    if (!formData.productDescription)
+      tempErrors.productDescription = "Product Description is required";
+    if (!formData.productPrice)
+      tempErrors.productPrice = "Product Price is required";
+    if (!formData.productImage)
+      tempErrors.productImage = "Product Image is required";
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
@@ -52,25 +72,25 @@ const Dashboard = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validate()) {
-       console.log('Form submitted', formData);
+      console.log("Form submitted", formData);
     }
   };
 
   const data = {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+    labels: ["January", "February", "March", "April", "May", "June", "July"],
     datasets: [
       {
-        label: 'Income',
+        label: "Income",
         data: [65, 59, 80, 81, 56, 55, 40],
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        borderColor: 'rgba(75, 192, 192, 1)',
+        backgroundColor: "rgba(75, 192, 192, 0.2)",
+        borderColor: "rgba(75, 192, 192, 1)",
         borderWidth: 1,
       },
       {
-        label: 'Expense',
+        label: "Expense",
         data: [28, 48, 40, 19, 86, 27, 90],
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        borderColor: 'rgba(255, 99, 132, 1)',
+        backgroundColor: "rgba(255, 99, 132, 0.2)",
+        borderColor: "rgba(255, 99, 132, 1)",
         borderWidth: 1,
       },
     ],
@@ -80,11 +100,11 @@ const Dashboard = () => {
     responsive: true,
     plugins: {
       legend: {
-        position: 'top',
+        position: "top",
       },
       title: {
         display: true,
-        text: 'Income and Expense Chart',
+        text: "Income and Expense Chart",
       },
     },
   };
@@ -94,8 +114,11 @@ const Dashboard = () => {
       <Sidebar />
       <div className="flex-1 p-10 text-black">
         <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
-        <p className="mb-6">Welcome to the Admin Dashboard. Here you can manage users, view reports, and more.</p>
-        
+        <p className="mb-6">
+          Welcome to the Admin Dashboard. Here you can manage users, view
+          reports, and more.
+        </p>
+
         <div className="grid grid-cols-3 gap-6">
           <div className="bg-blue-500 text-white shadow-md rounded-lg p-6">
             <h2 className="text-xl font-semibold mb-4">Product Orders</h2>
@@ -119,4 +142,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default withAuth(Dashboard, { requireLogin: true, requireAdmin: true });

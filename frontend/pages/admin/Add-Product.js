@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "@/components/Admin/Admin-Sidebar";
-import axios from "axios";
 import dynamic from "next/dynamic";
 import { useUploadProductImageMutation } from "@/store/slices/api/uploadsApiSlice";
-import { useCreateNewProductMutation } from "@/store/slices/api/productApiSlice";
+import {
+  useCreateNewProductMutation,
+  useFetchAllProductsQuery,
+  useDeleteProductMutation,
+} from "@/store/slices/api/productApiSlice";
+import { useFetchAllCategoriesQuery } from "@/store/slices/api/categoryApiSlice";
 import { toastManager } from "@/utils/toastManager";
 
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
-
-axios.defaults.baseURL = "http://localhost:5001/api";
+import { withAuth } from "@/utils/withAuth";
+import { useFetchAllSubCategoriesQuery } from "@/store/slices/api/subcategoryApiSlice";
 
 const Products = () => {
   const [formData, setFormData] = useState({
@@ -27,45 +31,28 @@ const Products = () => {
 
   const [uploadProductImage] = useUploadProductImageMutation();
   const [createNewProduct] = useCreateNewProductMutation();
+  const { data: productsData } = useFetchAllProductsQuery();
 
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [currentProductId, setCurrentProductId] = useState(null);
+  const { data: categoriesData } = useFetchAllCategoriesQuery();
+  const [deleteProduct] = useDeleteProductMutation();
+  const { data: subCategoriesData } = useFetchAllSubCategoriesQuery();
 
   useEffect(() => {
-    fetchCategories();
-    fetchSubCategories();
-    fetchProducts();
-  }, []);
-
-  const fetchCategories = async () => {
-    try {
-      const response = await axios.get("/categories");
-      setCategories(response.data);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
+    if (categoriesData) {
+      setCategories(categoriesData);
     }
-  };
-
-  const fetchSubCategories = async () => {
-    try {
-      const response = await axios.get("/subCategory");
-      setSubCategories(response.data);
-    } catch (error) {
-      console.error("Error fetching subcategories:", error);
+    if (productsData) {
+      setProducts(productsData);
     }
-  };
-
-  const fetchProducts = async () => {
-    try {
-      const response = await axios.get("/products");
-      setProducts(response.data);
-    } catch (error) {
-      console.error("Error fetching products:", error);
+    if (subCategoriesData) {
+      setSubCategories(subCategoriesData);
     }
-  };
+  }, [categoriesData, productsData, subCategoriesData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -86,54 +73,36 @@ const Products = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const toastID = toastManager.loading(
-      "Submitting.Creating a new product..."
-    );
+    const toastID = toastManager.loading("Please wait...");
     try {
-       const imageForm = new FormData();
-      imageForm.append("image", formData.image);
-      const data = await uploadProductImage(imageForm).unwrap();
+      const imageForm = new FormData();
+      if (formData.image) {
+        imageForm.append("image", formData.image);
+        const data = await uploadProductImage(imageForm).unwrap();
+        imageForm.append("imageURL", dat);
+      }
+
       const productData = {
         name: formData.name,
         price: formData.price,
         description: formData.description,
-        image: data.image,
+        image: imageForm.get("imageURL"),
         quantity: formData.quantity,
         discount: formData.discount,
         discountValidTime: formData.discountValidTime,
         categoryId: formData.categoryId,
         subCategoryId: formData.subCategoryId,
       };
-      await createNewProduct(productData).unwrap();
-      toastManager.updateStatus(toastID, {
-        render: "Product created successfully",
-        type: "success",
-      });
- 
-      const formDataToSend = new FormData();
-      for (const key in formData) {
-        formDataToSend.append(key, formData[key]);
-      }
-    //   for (let pair of formDataToSend.entries()) {
-    //     console.log(pair[0] + ': ' + pair[1]);
-    // }
-
-      if (isEditing) {
-        await axios.put(`/products/${currentProductId}`, formDataToSend, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
+      if (!isEditing) {
+        await createNewProduct(productData).unwrap();
+        toastManager.updateStatus(toastID, {
+          render: "Product created successfully",
+          type: "success",
         });
       } else {
-        await axios.post('/products', formDataToSend, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
+        console.log("Updating product:", productData);
       }
-      fetchProducts();
-       resetForm();
-      fetchProducts();
+      resetForm();
     } catch (error) {
       toastManager.updateStatus(toastID, {
         render: error?.data?.message || "Error creating product",
@@ -144,29 +113,37 @@ const Products = () => {
 
   const handleEdit = (product) => {
     setFormData({
-      name: product.name,
-      price: product.price.toString(),
-      description: product.description,
-      image: null,
-      imagePreview: product.image,
-      quantity: product.quantity.toString(),
-      discount: product.discount.toString(),
+      name: product?.name,
+      price: product?.price,
+      description: product?.description,
+      image: product?.image,
+      imagePreview: product?.image,
+      quantity: product?.quantity,
+      discount: product?.discount,
       discountValidTime: new Date(product.discountValidTime)
         .toISOString()
         .slice(0, 16),
-      categoryId: product.category._id,
-      subCategoryId: product.subCategory[0]._id,
+      categoryId: product?.category?._id,
+      subCategoryId: product?.subCategory?._id,
     });
     setIsEditing(true);
     setCurrentProductId(product._id);
   };
 
   const handleDelete = async (id) => {
+    const toastID = toastManager.loading("Please wait...");
     try {
-      await axios.delete(`/products/${id}`);
-      fetchProducts();
+      await deleteProduct(id).unwrap();
+      toastManager.updateStatus(toastID, {
+        render: "Product deleted successfully",
+        type: "success",
+      });
+      resetForm();
     } catch (error) {
-      console.error("Error deleting product:", error);
+      toastManager.updateStatus(toastID, {
+        render: error?.data?.message || "Error deleting product",
+        type: "error",
+      });
     }
   };
 
@@ -451,4 +428,4 @@ const Products = () => {
   );
 };
 
-export default Products;
+export default withAuth(Products, { requireLogin: true, requireAdmin: true });
