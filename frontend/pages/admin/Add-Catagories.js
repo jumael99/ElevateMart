@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "@/components/Admin/Admin-Sidebar";
-import axios from "axios";
 import dynamic from "next/dynamic";
 
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
@@ -12,9 +11,7 @@ import {
   useFetchAllCategoriesQuery,
 } from "../../store/slices/api/categoryApiSlice";
 import { toastManager } from "@/utils/toastManager";
-
-// Set the base URL for axios
-axios.defaults.baseURL = "http://localhost:5001/api";
+import { withAuth } from "@/utils/withAuth";
 
 const Categories = () => {
   const [formData, setFormData] = useState({
@@ -33,6 +30,7 @@ const Categories = () => {
 
   useEffect(() => {
     if (categoryData) {
+      console.log(categoryData);
       setCategories(categoryData);
     }
   }, [categoryData]);
@@ -263,4 +261,6 @@ const Categories = () => {
   );
 };
 
-export default Categories;
+export default withAuth(Categories, { requireLogin: true, requireAdmin: true });
+
+// export default Categories;

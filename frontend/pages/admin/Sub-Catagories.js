@@ -8,6 +8,8 @@ import {
   useUpdateSubCategoryMutation,
   useDeleteSubCategoryMutation,
 } from "@/store/slices/api/subcategoryApiSlice";
+import { useFetchAllCategoriesQuery } from "@/store/slices/api/categoryApiSlice";
+import { withAuth } from "@/utils/withAuth";
 
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
@@ -21,23 +23,20 @@ const SubCategory = () => {
   const [errors, setErrors] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [currentSubCategoryId, setCurrentSubCategoryId] = useState(null);
+  const { data: categoriesFromAPI } = useFetchAllCategoriesQuery();
 
-  const { data: subCategories = [], refetch: refetchSubCategories } = useFetchAllSubCategoriesQuery();
+  const { data: subCategories = [], refetch: refetchSubCategories } =
+    useFetchAllSubCategoriesQuery();
   const [createNewSubCategory] = useCreateNewSubCategoryMutation();
   const [updateSubCategory] = useUpdateSubCategoryMutation();
   const [deleteSubCategory] = useDeleteSubCategoryMutation();
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
-    try {
-      await refetchCategories();
-    } catch (error) {
-      console.error("Error fetching categories:", error);
+    if (categoriesFromAPI) {
+      setCategories(categoriesFromAPI);
     }
-  };
+  }, [categoriesFromAPI]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,7 +49,8 @@ const SubCategory = () => {
   const validate = () => {
     let tempErrors = {};
     if (!formData.name) tempErrors.name = "SubCategory Name is required";
-    if (!formData.description) tempErrors.description = "SubCategory Description is required";
+    if (!formData.description)
+      tempErrors.description = "SubCategory Description is required";
     if (!formData.category_id) tempErrors.category_id = "Category is required";
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
@@ -61,7 +61,10 @@ const SubCategory = () => {
     if (validate()) {
       try {
         if (isEditing) {
-          await updateSubCategory({ id: currentSubCategoryId, ...formData }).unwrap();
+          await updateSubCategory({
+            id: currentSubCategoryId,
+            ...formData,
+          }).unwrap();
         } else {
           await createNewSubCategory(formData).unwrap();
         }
@@ -259,4 +262,7 @@ const SubCategory = () => {
   );
 };
 
-export default SubCategory;
+export default withAuth(SubCategory, {
+  requireLogin: true,
+  requireAdmin: true,
+});

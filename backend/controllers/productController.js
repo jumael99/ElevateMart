@@ -38,12 +38,20 @@ const getProductBySlug = asyncHandler(async (req, res) => {
   res.status(200).json(product);
 });
 
- 
 const createNewProduct = asyncHandler(async (req, res) => {
-  const { name, price, description, quantity, discount, discountValidTime, category, subCategory } = req.body;
-  const image = req.file ? req.file.path : '';
+  const {
+    name,
+    price,
+    description,
+    quantity,
+    discount,
+    discountValidTime,
+    category,
+    subCategory,
+  } = req.body;
+  const image = req.file ? req.file.path : "";
 
-  console.log('Received product data:', req.body);
+  console.log("Received product data:", req.body);
 
   try {
     const newProduct = new productModel({
@@ -55,18 +63,16 @@ const createNewProduct = asyncHandler(async (req, res) => {
       discount,
       discountValidTime,
       category,
-      subCategory
+      subCategory,
     });
 
     const savedProduct = await newProduct.save();
     res.status(201).json(savedProduct);
   } catch (error) {
-    console.error('Error saving product:', error.message);
+    console.error("Error saving product:", error.message);
     res.status(500).json({ error: error.message });
   }
 });
-
-
 
 // @desc    Update a product
 // @route   PATCH /api/products/:slug
@@ -121,18 +127,14 @@ const updateProduct = asyncHandler(async (req, res) => {
 });
 
 // @desc    Delete a product
-// @route   DELETE /api/products/:slug
+// @route   DELETE /api/products/:id
 // @access  Private/Admin
 const deleteProduct = asyncHandler(async (req, res) => {
-  const product = await productModel.findOne({ slug: req.params.slug });
-
-  if (!product) {
-    return res
-      .status(404)
-      .json({ status: "error", message: "Product not found" });
+  const deletedProduct = await productModel.findByIdAndDelete(req.params.id);
+  if (!deletedProduct) {
+    res.status(404);
+    throw new Error("Product not found");
   }
-
-  await productModel.findByIdAndDelete(product._id);
 
   res.status(200).json({
     status: "success",

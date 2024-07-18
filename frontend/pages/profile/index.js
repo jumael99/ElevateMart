@@ -8,6 +8,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useSelector } from "react-redux";
 import axios from "axios";
+import { withAuth } from "@/utils/withAuth";
 
 const Profile = () => {
   const user = useSelector((state) => state.user.user);
@@ -266,4 +267,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default withAuth(Profile, { requireLogin: true });

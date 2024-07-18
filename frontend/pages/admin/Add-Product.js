@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "@/components/Admin/Admin-Sidebar";
-import axios from "axios";
 import dynamic from "next/dynamic";
 import { useUploadProductImageMutation } from "@/store/slices/api/uploadsApiSlice";
 import {
   useCreateNewProductMutation,
   useFetchAllProductsQuery,
+  useDeleteProductMutation,
 } from "@/store/slices/api/productApiSlice";
 import { useFetchAllCategoriesQuery } from "@/store/slices/api/categoryApiSlice";
 import { toastManager } from "@/utils/toastManager";
 
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
-
-axios.defaults.baseURL = "http://localhost:5001/api";
+import { withAuth } from "@/utils/withAuth";
+import { useFetchAllSubCategoriesQuery } from "@/store/slices/api/subcategoryApiSlice";
 
 const Products = () => {
   const [formData, setFormData] = useState({
@@ -39,7 +39,8 @@ const Products = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentProductId, setCurrentProductId] = useState(null);
   const { data: categoriesData } = useFetchAllCategoriesQuery();
-  console.log(productsData);
+  const [deleteProduct] = useDeleteProductMutation();
+  const { data: subCategoriesData } = useFetchAllSubCategoriesQuery();
 
   useEffect(() => {
     if (categoriesData) {
@@ -48,17 +49,11 @@ const Products = () => {
     if (productsData) {
       setProducts(productsData);
     }
-    fetchSubCategories();
-  }, [categoriesData, productsData]);
-
-  const fetchSubCategories = async () => {
-    try {
-      const response = await axios.get("/subCategory");
-      setSubCategories(response.data);
-    } catch (error) {
-      console.error("Error fetching subcategories:", error);
+    if (subCategoriesData) {
+      setSubCategories(subCategoriesData);
     }
-  };
+  }, [categoriesData, productsData, subCategoriesData]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -84,7 +79,7 @@ const Products = () => {
       if (formData.image) {
         imageForm.append("image", formData.image);
         const data = await uploadProductImage(imageForm).unwrap();
-        imageForm.append("imageURL", formData.image);
+        imageForm.append("imageURL", dat);
       }
 
       const productData = {
@@ -136,11 +131,19 @@ const Products = () => {
   };
 
   const handleDelete = async (id) => {
+    const toastID = toastManager.loading("Please wait...");
     try {
-      await axios.delete(`/products/${id}`);
-      fetchProducts();
+      await deleteProduct(id).unwrap();
+      toastManager.updateStatus(toastID, {
+        render: "Product deleted successfully",
+        type: "success",
+      });
+      resetForm();
     } catch (error) {
-      console.error("Error deleting product:", error);
+      toastManager.updateStatus(toastID, {
+        render: error?.data?.message || "Error deleting product",
+        type: "error",
+      });
     }
   };
 
@@ -425,4 +428,4 @@ const Products = () => {
   );
 };
 
-export default Products;
+export default withAuth(Products, { requireLogin: true, requireAdmin: true });
