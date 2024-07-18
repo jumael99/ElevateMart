@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "@/components/Admin/Admin-Sidebar";
-import axios from "axios";
 import dynamic from "next/dynamic";
+import "react-quill/dist/quill.snow.css";
+import {
+  useFetchAllSubCategoriesQuery,
+  useCreateNewSubCategoryMutation,
+  useUpdateSubCategoryMutation,
+  useDeleteSubCategoryMutation,
+} from "@/store/slices/api/subcategoryApiSlice";
 
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
-import "react-quill/dist/quill.snow.css";
-
-axios.defaults.baseURL = "http://localhost:5001/api";
 
 const SubCategory = () => {
   const [formData, setFormData] = useState({
@@ -16,31 +19,23 @@ const SubCategory = () => {
   });
 
   const [errors, setErrors] = useState({});
-  const [subCategories, setSubCategories] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [currentSubCategoryId, setCurrentSubCategoryId] = useState(null);
 
+  const { data: subCategories = [], refetch: refetchSubCategories } = useFetchAllSubCategoriesQuery();
+  const [createNewSubCategory] = useCreateNewSubCategoryMutation();
+  const [updateSubCategory] = useUpdateSubCategoryMutation();
+  const [deleteSubCategory] = useDeleteSubCategoryMutation();
+
   useEffect(() => {
     fetchCategories();
-    fetchSubCategories();
   }, []);
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("/categories");
-      setCategories(response.data);
+      await refetchCategories();
     } catch (error) {
       console.error("Error fetching categories:", error);
-    }
-  };
-
-  const fetchSubCategories = async () => {
-    try {
-      const response = await axios.get("/subCategory");
-      setSubCategories(response.data);
-    } catch (error) {
-      console.error("Error fetching subcategories:", error);
     }
   };
 
@@ -55,8 +50,7 @@ const SubCategory = () => {
   const validate = () => {
     let tempErrors = {};
     if (!formData.name) tempErrors.name = "SubCategory Name is required";
-    if (!formData.description)
-      tempErrors.description = "SubCategory Description is required";
+    if (!formData.description) tempErrors.description = "SubCategory Description is required";
     if (!formData.category_id) tempErrors.category_id = "Category is required";
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
@@ -67,11 +61,11 @@ const SubCategory = () => {
     if (validate()) {
       try {
         if (isEditing) {
-          await axios.patch(`/subCategory/${currentSubCategoryId}`, formData);
+          await updateSubCategory({ id: currentSubCategoryId, ...formData }).unwrap();
         } else {
-          await axios.post("/subCategory", formData);
+          await createNewSubCategory(formData).unwrap();
         }
-        fetchSubCategories();
+        refetchSubCategories();
         resetForm();
       } catch (error) {
         console.error("Error saving subcategory:", error);
@@ -91,8 +85,8 @@ const SubCategory = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/subCategory/${id}`);
-      fetchSubCategories();
+      await deleteSubCategory(id).unwrap();
+      refetchSubCategories();
     } catch (error) {
       console.error("Error deleting subcategory:", error);
     }
@@ -238,7 +232,7 @@ const SubCategory = () => {
                   ></td>
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                     {subCategory.category
-                      ? subCategory.categorry.name
+                      ? subCategory.category.name
                       : "No Category"}
                   </td>
                   <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">

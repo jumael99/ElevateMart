@@ -2,7 +2,6 @@
 
 import React from "react";
 import products from "@/static/products"; // Assuming this is your static data
-import getImageURL from "@/utils/image";
 
 const ProductDetails = ({ productId }) => {
   const product = products.find((p) => p._id === parseInt(productId));
@@ -16,7 +15,7 @@ const ProductDetails = ({ productId }) => {
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden">
         <div className="relative h-96">
           <img
-            src={getImageURL(product.image)}
+            src={product.image}
             alt="Product"
             className="absolute inset-0 w-full h-full object-fill"
           />
