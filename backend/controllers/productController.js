@@ -12,7 +12,16 @@ const getProducts = asyncHandler(async (req, res) => {
     filter.category = category;
   }
 
-  const products = await productModel.find(filter);
+  const products = await productModel
+    .find(filter)
+    .populate({
+      path: "category",
+      select: "name",
+    })
+    .populate({
+      path: "subCategory",
+      select: "name",
+    });
   res.status(200).json(products);
 });
 

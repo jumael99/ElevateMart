@@ -3,7 +3,10 @@ import Sidebar from "@/components/Admin/Admin-Sidebar";
 import axios from "axios";
 import dynamic from "next/dynamic";
 import { useUploadProductImageMutation } from "@/store/slices/api/uploadsApiSlice";
-import { useCreateNewProductMutation } from "@/store/slices/api/productApiSlice";
+import {
+  useCreateNewProductMutation,
+  useFetchAllProductsQuery,
+} from "@/store/slices/api/productApiSlice";
 import { useFetchAllCategoriesQuery } from "@/store/slices/api/categoryApiSlice";
 import { toastManager } from "@/utils/toastManager";
 
@@ -28,6 +31,7 @@ const Products = () => {
 
   const [uploadProductImage] = useUploadProductImageMutation();
   const [createNewProduct] = useCreateNewProductMutation();
+  const { data: productsData } = useFetchAllProductsQuery();
 
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -35,23 +39,17 @@ const Products = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentProductId, setCurrentProductId] = useState(null);
   const { data: categoriesData } = useFetchAllCategoriesQuery();
+  console.log(productsData);
 
   useEffect(() => {
     if (categoriesData) {
       setCategories(categoriesData);
     }
-    fetchSubCategories();
-    fetchProducts();
-  }, [categoriesData]);
-
-  const fetchCategories = async () => {
-    try {
-      const response = await axios.get("/categories");
-      setCategories(response.data);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
+    if (productsData) {
+      setProducts(productsData);
     }
-  };
+    fetchSubCategories();
+  }, [categoriesData, productsData]);
 
   const fetchSubCategories = async () => {
     try {
@@ -61,16 +59,6 @@ const Products = () => {
       console.error("Error fetching subcategories:", error);
     }
   };
-
-  const fetchProducts = async () => {
-    try {
-      const response = await axios.get("/products");
-      setProducts(response.data);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    }
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -90,31 +78,36 @@ const Products = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const toastID = toastManager.loading(
-      "Submitting.Creating a new product..."
-    );
+    const toastID = toastManager.loading("Please wait...");
     try {
       const imageForm = new FormData();
-      imageForm.append("image", formData.image);
-      const data = await uploadProductImage(imageForm).unwrap();
+      if (formData.image) {
+        imageForm.append("image", formData.image);
+        const data = await uploadProductImage(imageForm).unwrap();
+        imageForm.append("imageURL", formData.image);
+      }
+
       const productData = {
         name: formData.name,
         price: formData.price,
         description: formData.description,
-        image: data.image,
+        image: imageForm.get("imageURL"),
         quantity: formData.quantity,
         discount: formData.discount,
         discountValidTime: formData.discountValidTime,
         categoryId: formData.categoryId,
         subCategoryId: formData.subCategoryId,
       };
-      await createNewProduct(productData).unwrap();
-      toastManager.updateStatus(toastID, {
-        render: "Product created successfully",
-        type: "success",
-      });
+      if (!isEditing) {
+        await createNewProduct(productData).unwrap();
+        toastManager.updateStatus(toastID, {
+          render: "Product created successfully",
+          type: "success",
+        });
+      } else {
+        console.log("Updating product:", productData);
+      }
       resetForm();
-      fetchProducts();
     } catch (error) {
       toastManager.updateStatus(toastID, {
         render: error?.data?.message || "Error creating product",
@@ -125,18 +118,18 @@ const Products = () => {
 
   const handleEdit = (product) => {
     setFormData({
-      name: product.name,
-      price: product.price.toString(),
-      description: product.description,
-      image: null,
-      imagePreview: product.image,
-      quantity: product.quantity.toString(),
-      discount: product.discount.toString(),
+      name: product?.name,
+      price: product?.price,
+      description: product?.description,
+      image: product?.image,
+      imagePreview: product?.image,
+      quantity: product?.quantity,
+      discount: product?.discount,
       discountValidTime: new Date(product.discountValidTime)
         .toISOString()
         .slice(0, 16),
-      categoryId: product.category._id,
-      subCategoryId: product.subCategory[0]._id,
+      categoryId: product?.category?._id,
+      subCategoryId: product?.subCategory?._id,
     });
     setIsEditing(true);
     setCurrentProductId(product._id);

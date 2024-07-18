@@ -5,6 +5,13 @@ import dynamic from "next/dynamic";
 
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
+import {
+  useCreateNewCategoryMutation,
+  useUpdateCategoryMutation,
+  useDeleteCategoryMutation,
+  useFetchAllCategoriesQuery,
+} from "../../store/slices/api/categoryApiSlice";
+import { toastManager } from "@/utils/toastManager";
 
 // Set the base URL for axios
 axios.defaults.baseURL = "http://localhost:5001/api";
@@ -18,21 +25,17 @@ const Categories = () => {
   const [errors, setErrors] = useState({});
   const [categories, setCategories] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
-  const [currentCategoryId, setCurrentCategoryId] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [createCategory] = useCreateNewCategoryMutation();
+  const [updateCategory] = useUpdateCategoryMutation();
+  const [deleteCategory] = useDeleteCategoryMutation();
+  const { data: categoryData } = useFetchAllCategoriesQuery();
 
   useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  // Fetch categories from the API
-  const fetchCategories = async () => {
-    try {
-      const response = await axios.get("/categories");
-      setCategories(response.data);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
+    if (categoryData) {
+      setCategories(categoryData);
     }
-  };
+  }, [categoryData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -63,25 +66,36 @@ const Categories = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validate()) {
+      const toastId = toastManager.loading("Please wait...");
       try {
-        const { categoryName, categoryDescription } = formData;
-        const newCategory = {
-          name: categoryName,
-          description: categoryDescription,
-        };
-
-        if (isEditing) {
-          await axios.put(`/categories/${currentCategoryId}`, newCategory);
+        if (!isEditing) {
+          await createCategory(formData).unwrap();
+          toastManager.updateStatus(toastId, {
+            render: "Category added successfully",
+            type: "success",
+          });
         } else {
-          // Add new category
-          const response = await axios.post("/categories", newCategory);
-          console.log("New category added:", response.data);
+          const updatedCategory = {
+            ...selectedCategory,
+            name: formData.categoryName,
+            description: formData.categoryDescription,
+          };
+          await updateCategory(updatedCategory).unwrap();
+          toastManager.updateStatus(toastId, {
+            render: "Category updated successfully",
+            type: "success",
+          });
         }
-
-        fetchCategories();
-        resetForm();
       } catch (error) {
-        console.error("Error saving category:", error);
+        const message = error?.data
+          ? error?.data?.message
+          : "An error occurred";
+        toastManager.updateStatus(toastId, {
+          render: message,
+          type: "error",
+        });
+      } finally {
+        resetForm();
       }
     }
   };
@@ -92,15 +106,23 @@ const Categories = () => {
       categoryDescription: category.description,
     });
     setIsEditing(true);
-    setCurrentCategoryId(category._id);
+    setSelectedCategory(category);
   };
 
   const handleDelete = async (id) => {
+    const toastId = toastManager.loading("Please wait...");
     try {
-      await axios.delete(`/categories/${id}`);
-      fetchCategories();
+      await deleteCategory(id).unwrap();
+      toastManager.updateStatus(toastId, {
+        render: "Category deleted successfully",
+        type: "success",
+      });
     } catch (error) {
-      console.error("Error deleting category:", error);
+      const message = error?.data ? error?.data?.message : "An error occurred";
+      toastManager.updateStatus(toastId, {
+        render: message,
+        type: "error",
+      });
     }
   };
 
@@ -111,12 +133,12 @@ const Categories = () => {
     });
     setErrors({});
     setIsEditing(false);
-    setCurrentCategoryId(null);
+    setSelectedCategory(null);
   };
 
   return (
     <div className="flex">
-      <Sidebar /> {/* Assuming Sidebar component is correctly implemented */}
+      <Sidebar />
       <div className="flex-1 p-10 text-black">
         <div className="bg-white shadow-md rounded-lg p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4">
