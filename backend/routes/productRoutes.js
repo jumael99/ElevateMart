@@ -12,8 +12,8 @@ const productRouter = express.Router();
 // Define routes
 productRouter.route("/").get(getProducts).post(createNewProduct);
 
-productRouter.route("/:slug").get(getProductBySlug).patch(updateProduct);
+productRouter.route("/:slug").get(getProductBySlug);
 
-productRouter.route("/:id").delete(deleteProduct);
+productRouter.route("/:id").delete(deleteProduct).patch(updateProduct);
 
 export default productRouter;
