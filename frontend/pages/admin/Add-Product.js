@@ -116,7 +116,6 @@ const Products = () => {
         subCategoryId: formData.subCategoryId,
       };
 
-      console.log(productData);
       if (!isEditing) {
         await createNewProduct(productData).unwrap();
         toastManager.updateStatus(toastID, {

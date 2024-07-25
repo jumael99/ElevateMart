@@ -34,7 +34,7 @@ export const productApi = apiSlice.injectEndpoints({
     }),
     updateProductById: builder.mutation({
       query: (product) => ({
-        url: `${PRODUCT_URL}/${product._id}`,
+        url: `${PRODUCT_URL}/${product.id}`,
         method: "PATCH",
         body: product,
       }),
