@@ -30,7 +30,6 @@ const Categories = () => {
 
   useEffect(() => {
     if (categoryData) {
-      console.log(categoryData);
       setCategories(categoryData);
     }
   }, [categoryData]);

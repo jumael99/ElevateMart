@@ -10,7 +10,15 @@ const userApi = apiSlice.injectEndpoints({
       }),
       providesTags: ["User"],
     }),
+    updateMyProfile: builder.mutation({
+      query: (profileData) => ({
+        url: `${USER_URL}/`,
+        method: "PUT",
+        body: profileData,
+      }),
+      invalidatesTags: ["User"],
+    }),
   }),
 });
 
-export const { useFetchMyProfileQuery } = userApi;
+export const { useFetchMyProfileQuery, useUpdateMyProfileMutation } = userApi;

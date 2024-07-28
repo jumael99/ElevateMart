@@ -74,10 +74,7 @@ const createNewProduct = asyncHandler(async (req, res) => {
 // @route   PATCH /api/products/:id
 // @access  Private/Admin
 const updateProduct = asyncHandler(async (req, res) => {
-  console.log(typeof req.params.id);
   const product = await productModel.findOne({ _id: req.params.id });
-
-  console.log(product);
 
   if (!product) {
     res.status(404);
