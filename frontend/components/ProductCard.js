@@ -2,11 +2,11 @@ import getImageURL from "@/utils/image";
 import { useRouter } from "next/router";
 
 const ProductCard = ({ productData }) => {
-  const { name, image, _id, price, countInStock } = productData || {};
+  const { name, image, price, countInStock, slug } = productData || {};
   const router = useRouter();
 
   const handleViewProduct = () => {
-    router.push(`/products/${_id}`);
+    router.push(`/products/${slug}`);
   };
 
   return (
