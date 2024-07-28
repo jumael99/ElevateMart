@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import styles from "../styles/Login.module.css";
-import { IoEyeOffSharp } from "react-icons/io5";
-import { FaEye } from "react-icons/fa";
-import Link from "next/link";
-import { useDispatch, useSelector } from "react-redux";
+  import { useDispatch, useSelector } from "react-redux";
 import { setCredentials } from "../store/slices/authSlice";
 import { useLoginMutation } from "../store/slices/api/authApiSlice";
 import { toastManager } from "@/utils/toastManager";

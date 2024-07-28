@@ -11,9 +11,13 @@ import { setUser, deleteUser } from "@/store/slices/userSlice";
 
 const Header = () => {
   const { userInfo } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.user);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
-  const { data: userInformation, isError } = useFetchMyProfileQuery();
+  const needFetch = !!user;
+  const { data: userInformation, isError } = useFetchMyProfileQuery(undefined, {
+    skip: needFetch,
+  });
 
   const [logout, { isLoading }] = useLogoutMutation();
   const dispatch = useDispatch();
@@ -21,9 +25,11 @@ const Header = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (userInfo) {
+    if (user) {
       setIsUserLoggedIn(true);
+    } else if (userInfo && userInformation) {
       dispatch(setUser(userInformation));
+      setIsUserLoggedIn(true);
     } else {
       setIsUserLoggedIn(false);
     }
