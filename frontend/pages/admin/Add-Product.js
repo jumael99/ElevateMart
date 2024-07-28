@@ -5,6 +5,7 @@ import { useUploadProductImageMutation } from "@/store/slices/api/uploadsApiSlic
 import {
   useCreateNewProductMutation,
   useFetchAllProductsQuery,
+  useUpdateProductByIdMutation,
   useDeleteProductMutation,
 } from "@/store/slices/api/productApiSlice";
 import { useFetchAllCategoriesQuery } from "@/store/slices/api/categoryApiSlice";
@@ -17,6 +18,7 @@ import { useFetchAllSubCategoriesQuery } from "@/store/slices/api/subcategoryApi
 
 const Products = () => {
   const [formData, setFormData] = useState({
+    id: "",
     name: "",
     price: "",
     description: "",
@@ -37,10 +39,11 @@ const Products = () => {
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
-  const [currentProductId, setCurrentProductId] = useState(null);
+  // const [currentProductId, setCurrentProductId] = useState(null);
   const { data: categoriesData } = useFetchAllCategoriesQuery();
   const [deleteProduct] = useDeleteProductMutation();
   const { data: subCategoriesData } = useFetchAllSubCategoriesQuery();
+  const [updateProduct] = useUpdateProductByIdMutation();
 
   useEffect(() => {
     if (categoriesData) {
@@ -71,28 +74,48 @@ const Products = () => {
     });
   };
 
+  const resetForm = () => {
+    setFormData({
+      id: "",
+      name: "",
+      price: "",
+      description: "",
+      image: null,
+      imagePreview: "",
+      quantity: "",
+      discount: "",
+      discountValidTime: "",
+      categoryId: "",
+      subCategoryId: "",
+    });
+    setIsEditing(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const toastID = toastManager.loading("Please wait...");
     try {
       const imageForm = new FormData();
-      if (formData.image) {
+      if (formData.image && formData.image instanceof File) {
+        console.log("Hello");
         imageForm.append("image", formData.image);
         const data = await uploadProductImage(imageForm).unwrap();
-        imageForm.append("imageURL", dat);
+        imageForm.append("imageURL", data.image);
       }
 
       const productData = {
+        id: isEditing ? formData.id : undefined,
         name: formData.name,
         price: formData.price,
         description: formData.description,
-        image: imageForm.get("imageURL"),
+        image: imageForm.get("imageURL") || formData.image,
         quantity: formData.quantity,
         discount: formData.discount,
         discountValidTime: formData.discountValidTime,
         categoryId: formData.categoryId,
         subCategoryId: formData.subCategoryId,
       };
+
       if (!isEditing) {
         await createNewProduct(productData).unwrap();
         toastManager.updateStatus(toastID, {
@@ -100,19 +123,26 @@ const Products = () => {
           type: "success",
         });
       } else {
-        console.log("Updating product:", productData);
+        await updateProduct(productData).unwrap();
+        toastManager.updateStatus(toastID, {
+          render: "Product updated successfully",
+          type: "success",
+        });
       }
-      resetForm();
     } catch (error) {
       toastManager.updateStatus(toastID, {
-        render: error?.data?.message || "Error creating product",
+        render: error?.data?.message || "Error. Something went wrong!",
         type: "error",
       });
+    } finally {
+      resetForm();
     }
   };
 
   const handleEdit = (product) => {
+    console.log(product);
     setFormData({
+      id: product._id,
       name: product?.name,
       price: product?.price,
       description: product?.description,
@@ -127,7 +157,6 @@ const Products = () => {
       subCategoryId: product?.subCategory?._id,
     });
     setIsEditing(true);
-    setCurrentProductId(product._id);
   };
 
   const handleDelete = async (id) => {
@@ -145,23 +174,6 @@ const Products = () => {
         type: "error",
       });
     }
-  };
-
-  const resetForm = () => {
-    setFormData({
-      name: "",
-      price: "",
-      description: "",
-      image: null,
-      imagePreview: "",
-      quantity: "",
-      discount: "",
-      discountValidTime: "",
-      categoryId: "",
-      subCategoryId: "",
-    });
-    setIsEditing(false);
-    setCurrentProductId(null);
   };
 
   return (
