@@ -1,7 +1,7 @@
 // frontend/components/ProductDetails.js
 
 import React from "react";
-import products from "@/static/products"; // Assuming this is your static data
+// import products from "@/static/products";  
 
 const ProductDetails = ({ productId }) => {
   const product = products.find((p) => p._id === parseInt(productId));
