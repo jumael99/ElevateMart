@@ -1,42 +1,47 @@
-import asyncHandler from '../middleware/asyncHandler.js';
-import generateToken from '../utils/generateToken.js';
-import User from '../models/userModel.js';
+import asyncHandler from "../middleware/asyncHandler.js";
+import generateToken from "../utils/generateToken.js";
+import User from "../models/userModel.js";
 
 // @desc    Get user profile
 // @route   GET /api/users
 // @access  Protected
 const getProfile = asyncHandler(async (req, res) => {
+  const { email } = req.user;
 
-  const { email } = req.body;
-
-  const profile = await User.findOne({ email});
+  const profile = await User.findOne({ email });
   if (!profile) {
-    return res.status(404).json({ message: 'Profile not found x' });
+    throw new Error("Profile not found");
   }
-  res.json(profile);
+  res.status(200).json(profile);
 });
-
 
 // @desc    Edit user profile
 // @route   PUT /api/users
 // @access  Protected
 const updateProfile = asyncHandler(async (req, res) => {
-  const { email, phone, address, name} = req.body;
+  const { email, phone, address, name, image } = req.body;
 
-  const profile = await User.findOneAndUpdate(
-      { email },
-      { phone, address, name},
-      { new: true, runValidators: true }
-  );
-
+  const profile = await User.findOne({ email });
   if (!profile) {
-    return res.status(404).json({ message: 'Profile not found' });
+    throw new Error("Profile not found");
   }
 
-  res.json(profile);
+  if (profile._id.toString() !== req.user._id.toString()) {
+    throw new Error("You are not authorized to update this profile");
+  }
+
+  const newProfileData = await User.findByIdAndUpdate(
+    profile._id,
+    {
+      name,
+      phone,
+      address,
+      profilePicture: image,
+    },
+    { new: true }
+  );
+
+  res.status(200).json(newProfileData);
 });
 
-export {
-  getProfile,
-  updateProfile
-};
+export { getProfile, updateProfile };

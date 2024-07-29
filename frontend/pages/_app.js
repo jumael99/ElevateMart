@@ -20,6 +20,7 @@ function MyApp({ Component, pageProps }) {
           --font-poppins: ${poppins.style.fontFamily};
         }
       `}</style>
+      
       <Layout>
         <Component {...pageProps} />
         <ToastContainer />

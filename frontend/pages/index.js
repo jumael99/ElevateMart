@@ -1,9 +1,17 @@
+import PromotionCard from "@/components/PromotionCard";
 
+// const Home = () => {
+//     return (
+//         <div>Home</div>
+//     )
+// }
 
-const Home = () => {
+ const LandingPage = () => {
     return (
-        <div>Home</div>
+      <PromotionCard />
     )
 }
 
-export default Home
+ const Home = LandingPage;
+
+export default Home;
