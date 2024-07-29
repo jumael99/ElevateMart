@@ -4,6 +4,7 @@ import path from "path";
 import sharp from "sharp";
 import fs from "fs";
 import protectMiddleware from "../middleware/protectMiddleware.js";
+import asyncHandler from "../middleware/asyncHandler.js";
 
 const router = express.Router();
 const storage = multer.memoryStorage();
@@ -78,49 +79,55 @@ router.post("/product", (req, res) => {
 
 router.use(protectMiddleware());
 
-router.post("/removeImage", (req, res) => {
-  const removeSingleImage = (req, res, callback) => {
+router.post(
+  "/removeImage",
+  asyncHandler(async (req, res) => {
     const imagePath = req.body.imagePath;
 
     if (!imagePath) {
-      return res.status(400).json({ error: "Image path is required" });
+      throw new Error("Image path is required");
     }
 
     if (
       !imagePath.startsWith("/uploads/users") &&
       !imagePath.startsWith("/uploads/products")
     ) {
-      return res.status(400).json({
-        error: "Invalid image path. You can only delete product or user image",
-      });
+      throw new Error(
+        "Invalid image path. You can only delete product or user image"
+      );
     }
 
     if (imagePath.startsWith("/uploads/products")) {
       if (!req.user.isAdmin) {
-        return res.status(403).json({
-          error: "You are not allowed to delete product images",
-        });
+        throw new Error("You are not allowed to delete product images");
       }
     }
 
     const fullPath = path.join(__dirname, imagePath);
 
-    fs.unlink(fullPath, (err) => {
-      if (err) {
-        console.error("Error removing image:", err);
-        return res.status(500).json({ error: "Failed to remove image" });
-      }
-
-      res.status(200).json({ message: "Image removed successfully" });
-      callback(null);
+    await new Promise((resolve, reject) => {
+      fs.access(fullPath, fs.constants.F_OK, (err) => {
+        if (err) {
+          return res
+            .status(200)
+            .json({ message: "Image Removed Successfully" });
+        }
+        resolve();
+      });
     });
-  };
 
-  removeSingleImage(req, res, async function (err) {
-    if (err) {
-      console.error("Error in callback:", err);
-    }
-  });
-});
+    await new Promise((resolve, reject) => {
+      fs.unlink(fullPath, (err) => {
+        if (err) {
+          console.error("Error removing image:", err);
+          return reject(new Error("Failed to remove image"));
+        }
+        resolve();
+      });
+    });
+
+    res.status(200).json({ message: "Image removed successfully" });
+  })
+);
 
 export default router;

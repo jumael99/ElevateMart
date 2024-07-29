@@ -1,13 +1,24 @@
 // frontend/components/ProductDetails.js
-
 import React from "react";
-import products from "@/static/products"; // Assuming this is your static data
+import { useFetchProductBySlugQuery } from "@/store/slices/api/productApiSlice";
+import { useRouter } from "next/router";
 
-const ProductDetails = ({ productId }) => {
-  const product = products.find((p) => p._id === parseInt(productId));
+const ProductDetails = () => {
+  const router = useRouter();
+  const { slug } = router.query;
+
+  const { data: product, error, isLoading } = useFetchProductBySlugQuery(slug);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
 
   if (!product) {
-    return <div>Product not found</div>; // Handle case where product is not found
+    return <div>Product not found</div>;
   }
 
   return (
@@ -15,28 +26,27 @@ const ProductDetails = ({ productId }) => {
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden">
         <div className="relative h-96">
           <img
-            src={product.image}
+            src={product.image || '/placeholder-image.jpg'}
             alt="Product"
             className="absolute inset-0 w-full h-full object-fill"
           />
         </div>
 
         <div className="p-8">
-          <h1 className="text-4xl font-extrabold text-gray-800 mb-4">
-            {product.name}
-          </h1>
+          <h1 className="text-4xl font-extrabold text-gray-800 mb-4">{product.name}</h1>
           <div className="flex items-center mb-4">
-            {/* Star rating or other product metadata */}
+            <div className="flex text-yellow-400">
+              {"★★★★☆".split("").map((star, index) => (
+                <span key={index}>{star}</span>
+              ))}
+            </div>
+            <span className="ml-2 text-gray-600">{product.numReviews}</span>
           </div>
 
-          <p className="text-gray-600 mb-6 leading-relaxed">
-            {product.description}
-          </p>
+          <p className="text-gray-600 mb-6 leading-relaxed">{product.description}</p>
 
           <div className="mb-6">
-            <span className="text-3xl font-bold text-gray-700">
-              ${product.price}
-            </span>
+            <span className="text-3xl font-bold text-gray-700">${product.price}</span>
           </div>
 
           <div className="mb-6">

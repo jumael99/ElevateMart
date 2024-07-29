@@ -65,10 +65,7 @@ const Profile = () => {
         const newFormData = new FormData();
         newFormData.append("image", formData.image);
         if (user.profilePicture) {
-          const res = await deleteImage(user.profilePicture).unwrap();
-          if (res.status !== 200) {
-            throw new Error("Failed to update profile");
-          }
+          await deleteImage(user.profilePicture).unwrap();
         }
         const res = await uploadUserImage(newFormData).unwrap();
         updatedData = { ...updatedData, image: res.image };

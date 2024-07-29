@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-import sproducts from "@/static/products";
 import ProductCard from "./ProductCard";
 import { useFetchAllProductsQuery } from "@/store/slices/api/productApiSlice";
 
 const HomePageProducts = () => {
-  const showProducts = sproducts.slice(0, 4);
-  const [products, setProducts] = useState(showProducts);
+  const [products, setProducts] = useState([]);
   const { data: productsData, error, isLoading } = useFetchAllProductsQuery();
+
   useEffect(() => {
     if (productsData) {
       setProducts(productsData);
