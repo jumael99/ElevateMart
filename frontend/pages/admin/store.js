@@ -30,71 +30,42 @@ const store = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {products.map((product) =>
-                                product.countInStock > 0 ? (
-                                    <tr
-                                        key={product.id}
-                                        className="border-t border-gray-200 hover:bg-gray-100"
-                                    >
-                                        <td className="py-3 px-4">
-                                            <img
-                                                src={product.image}
-                                                alt={product.name}
-                                                className="h-16 w-16 object-cover rounded-full"
-                                            />
-                                        </td>
-                                        <td className="py-3 px-4">{product.name}</td>
-                                        <td className="py-3 px-4">{product.category}</td>
-                                        <td className="py-3 px-4">{product.countInStock}</td>
-                                        <td className="py-3 px-4 flex space-x-2">
-                                            <button
-                                                type="button"
-                                                className="px-4 py-2 text-sm text-white bg-blue-500 rounded hover:bg-blue-600"
-                                                onClick={() => editHandler(product.name)}
-                                            >
-                                                Edit
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="px-4 py-2 text-sm text-white bg-red-500 rounded hover:bg-red-600"
-                                                onClick={() => deleteHandler(product.name)}
-                                            >
-                                                Delete
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    <tr key={product.id} className="border-t bg-red-200">
-                                        <td className="py-3 px-4">
-                                            <img
-                                                src={product.image}
-                                                alt={product.name}
-                                                className="h-16 w-16 object-cover rounded-full"
-                                            />
-                                        </td>
-                                        <td className="py-3 px-4">{product.name}</td>
-                                        <td className="py-3 px-4">{product.category}</td>
-                                        <td className="py-3 px-4">{product.countInStock}</td>
-                                        <td className="py-3 px-4 flex space-x-2">
-                                            <button
-                                                type="button"
-                                                className="px-4 py-2 text-sm text-white bg-blue-500 rounded hover:bg-blue-600"
-                                                onClick={() => editHandler(product.name)}
-                                            >
-                                                Edit
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="px-4 py-2 text-sm text-white bg-red-500 rounded hover:bg-red-600"
-                                                onClick={() => deleteHandler(product.name)}
-                                            >
-                                                Delete
-                                            </button>
-                                        </td>
-                                    </tr>
-                                )
-                            )}
-                        </tbody>
+              {Array.isArray(products) && products.length > 0 ? (
+                products.map((product) => (
+                  <tr key={product._id}>
+                    <td className="py-2">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="h-16 w-16 object-cover"
+                      />
+                    </td>
+                    <td className="py-2">{product.name}</td>
+                    <td className="py-2">{product.price}</td>
+                    <td className="py-2">
+                      <button
+                        onClick={() => handleEdit(product)}
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(product._id)}
+                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ml-2"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="py-2 text-center">
+                    No products found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
                     </table>
                 </div>
             </div>

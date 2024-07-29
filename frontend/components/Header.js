@@ -8,11 +8,14 @@ import { clearCredentials } from "@/store/slices/authSlice";
 import { toastManager } from "@/utils/toastManager";
 import { useFetchMyProfileQuery } from "@/store/slices/api/userApiSlice";
 import { setUser, deleteUser } from "@/store/slices/userSlice";
+import CartDropdown from "./CartDropdown";
 
 const Header = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const { user } = useSelector((state) => state.user);
+  const cart = useSelector((state) => state.cart);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
   const needFetch = !!user;
   const { data: userInformation, isError } = useFetchMyProfileQuery(undefined, {
@@ -57,14 +60,15 @@ const Header = () => {
     }
   };
 
+  const toggleCart = () => {
+    setIsCartOpen(!isCartOpen);
+  };
+
   return (
     <header>
       <nav className="bg-lightBlue-500 w-full shadow-md">
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-          <a
-            href="/"
-            className="flex items-center space-x-3 rtl:space-x-reverse"
-          >
+          <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
             <span className="self-center text-2xl font-semibold whitespace-nowrap text-black">
               ElevateMart
             </span>
@@ -130,44 +134,29 @@ const Header = () => {
           >
             <ul className="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-lightBlue-500 md:flex-row md:space-x-8 md:mt-0 md:border-0">
               <li>
-                <Link
-                  href="/"
-                  className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0"
-                >
+                <Link href="/" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">
                   Home
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/products"
-                  className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0"
-                >
+                <Link href="/products" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">
                   Products
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/services"
-                  className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0"
-                >
+                <Link href="/services" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">
                   Services
                 </Link>
               </li>
               {!isUserLoggedIn && (
                 <>
                   <li>
-                    <Link
-                      href="/login"
-                      className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0"
-                    >
+                    <Link href="/login" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">
                       Login
                     </Link>
                   </li>
                   <li>
-                    <Link
-                      href="/register"
-                      className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0"
-                    >
+                    <Link href="/register" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">
                       Register
                     </Link>
                   </li>
@@ -175,21 +164,16 @@ const Header = () => {
               )}
               {isUserLoggedIn && (
                 <li onClick={handleLogout}>
-                  <Link
-                    href="#"
-                    className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0 hover:cursor-pointer"
-                  >
+                  <Link href="#" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0 hover:cursor-pointer">
                     Logout
                   </Link>
                 </li>
               )}
               {isUserLoggedIn && (
                 <li className="ml-6">
-                  <div className="relative py-2">
-                    <div className="absolute top-0 left-3">
-                      <p className="flex h-2 w-2 items-center justify-center rounded-full bg-red-500 p-3 text-xs text-white">
-                        3
-                      </p>
+                  <div className="relative py-2 cursor-pointer" onClick={toggleCart}>
+                    <div className="absolute top-0 right-0 flex h-2 w-2 items-center justify-center rounded-full bg-red-500 p-3 text-xs text-white">
+                      {cart && cart.cart ? cart.cart.length : 0}
                     </div>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -206,6 +190,7 @@ const Header = () => {
                       />
                     </svg>
                   </div>
+                  <CartDropdown isOpen={isCartOpen} toggleCart={toggleCart} />
                 </li>
               )}
             </ul>
