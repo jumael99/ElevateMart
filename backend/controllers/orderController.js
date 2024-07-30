@@ -5,20 +5,14 @@ import asyncHandler from "../middleware/asyncHandler.js";
 // @route   POST /api/orders
 // @access  Private
 const createOrder = asyncHandler(async (req, res) => {
-  const { products, shippingAddress, paymentMethod, totalAmount } = req.body;
-  const orderItems = products.map((product) => {
-    return {
-      product: product._id,
-      quantity: product.quantity,
-      price: product.price,
-    };
-  });
+  const { products, totalAmount } = req.body;
+
+  const shippingAddress = req.user.address;
 
   const newOrder = await orderModel.create({
     orderBy: req.user._id,
-    orderItems,
+    orderItems: products,
     shippingAddress,
-    paymentMethod,
     totalAmount,
   });
 
@@ -30,22 +24,26 @@ const createOrder = asyncHandler(async (req, res) => {
 
 // @desc    Update Payment Status
 // @route   PUT /api/orders/:id/payment
-// @access  Private
+// @access  Public
 const updatePaymentStatus = asyncHandler(async (req, res) => {
   const order = await orderModel.findById(req.params.id);
   if (!order) {
     res.status(404);
     throw new Error("Order not found");
   }
-  const { id, status, updateTime, emailAddress } = req.body;
+  const { id, status, updateTime, paymentMethod, currency, conversionRate } =
+    req.body;
+
   const paymentResult = {
-    id,
+    transactionID: id,
     status,
     updateTime,
-    emailAddress,
+    currency,
+    conversionRate,
   };
   order.paymentResult = paymentResult;
   order.deliveryStatus = "Processing";
+  order.paymentMethod = paymentMethod;
   await order.save();
   res.status(204).json();
 });
@@ -75,7 +73,7 @@ const getOrderById = asyncHandler(async (req, res) => {
 });
 
 // @desc    Get logged in user orders
-// @route   GET /api/orders/myorders
+// @route   GET /api/orders/myOrders
 // @access  Private
 const getMyOrders = asyncHandler(async (req, res) => {
   const orders = await orderModel.find({ orderBy: req.user._id }).populate({

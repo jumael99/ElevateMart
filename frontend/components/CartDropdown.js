@@ -4,13 +4,19 @@ import {
   decreaseQuantity,
   increaseQuantity,
   removeFromCart,
+  deleteCart,
 } from "@/store/slices/cartSlice";
 import { FaMinus, FaPlus, FaTimes } from "react-icons/fa";
+import { useCreateOrderMutation } from "@/store/slices/api/orderApiSlice";
+import { toastManager } from "@/utils/toastManager";
+import { useCreatePaymentIntentMutation } from "@/store/slices/api/paymentSlice";
 
 const CartDropdown = ({ isOpen, toggleCart }) => {
   const cart = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   const [totalAmount, setTotalAmount] = useState(0);
+  const [createOrder] = useCreateOrderMutation();
+  const [createPaymentIntent] = useCreatePaymentIntentMutation();
 
   useEffect(() => {
     const calculateTotalAmount = () => {
@@ -20,7 +26,7 @@ const CartDropdown = ({ isOpen, toggleCart }) => {
       );
     };
     setTotalAmount(calculateTotalAmount());
-  }, [cart.cart]);
+  }, [cart]);
 
   const handleIncrease = (item) => {
     dispatch(increaseQuantity(item));
@@ -32,6 +38,56 @@ const CartDropdown = ({ isOpen, toggleCart }) => {
 
   const handleRemove = (item) => {
     dispatch(removeFromCart(item));
+  };
+
+  const handleCheckout = async (e) => {
+    e.preventDefault();
+    if (cart.cart.length === 0) {
+      toastManager("error", "Your cart is empty");
+      return;
+    }
+    const toastId = toastManager.loading("Processing your order...");
+    const products = await cart.cart.map((item) => ({
+      _id: item._id,
+      quantity: item.quantity,
+      price: item.itemPrice,
+    }));
+    const order = {
+      products,
+      totalAmount: cart.totalPayableAmount,
+    };
+    try {
+      const response = await createOrder(order).unwrap();
+      toastManager.updateStatus(toastId, {
+        type: "success",
+        render: "Order placed successfully",
+      });
+      const orderId = response.order._id;
+      const paymentIntent = {
+        amount: cart.totalPayableAmount,
+        orderID: orderId,
+        currency: "BDT",
+      };
+      const paymentResponse = await createPaymentIntent(paymentIntent).unwrap();
+      toastManager.updateStatus(toastId, {
+        type: "success",
+        render: "Redirecting to payment gateway...",
+      });
+      setTimeout(() => {
+        window.location.href = paymentResponse.payment_url;
+      }, 2000);
+      dispatch(deleteCart());
+      toggleCart();
+    } catch (error) {
+      const errorMessage =
+        error?.data?.message ||
+        error?.error?.message ||
+        "Something went wrong. Please try again later.";
+      toastManager.updateStatus(toastId, {
+        type: "error",
+        render: errorMessage,
+      });
+    }
   };
 
   if (!isOpen) return null;
@@ -120,9 +176,7 @@ const CartDropdown = ({ isOpen, toggleCart }) => {
               </p>
               <div className="mt-6">
                 <button
-                  onClick={() =>
-                    console.log("Checkout functionality goes here")
-                  }
+                  onClick={handleCheckout}
                   className="w-full flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
                 >
                   Checkout
