@@ -2,9 +2,13 @@ import express from "express";
 import multer from "multer";
 import path from "path";
 import sharp from "sharp";
+import fs from "fs";
+import protectMiddleware from "../middleware/protectMiddleware.js";
+import asyncHandler from "../middleware/asyncHandler.js";
 
 const router = express.Router();
 const storage = multer.memoryStorage();
+const __dirname = path.resolve();
 
 function fileFilter(req, file, cb) {
   const filetypes = /jpe?g|png|webp/;
@@ -72,5 +76,58 @@ router.post("/product", (req, res) => {
     }
   });
 });
+
+router.use(protectMiddleware());
+
+router.post(
+  "/removeImage",
+  asyncHandler(async (req, res) => {
+    const imagePath = req.body.imagePath;
+
+    if (!imagePath) {
+      throw new Error("Image path is required");
+    }
+
+    if (
+      !imagePath.startsWith("/uploads/users") &&
+      !imagePath.startsWith("/uploads/products")
+    ) {
+      throw new Error(
+        "Invalid image path. You can only delete product or user image"
+      );
+    }
+
+    if (imagePath.startsWith("/uploads/products")) {
+      if (!req.user.isAdmin) {
+        throw new Error("You are not allowed to delete product images");
+      }
+    }
+
+    const fullPath = path.join(__dirname, imagePath);
+
+    await new Promise((resolve, reject) => {
+      fs.access(fullPath, fs.constants.F_OK, (err) => {
+        if (err) {
+          return res
+            .status(200)
+            .json({ message: "Image Removed Successfully" });
+        }
+        resolve();
+      });
+    });
+
+    await new Promise((resolve, reject) => {
+      fs.unlink(fullPath, (err) => {
+        if (err) {
+          console.error("Error removing image:", err);
+          return reject(new Error("Failed to remove image"));
+        }
+        resolve();
+      });
+    });
+
+    res.status(200).json({ message: "Image removed successfully" });
+  })
+);
 
 export default router;

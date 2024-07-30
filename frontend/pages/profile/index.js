@@ -9,15 +9,26 @@ import {
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { withAuth } from "@/utils/withAuth";
-
+import {
+  useUploadUserImageMutation,
+  useDeleteImageMutation,
+} from "@/store/slices/api/uploadsApiSlice";
+import { useUpdateMyProfileMutation } from "@/store/slices/api/userApiSlice";
+import { toastManager } from "@/utils/toastManager";
+import { useRouter } from "next/router";
 const Profile = () => {
   const user = useSelector((state) => state.user.user);
+  const [uploadUserImage] = useUploadUserImageMutation();
+  const [deleteImage] = useDeleteImageMutation();
+  const [updateMyProfile] = useUpdateMyProfileMutation();
+  const router = useRouter();
 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     address: "",
+    image: null,
   });
   const [displayData, setDisplayData] = useState({
     name: "",
@@ -40,22 +51,40 @@ const Profile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const toastId = toastManager.loading("Updating profile...");
+
     try {
-      const response = await axios.put(
-        "http://localhost:5001/api/users",
-        formData
-      );
-      if (response.status === 200) {
-        setIsEditing(false);
-        setDisplayData(formData);
-      } else {
-        console.error("Failed to update profile");
+      let updatedData = {};
+      updatedData = {
+        name: formData.name,
+        phone: formData.phone,
+        address: formData.address,
+        email: formData.email,
+      };
+      if (formData.image) {
+        const newFormData = new FormData();
+        newFormData.append("image", formData.image);
+        if (user.profilePicture) {
+          await deleteImage(user.profilePicture).unwrap();
+        }
+        const res = await uploadUserImage(newFormData).unwrap();
+        updatedData = { ...updatedData, image: res.image };
       }
+      await updateMyProfile(updatedData).unwrap();
+      setDisplayData(formData);
+      setIsEditing(false);
+      toastManager.updateStatus(toastId, {
+        render: "Profile updated successfully",
+        type: "success",
+      });
+      setTimeout(() => {
+        router.reload();
+      }, 2000);
     } catch (error) {
-      console.error(
-        "Error updating profile:",
-        error.response ? error.response.data : error.message
-      );
+      toastManager.updateStatus(toastId, {
+        render: error?.data?.message || "Failed to update profile",
+        type: "error",
+      });
     }
   };
 
@@ -64,6 +93,19 @@ const Profile = () => {
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
+    }));
+  };
+
+  const handleProfilePictureChange = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      setPicturePreview(reader.result);
+    };
+    setFormData((prevData) => ({
+      ...prevData,
+      image: file,
     }));
   };
 
@@ -143,6 +185,7 @@ const Profile = () => {
                     <input
                       type="email"
                       name="email"
+                      disabled
                       value={formData.email}
                       onChange={handleInputChange}
                       className="w-full p-2 border border-gray-300 rounded"
@@ -253,6 +296,8 @@ const Profile = () => {
                     <input
                       type="file"
                       id="profile-photo-upload"
+                      disabled={!isEditing}
+                      onChange={handleProfilePictureChange}
                       className="hidden"
                       accept="image/*"
                     />

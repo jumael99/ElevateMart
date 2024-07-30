@@ -5,7 +5,9 @@ import { useRouter } from "next/router";
 function unauthorized() {
   const router = useRouter();
   useEffect(() => {
-    toastManager.error("You are not authorized to view this page");
+    toastManager.error(
+      "⚠️ NOT Authorized ⚠️. You will be redirected to the home page"
+    );
   }, []);
   setTimeout(() => {
     router.push("/");

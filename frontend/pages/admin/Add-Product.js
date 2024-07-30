@@ -97,7 +97,6 @@ const Products = () => {
     try {
       const imageForm = new FormData();
       if (formData.image && formData.image instanceof File) {
-        console.log("Hello");
         imageForm.append("image", formData.image);
         const data = await uploadProductImage(imageForm).unwrap();
         imageForm.append("imageURL", data.image);
@@ -140,7 +139,6 @@ const Products = () => {
   };
 
   const handleEdit = (product) => {
-    console.log(product);
     setFormData({
       id: product._id,
       name: product?.name,

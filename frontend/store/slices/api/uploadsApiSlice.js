@@ -17,8 +17,18 @@ const uploadsApi = apiSlice.injectEndpoints({
         body: formData,
       }),
     }),
+    deleteImage: builder.mutation({
+      query: (imagePath) => ({
+        url: `${UPLOAD_URL}/removeImage`,
+        method: "POST",
+        body: { imagePath },
+      }),
+    }),
   }),
 });
 
-export const { useUploadUserImageMutation, useUploadProductImageMutation } =
-  uploadsApi;
+export const {
+  useUploadUserImageMutation,
+  useUploadProductImageMutation,
+  useDeleteImageMutation,
+} = uploadsApi;

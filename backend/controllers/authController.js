@@ -40,12 +40,6 @@ const login = asyncHandler(async (req, res) => {
 
   const token = generateToken(res, existingUser._id, existingUser.isAdmin);
 
-  let redirectPath = "/";  
-
-  if (existingUser.isAdmin) {
-    redirectPath = "/admin/dashboard";
-  }
-
   res.status(200).json({
     status: "success",
     message: "Login successful",
