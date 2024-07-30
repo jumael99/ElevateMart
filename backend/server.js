@@ -13,8 +13,7 @@ import { corsOptions } from "./middleware/corsOptions.js";
 import cors from "cors";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
-import orderRoutes from "./routes/orderRoutes.js";
-
+import orderRoutes from "./routes/orderRoute.js"
 dotenv.config();
 connectDB();
 

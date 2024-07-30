@@ -25,3 +25,5 @@ router.route("/:id/payment").patch(protectMiddleware(), updatePaymentStatus);
 router
   .route("/:id/deleiver")
   .patch(protectMiddleware("admin"), updateDeliveryStatus);
+
+export default router

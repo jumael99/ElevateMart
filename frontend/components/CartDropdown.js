@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  decreaseQuantity,
-  increaseQuantity,
-  removeFromCart,
-} from "@/store/slices/cartSlice";
+import { decreaseQuantity, increaseQuantity, removeFromCart } from "@/store/slices/cartSlice";
 import { FaMinus, FaPlus, FaTimes } from "react-icons/fa";
 
 const CartDropdown = ({ isOpen, toggleCart }) => {
@@ -23,11 +19,19 @@ const CartDropdown = ({ isOpen, toggleCart }) => {
   }, [cart.cart]);
 
   const handleIncrease = (item) => {
-    dispatch(increaseQuantity(item));
+    if (item.quantity < item.quantity) {
+      dispatch(increaseQuantity(item));
+    } else {
+      alert("Cannot add more than available stock");
+    }
   };
 
   const handleDecrease = (item) => {
-    dispatch(decreaseQuantity(item));
+    if (item.quantity > 1) {
+      dispatch(decreaseQuantity(item));
+    } else {
+      handleRemove(item);
+    }
   };
 
   const handleRemove = (item) => {
@@ -58,9 +62,7 @@ const CartDropdown = ({ isOpen, toggleCart }) => {
 
               <ul className="mt-8 space-y-6 divide-y divide-gray-200">
                 {cart.cart.length === 0 ? (
-                  <p className="text-center text-gray-500">
-                    Your cart is empty
-                  </p>
+                  <p className="text-center text-gray-500">Your cart is empty</p>
                 ) : (
                   cart.cart.map((item) => (
                     <li key={item._id} className="flex py-6">
@@ -118,24 +120,28 @@ const CartDropdown = ({ isOpen, toggleCart }) => {
               <p className="mt-0.5 text-sm text-gray-500">
                 Shipping and taxes calculated at checkout.
               </p>
-              <div className="mt-6">
-                <button
-                  onClick={() =>
-                    console.log("Checkout functionality goes here")
-                  }
-                  className="w-full flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
-                >
-                  Checkout
-                </button>
-              </div>
-              <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
-                <button
-                  type="button"
-                  onClick={toggleCart}
-                  className="font-medium text-indigo-600 hover:text-indigo-500"
-                >
-                  Continue Shopping &rarr;
-                </button>
+              {cart.cart.length > 0 && (
+                <div className="mt-6">
+                  <button
+                    onClick={() => console.log("Checkout functionality goes here")}
+                    className="w-full flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
+                    disabled={cart.cart.length === 0}
+                  >
+                    Checkout
+                  </button>
+                </div>
+              )}
+              <div className="mt-6 flex justify-center text-sm text-center text-gray-500">
+                <p>
+                  or{" "}
+                  <button
+                    onClick={toggleCart}
+                    type="button"
+                    className="text-indigo-600 font-medium hover:text-indigo-500"
+                  >
+                    Continue Shopping<span aria-hidden="true"> &rarr;</span>
+                  </button>
+                </p>
               </div>
             </div>
           </div>
