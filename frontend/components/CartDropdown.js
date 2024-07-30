@@ -1,11 +1,19 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { decreaseQuantity, increaseQuantity, removeFromCart } from "@/store/slices/cartSlice";
- import { FaMinus, FaPlus, FaTimes } from 'react-icons/fa';
+import { FaMinus, FaPlus, FaTimes } from 'react-icons/fa';
 
 const CartDropdown = ({ isOpen, toggleCart }) => {
   const cart = useSelector((state) => state.cart);
   const dispatch = useDispatch();
+  const [totalAmount, setTotalAmount] = useState(0);
+
+  useEffect(() => {
+    const calculateTotalAmount = () => {
+      return cart.cart.reduce((total, item) => total + item.itemPrice * item.quantity, 0);
+    };
+    setTotalAmount(calculateTotalAmount());
+  }, [cart.cart]);
 
   const handleIncrease = (item) => {
     dispatch(increaseQuantity(item));
@@ -34,7 +42,8 @@ const CartDropdown = ({ isOpen, toggleCart }) => {
                   onClick={toggleCart}
                   className="ml-3 flex h-7 items-center text-gray-400 hover:text-gray-500"
                 >
-                 </button>
+                  <FaTimes />
+                </button>
               </div>
 
               <ul className="mt-8 space-y-6 divide-y divide-gray-200">
@@ -50,7 +59,7 @@ const CartDropdown = ({ isOpen, toggleCart }) => {
                         <div>
                           <div className="flex justify-between text-base font-medium text-gray-900">
                             <h3>{item.name}</h3>
-                            <p className="ml-4">{item.itemPrice}€</p>
+                            <p className="ml-4">{item.itemPrice} Tk</p>
                           </div>
                           <p className="mt-1 text-sm text-gray-500">{item.color || "Color"}</p>
                         </div>
@@ -77,7 +86,7 @@ const CartDropdown = ({ isOpen, toggleCart }) => {
             <div className="border-t border-gray-200 py-6 px-4 sm:px-6">
               <div className="flex justify-between text-base font-medium text-gray-900">
                 <p>Total amount:</p>
-                <p>{cart.totalPayableAmount}€</p>
+                <p>{totalAmount} Tk</p>
               </div>
               <p className="mt-0.5 text-sm text-gray-500">Shipping and taxes calculated at checkout.</p>
               <div className="mt-6">
