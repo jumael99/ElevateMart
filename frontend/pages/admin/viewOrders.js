@@ -6,7 +6,14 @@ import React, { useState } from "react";
 const viewOrders = () => {
   const [orderList, setOrderList] = useState(orders);
 
-  const handleStatusChange = (id) => {
+  const handlePaymentStatus = (id) => {
+    setOrderList((prevOrders) =>
+      prevOrders.map((order) =>
+        order.id === id ? { ...order, status: "paid" } : order
+      )
+    );
+  };
+  const handleDeliveryStatus = (id) => {
     setOrderList((prevOrders) =>
       prevOrders.map((order) =>
         order.id === id ? { ...order, status: "done" } : order
@@ -27,7 +34,8 @@ const viewOrders = () => {
               <th className="p-3 border border-gray-300">Price</th>
               <th className="p-3 border border-gray-300">Method</th>
               <th className="p-3 border border-gray-300">Transaction ID</th>
-              <th className="p-3 border border-gray-300">Status</th>
+              <th className="p-3 border border-gray-300">Payment</th>
+              <th className="p-3 border border-gray-300">Delivery Status</th>
             </tr>
           </thead>
           <tbody>
@@ -41,11 +49,21 @@ const viewOrders = () => {
                 <td className="p-3 border">
                   <Buttons
                     color={"green"}
-                    text={order.status}
+                    text={order.paymentStatus}
                     textColor={"white"}
                     padding={"1px 4px"}
                     bRadius={"5px"}
-                    onClick = {() => handleStatusChange(order.id)}
+                    onClick={() => handlePaymentStatus(order.id)}
+                  />
+                </td>
+                <td className="p-3 border">
+                  <Buttons
+                    color={"green"}
+                    text={order.delStatus}
+                    textColor={"white"}
+                    padding={"1px 4px"}
+                    bRadius={"5px"}
+                    onClick={() => handleDeliveryStatus(order.id)}
                   />
                 </td>
               </tr>

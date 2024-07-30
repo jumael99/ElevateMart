@@ -5,7 +5,8 @@ export const orders = [
         price: "100",
         method:"Bkash",
         transactionId: "xyz",
-        status: "pending"
+        paymentStatus: "pending",
+        delStatus: "pending"
     },
     {
         id: "2",
@@ -13,6 +14,7 @@ export const orders = [
         price: "100",
         method:"Cash on Delivery",
         transactionId: "",
-        status: "pending"
+        paymentStatus: "pending",
+        delStatus: "pending"
     },
 ]
