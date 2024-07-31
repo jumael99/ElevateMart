@@ -1,20 +1,16 @@
-import React from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { updatePaymentStatus, updateDeliveryStatus } from "@/store/slices/ordersSlice";
+import React, { useEffect, useState } from "react";
 import Sidebar from "@/components/Admin/Admin-Sidebar";
 import Buttons from "@/components/Admin/Buttons";
+import { useFetchAllOrdersQuery } from "@/store/slices/api/orderApiSlice";
 
 const ViewOrders = () => {
-  const dispatch = useDispatch();
-  const orderList = useSelector((state) => state.orders);
-
-  const handlePaymentStatus = (id) => {
-    dispatch(updatePaymentStatus({ id, status: "paid" }));
-  };
-
-  const handleDeliveryStatus = (id) => {
-    dispatch(updateDeliveryStatus({ id, status: "done" }));
-  };
+  const { data } = useFetchAllOrdersQuery();
+  const [orderList, setOrderList] = useState([]);
+  useEffect(() => {
+    if (data) {
+      setOrderList(data.orders);
+    }
+  }, [data]);
 
   return (
     <div className="flex">
@@ -36,15 +32,17 @@ const ViewOrders = () => {
           <tbody>
             {orderList.map((order) => (
               <tr key={order.id}>
-                <td className="p-3 border ">{order.id}</td>
-                <td className="p-3 border ">{order.created}</td>
-                <td className="p-3 border "> {order.price}</td>
-                <td className="p-3 border">{order.method}</td>
-                <td className="p-3 border">{order.transactionId}</td>
+                <td className="p-3 border ">{order._id}</td>
+                <td className="p-3 border ">{order.createdAt}</td>
+                <td className="p-3 border "> {order.totalAmount}</td>
+                <td className="p-3 border">{order.paymentMethod}</td>
+                <td className="p-3 border">
+                  {order.paymentResult.transactionID}
+                </td>
                 <td className="p-3 border">
                   <Buttons
                     color={"green"}
-                    text={order.paymentStatus}
+                    text={order.paymentResult.status}
                     textColor={"white"}
                     padding={"1px 4px"}
                     bRadius={"5px"}
@@ -54,7 +52,7 @@ const ViewOrders = () => {
                 <td className="p-3 border">
                   <Buttons
                     color={"green"}
-                    text={order.delStatus}
+                    text={order.deliveryStatus}
                     textColor={"white"}
                     padding={"1px 4px"}
                     bRadius={"5px"}
