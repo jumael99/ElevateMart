@@ -1,24 +1,19 @@
+import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { updatePaymentStatus, updateDeliveryStatus } from "@/store/slices/ordersSlice";
 import Sidebar from "@/components/Admin/Admin-Sidebar";
 import Buttons from "@/components/Admin/Buttons";
-import { orders } from "@/lib/orders";
-import React, { useState } from "react";
 
-const viewOrders = () => {
-  const [orderList, setOrderList] = useState(orders);
+const ViewOrders = () => {
+  const dispatch = useDispatch();
+  const orderList = useSelector((state) => state.orders);
 
   const handlePaymentStatus = (id) => {
-    setOrderList((prevOrders) =>
-      prevOrders.map((order) =>
-        order.id === id ? { ...order, status: "paid" } : order
-      )
-    );
+    dispatch(updatePaymentStatus({ id, status: "paid" }));
   };
+
   const handleDeliveryStatus = (id) => {
-    setOrderList((prevOrders) =>
-      prevOrders.map((order) =>
-        order.id === id ? { ...order, status: "done" } : order
-      )
-    );
+    dispatch(updateDeliveryStatus({ id, status: "done" }));
   };
 
   return (
@@ -75,4 +70,4 @@ const viewOrders = () => {
   );
 };
 
-export default viewOrders;
+export default ViewOrders;
