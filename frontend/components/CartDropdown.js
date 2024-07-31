@@ -10,6 +10,7 @@ import { FaMinus, FaPlus, FaTimes } from "react-icons/fa";
 import { useCreateOrderMutation } from "@/store/slices/api/orderApiSlice";
 import { toastManager } from "@/utils/toastManager";
 import { useCreatePaymentIntentMutation } from "@/store/slices/api/paymentSlice";
+import { useFetchProductBySlugQuery } from "@/store/slices/api/productApiSlice";
 
 const CartDropdown = ({ isOpen, toggleCart }) => {
   const cart = useSelector((state) => state.cart);
@@ -29,11 +30,7 @@ const CartDropdown = ({ isOpen, toggleCart }) => {
   }, [cart]);
 
   const handleIncrease = (item) => {
-    if (item.quantity < item.quantity) {
-      dispatch(increaseQuantity(item));
-    } else {
-      alert("Cannot add more than available stock");
-    }
+    dispatch(increaseQuantity(item));
   };
 
   const handleDecrease = (item) => {
