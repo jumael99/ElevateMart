@@ -45,6 +45,9 @@ const PaymentSuccessful = () => {
           type: "error",
           render: errorMessage,
         });
+        setTimeout(() => {
+          router.push("/");
+        }, 2000);
       }
     };
     if (orderID) {
@@ -52,11 +55,7 @@ const PaymentSuccessful = () => {
     }
   }, [orderID]);
 
-  return (
-    <div>
-      <h1>Payment Successful</h1>
-    </div>
-  );
+  return null;
 };
 
 export default PaymentSuccessful;

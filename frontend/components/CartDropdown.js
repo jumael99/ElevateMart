@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   decreaseQuantity,
@@ -18,22 +18,19 @@ const CartDropdown = ({ isOpen, toggleCart }) => {
   const [createOrder] = useCreateOrderMutation();
   const [createPaymentIntent] = useCreatePaymentIntentMutation();
 
+  const calculateTotalAmount = useMemo(() => {
+    return cart.cart.reduce(
+      (total, item) => total + item.itemPrice * item.quantity,
+      0
+    );
+  }, [cart.cart]);
+
   useEffect(() => {
-    const calculateTotalAmount = () => {
-      return cart.cart.reduce(
-        (total, item) => total + item.itemPrice * item.quantity,
-        0
-      );
-    };
-    setTotalAmount(calculateTotalAmount());
-  }, [cart]);
+    setTotalAmount(calculateTotalAmount);
+  }, [calculateTotalAmount]);
 
   const handleIncrease = (item) => {
-    if (item.quantity < item.quantity) {
-      dispatch(increaseQuantity(item));
-    } else {
-      alert("Cannot add more than available stock");
-    }
+    dispatch(increaseQuantity(item));
   };
 
   const handleDecrease = (item) => {
@@ -51,7 +48,7 @@ const CartDropdown = ({ isOpen, toggleCart }) => {
   const handleCheckout = async (e) => {
     e.preventDefault();
     if (cart.cart.length === 0) {
-      toastManager("error", "Your cart is empty");
+      toastManager.error("Cart is empty. Cannot place order.");
       return;
     }
     const toastId = toastManager.loading("Processing your order...");
@@ -97,7 +94,6 @@ const CartDropdown = ({ isOpen, toggleCart }) => {
       });
     }
   };
-
   if (!isOpen) return null;
 
   return (

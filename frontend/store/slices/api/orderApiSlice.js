@@ -17,20 +17,22 @@ const orderApiSlice = apiSlice.injectEndpoints({
         body: paymentData,
       }),
     }),
-    getMyOrders: builder.query({
-      query: () => `${ORDER_URL}/myOrders`,  
+    fetchOrderById: builder.query({
+      query: (orderID) => `${ORDER_URL}/${orderID}`,
     }),
-    getOrderById: builder.query({
-      query: (id) => `${ORDER_URL}/${id}`,
+    fetchAllOrders: builder.query({
+      query: () => ORDER_URL,
+    }),
+    fetchMyOrders: builder.query({
+      query: () => `${ORDER_URL}/myorders`,
     }),
   }),
 });
 
-export const { 
-  useCreateOrderMutation, 
-  useUpdatePaymentStatusMutation, 
-  useGetMyOrdersQuery,  
-  useGetOrderByIdQuery 
+export const {
+  useCreateOrderMutation,
+  useUpdatePaymentStatusMutation,
+  useFetchAllOrdersQuery,
+  useFetchMyOrdersQuery,
+  useFetchOrderByIdQuery,
 } = orderApiSlice;
-
-export default orderApiSlice;

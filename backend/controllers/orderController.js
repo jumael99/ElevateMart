@@ -1,5 +1,6 @@
 import orderModel from "../models/orderModel.js";
 import asyncHandler from "../middleware/asyncHandler.js";
+import productModel from "../models/productModel.js";
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -8,6 +9,15 @@ const createOrder = asyncHandler(async (req, res) => {
   const { products, totalAmount } = req.body;
 
   const shippingAddress = req.user.address;
+
+  for (const item of products) {
+    const product = await productModel.findById(item._id);
+    if (product.quantity < item.quantity) {
+      throw new Error(
+        `${product.name} has only ${product.quantity} left. Please reduce the quantity.`
+      );
+    }
+  }
 
   const newOrder = await orderModel.create({
     orderBy: req.user._id,
@@ -41,6 +51,14 @@ const updatePaymentStatus = asyncHandler(async (req, res) => {
     currency,
     conversionRate,
   };
+  if (status === "Success") {
+    order.orderItems.forEach(async (item) => {
+      await productModel.findByIdAndUpdate(item._id, {
+        $inc: { quantity: -item.quantity },
+      });
+    });
+  }
+
   order.paymentResult = paymentResult;
   order.deliveryStatus = "Processing";
   order.paymentMethod = paymentMethod;
