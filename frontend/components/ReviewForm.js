@@ -1,41 +1,43 @@
-import React, { useState, useEffect } from 'react';
-import { useCreateReviewMutation, useUpdateReviewMutation } from '../store/slices/api/reviewApiSlice';
+import React, { useState } from 'react';
+import { useCreateReviewMutation } from '../store/slices/api/reviewApiSlice';
 import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
 
-const ReviewForm = ({ productId, review = null }) => {
-  const [rating, setRating] = useState(review ? review.rating : 0);
-  const [comment, setComment] = useState(review ? review.comment : '');
-  const [createReview] = useCreateReviewMutation();
-  const [updateReview] = useUpdateReviewMutation();
+const ReviewForm = ({ productId }) => {
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
+  const [createReview, { isLoading }] = useCreateReviewMutation();
+  const { userInfo } = useSelector((state) => state.auth);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Submitting review:', { productId, rating, comment });
-
-    if (rating === 0 || comment.trim() === '') {
+  
+    if (rating === 0 || !comment || comment.trim() === '') {
       toast.error('Please fill in both rating and comment');
       return;
     }
-
+  
+    if (!userInfo) {
+      toast.error('Please log in to submit a review');
+      return;
+    }
+  
     try {
-      if (review) {
-        const result = await updateReview({ id: review._id, rating, comment });
-        console.log('Update result:', result);
-      } else {
-        const result = await createReview({ productId, rating, comment });
-        console.log('Create result:', result);
-        onReviewSubmitted();
-      }
+      const result = await createReview({ productId, rating, comment }).unwrap();
+      console.log('Create result:', result);
+      toast.success('Review submitted successfully');
       setRating(0);
       setComment('');
-    } catch (error) {
-      toast.error(review ? 'Failed to update review' : 'Failed to add review');
+    } catch (err) {
+      console.error('Failed to add review:', err);
+      toast.error(err.data?.message || 'Failed to add review');
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-md">
-      <h2 className="text-2xl font-semibold mb-4">{review ? 'Edit Review' : 'Add a Review'}</h2>
+      <h2 className="text-2xl font-semibold mb-4">Add a Review</h2>
       
       {/* Rating */}
       <div className="mb-6">
@@ -48,13 +50,13 @@ const ReviewForm = ({ productId, review = null }) => {
               xmlns="http://www.w3.org/2000/svg"
               className={`h-6 w-6 cursor-pointer ${r <= rating ? 'text-yellow-400' : 'text-gray-300'}`}
               viewBox="0 0 24 24"
-              fill="none"
+              fill="currentColor"
               stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <path d="M12 17l-5 3l1-5l-4-4l5-0.5L12 3l2 5.5L19 9l-4 4l1 5l-5-3z" />
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
             </svg>
           ))}
         </div>
@@ -76,9 +78,10 @@ const ReviewForm = ({ productId, review = null }) => {
       {/* Submit Button */}
       <button
         type="submit"
-        className="w-full py-3 px-6 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition duration-300"
+        disabled={isLoading}
+        className="w-full py-3 px-6 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition duration-300 disabled:opacity-50"
       >
-        {review ? 'Update Review' : 'Submit Review'}
+        {isLoading ? 'Submitting...' : 'Submit Review'}
       </button>
     </form>
   );

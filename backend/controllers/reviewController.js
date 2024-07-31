@@ -1,4 +1,3 @@
-// controllers/reviewController.js
 import Review from '../models/reviewModel.js';
 import Product from '../models/productModel.js';
 import asyncHandler from '../middleware/asyncHandler.js';
@@ -16,6 +15,11 @@ const createReview = asyncHandler(async (req, res) => {
   if (!productId || !rating || !comment) {
     console.log('Missing required fields');
     return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  if (!req.user) {
+    console.log('User not authenticated');
+    return res.status(401).json({ message: 'User not authenticated' });
   }
 
   try {
@@ -41,63 +45,4 @@ const createReview = asyncHandler(async (req, res) => {
   }
 });
 
-
-// @desc    Get reviews for a product
-// @route   GET /api/reviews/:productId
-// @access  Public
-const getReviews = asyncHandler(async (req, res) => {
-  const reviews = await Review.find({ product: req.params.productId }).populate('user', 'name');
-
-  res.json(reviews);
-});
-
-const canUserReviewProduct = asyncHandler(async (req, res) => {
-  const { productId } = req.params;
-  const userId = req.user._id;
-
-  // For testing purposes, let's say users with odd-numbered IDs can review odd-numbered products,
-  // and users with even-numbered IDs can review even-numbered products
-  const canReview = userId % 2 === productId % 2;
-
-  res.json({ canReview });
-});
-
-const updateReview = asyncHandler(async (req, res) => {
-  const { rating, comment } = req.body;
-  const review = await Review.findById(req.params.id);
-
-  if (review) {
-    if (review.user.toString() !== req.user._id.toString()) {
-      res.status(401);
-      throw new Error('Not authorized to update this review');
-    }
-
-    review.rating = Number(rating) || review.rating;
-    review.comment = comment || review.comment;
-
-    const updatedReview = await review.save();
-    res.json(updatedReview);
-  } else {
-    res.status(404);
-    throw new Error('Review not found');
-  }
-});
-
-const deleteReview = asyncHandler(async (req, res) => {
-  const review = await Review.findById(req.params.id);
-
-  if (review) {
-    if (review.user.toString() !== req.user._id.toString()) {
-      res.status(401);
-      throw new Error('Not authorized to delete this review');
-    }
-
-    await review.remove();
-    res.json({ message: 'Review removed' });
-  } else {
-    res.status(404);
-    throw new Error('Review not found');
-  }
-});
-
-export { createReview, getReviews, canUserReviewProduct, updateReview, deleteReview };
+export { createReview };

@@ -37,6 +37,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use('/api/reviews', reviewRoutes);
 
+
 if (process.env.NODE_ENV === "production") {
   app.use("/uploads", express.static("/var/data/uploads"));
   app.use(express.static(path.join(__dirname, "/frontend/build")));
