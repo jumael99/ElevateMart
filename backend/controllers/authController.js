@@ -44,7 +44,6 @@ const login = asyncHandler(async (req, res) => {
     status: "success",
     message: "Login successful",
     token,
-    // redirectPath,
   });
 });
 
