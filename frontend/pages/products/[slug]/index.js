@@ -100,7 +100,7 @@ const ProductDetails = () => {
       <div className="mt-12 max-w-5xl mx-auto">
         <h2 className="text-2xl font-bold mb-4">Product Reviews</h2>
         <ReviewsList productId={product._id} />
-        {userInfo &&  (
+        {userInfo && (
           <>
             <h3 className="text-xl font-bold mt-8 mb-4">Add Your Review</h3>
             <ReviewForm productId={product._id} />

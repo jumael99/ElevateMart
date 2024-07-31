@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useGetReviewsQuery, useDeleteReviewMutation } from '../store/slices/api/reviewApiSlice';
 import { useSelector } from 'react-redux';
@@ -19,16 +18,16 @@ const ReviewsList = ({ productId }) => {
     }
   };
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error loading reviews</p>;
+  if (isLoading) return <p>Loading reviews...</p>;
+  if (error) return <p>Error loading reviews: {error.message}</p>;
 
   return (
-    <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-md">
+    <div className="text-black max-w-lg mx-auto p-6 bg-white shadow-md rounded-md">
       <h2 className="text-2xl font-semibold mb-4">Reviews</h2>
-      {reviews.length === 0 ? (
+      {reviews && reviews.length === 0 ? (
         <p>No reviews yet</p>
       ) : (
-        reviews.map((review) => (
+        reviews && reviews.map((review) => (
           <div key={review._id} className="mb-4 border-b pb-4">
             <h3 className="text-lg font-semibold">{review.user.name}</h3>
             <p className="text-gray-600">Rating: {review.rating} Star{review.rating > 1 ? 's' : ''}</p>

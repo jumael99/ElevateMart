@@ -9,7 +9,7 @@ const baseQuery = fetchBaseQuery({
     }
     return headers;
   },
-  credentials: 'include', // Add this line to include credentials
+  credentials: 'include',
 });
 
 export const reviewApiSlice = createApi({

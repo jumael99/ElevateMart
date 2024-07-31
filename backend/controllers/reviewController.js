@@ -45,4 +45,31 @@ const createReview = asyncHandler(async (req, res) => {
   }
 });
 
-export { createReview };
+// @desc    Get reviews for a specific product
+// @route   GET /api/reviews/product/:productId
+// @access  Public
+const getProductReviews = asyncHandler(async (req, res) => {
+  const { productId } = req.params;
+
+  if (!productId) {
+    return res.status(400).json({ message: 'Product ID is required' });
+  }
+
+  try {
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    const reviews = await Review.find({ product: productId })
+      .populate('user', 'name')
+      .sort({ createdAt: -1 });
+
+    res.json(reviews);
+  } catch (error) {
+    console.error('Error in getProductReviews:', error);
+    res.status(500).json({ message: 'Server error', error: error.toString() });
+  }
+});
+
+export { createReview, getProductReviews };
