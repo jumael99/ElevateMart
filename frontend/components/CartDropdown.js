@@ -29,11 +29,19 @@ const CartDropdown = ({ isOpen, toggleCart }) => {
   }, [cart]);
 
   const handleIncrease = (item) => {
-    dispatch(increaseQuantity(item));
+    if (item.quantity < item.quantity) {
+      dispatch(increaseQuantity(item));
+    } else {
+      alert("Cannot add more than available stock");
+    }
   };
 
   const handleDecrease = (item) => {
-    dispatch(decreaseQuantity(item));
+    if (item.quantity > 1) {
+      dispatch(decreaseQuantity(item));
+    } else {
+      handleRemove(item);
+    }
   };
 
   const handleRemove = (item) => {
