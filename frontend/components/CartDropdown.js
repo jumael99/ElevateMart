@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   decreaseQuantity,
@@ -10,7 +10,6 @@ import { FaMinus, FaPlus, FaTimes } from "react-icons/fa";
 import { useCreateOrderMutation } from "@/store/slices/api/orderApiSlice";
 import { toastManager } from "@/utils/toastManager";
 import { useCreatePaymentIntentMutation } from "@/store/slices/api/paymentSlice";
-import { useFetchProductBySlugQuery } from "@/store/slices/api/productApiSlice";
 
 const CartDropdown = ({ isOpen, toggleCart }) => {
   const cart = useSelector((state) => state.cart);
@@ -19,15 +18,16 @@ const CartDropdown = ({ isOpen, toggleCart }) => {
   const [createOrder] = useCreateOrderMutation();
   const [createPaymentIntent] = useCreatePaymentIntentMutation();
 
+  const calculateTotalAmount = useMemo(() => {
+    return cart.cart.reduce(
+      (total, item) => total + item.itemPrice * item.quantity,
+      0
+    );
+  }, [cart.cart]);
+
   useEffect(() => {
-    const calculateTotalAmount = () => {
-      return cart.cart.reduce(
-        (total, item) => total + item.itemPrice * item.quantity,
-        0
-      );
-    };
-    setTotalAmount(calculateTotalAmount());
-  }, [cart]);
+    setTotalAmount(calculateTotalAmount);
+  }, [calculateTotalAmount]);
 
   const handleIncrease = (item) => {
     dispatch(increaseQuantity(item));
@@ -48,7 +48,7 @@ const CartDropdown = ({ isOpen, toggleCart }) => {
   const handleCheckout = async (e) => {
     e.preventDefault();
     if (cart.cart.length === 0) {
-      toastManager("error", "Your cart is empty");
+      toastManager.error("Cart is empty. Cannot place order.");
       return;
     }
     const toastId = toastManager.loading("Processing your order...");
@@ -94,7 +94,6 @@ const CartDropdown = ({ isOpen, toggleCart }) => {
       });
     }
   };
-
   if (!isOpen) return null;
 
   return (
