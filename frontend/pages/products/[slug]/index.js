@@ -1,13 +1,22 @@
 import { useFetchProductBySlugQuery } from "@/store/slices/api/productApiSlice";
 import { useRouter } from "next/router";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "@/store/slices/cartSlice";
 import React from "react";
+import ReviewsList from "@/components/ReviewsList";
+import ReviewForm from "@/components/ReviewForm";
+import { useCanReviewProductQuery } from "@/store/slices/api/reviewApiSlice";
 
 const ProductDetails = () => {
-  const slug = useRouter().query.slug;
-  const { data: product, error, isLoading } = useFetchProductBySlugQuery(slug);
+  const router = useRouter();
+  const { slug } = router.query;
   const dispatch = useDispatch();
+  const { userInfo } = useSelector((state) => state.auth);
+
+  const { data: product, error, isLoading } = useFetchProductBySlugQuery(slug);
+  const { data: canReview } = useCanReviewProductQuery(product?._id, {
+    skip: !product || !userInfo,
+  });
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -68,12 +77,25 @@ const ProductDetails = () => {
           <div className="flex items-center justify-center">
             <button
               onClick={addToCartFunction}
-              className="w-[40%]  bg-gray-700 text-white py-3 px-6 rounded-lg hover:bg-gray-600 transition duration-300 ease-in-out transform hover:scale-105"
+              className="w-[40%] bg-gray-700 text-white py-3 px-6 rounded-lg hover:bg-gray-600 transition duration-300 ease-in-out transform hover:scale-105"
             >
               Add to Cart
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Reviews Section */}
+      <div className="mt-12 max-w-5xl mx-auto">
+        <h2 className="text-2xl font-bold mb-4">Product Reviews</h2>
+        <ReviewsList productId={product._id} />
+        {userInfo && (
+          <>
+            <h3 className="text-xl font-bold mt-8 mb-4">Add Your Review</h3>
+            <ReviewForm productId={product._id} />
+          </>
+        )}
+
       </div>
     </div>
   );

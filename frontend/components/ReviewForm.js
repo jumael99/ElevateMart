@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
-import { useCreateReviewMutation } from '../store/slices/api/reviewApiSlice';
+import React, { useState, useEffect } from 'react';
+import { useCreateReviewMutation, useUpdateReviewMutation } from '../store/slices/api/reviewApiSlice';
 import { toast } from 'react-toastify';
 
-const ReviewForm = ({ productId }) => {
-  const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState('');
+const ReviewForm = ({ productId, review = null }) => {
+  const [rating, setRating] = useState(review ? review.rating : 0);
+  const [comment, setComment] = useState(review ? review.comment : '');
   const [createReview] = useCreateReviewMutation();
+  const [updateReview] = useUpdateReviewMutation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Submitting review:', { productId, rating, comment });
 
     if (rating === 0 || comment.trim() === '') {
       toast.error('Please fill in both rating and comment');
@@ -16,18 +18,24 @@ const ReviewForm = ({ productId }) => {
     }
 
     try {
-      await createReview({ productId, rating, comment });
-      toast.success('Review added successfully');
+      if (review) {
+        const result = await updateReview({ id: review._id, rating, comment });
+        console.log('Update result:', result);
+      } else {
+        const result = await createReview({ productId, rating, comment });
+        console.log('Create result:', result);
+        onReviewSubmitted();
+      }
       setRating(0);
       setComment('');
     } catch (error) {
-      toast.error('Failed to add review');
+      toast.error(review ? 'Failed to update review' : 'Failed to add review');
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-md">
-      <h2 className="text-2xl font-semibold mb-4">Add a Review</h2>
+      <h2 className="text-2xl font-semibold mb-4">{review ? 'Edit Review' : 'Add a Review'}</h2>
       
       {/* Rating */}
       <div className="mb-6">
@@ -70,7 +78,7 @@ const ReviewForm = ({ productId }) => {
         type="submit"
         className="w-full py-3 px-6 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition duration-300"
       >
-        Submit
+        {review ? 'Update Review' : 'Submit Review'}
       </button>
     </form>
   );
