@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '@/store/slices/cartSlice';
 import { useFetchProductBySlugQuery } from '@/store/slices/api/productApiSlice';
-import { useCanReviewProductQuery } from '@/store/slices/api/reviewApiSlice';
+import { useCanReviewProductQuery, useGetReviewsQuery } from '@/store/slices/api/reviewApiSlice';
 import ReviewsList from '@/components/ReviewsList';
 import ReviewForm from '@/components/ReviewForm';
 
@@ -14,9 +14,22 @@ const ProductDetails = () => {
   const { userInfo } = useSelector((state) => state.auth);
 
   const { data: product, error, isLoading } = useFetchProductBySlugQuery(slug);
+  const { data: reviews } = useGetReviewsQuery(product?._id, {
+    skip: !product,
+  });
   const { data: canReview } = useCanReviewProductQuery(product?._id, {
     skip: !product || !userInfo,
   });
+
+  const [averageRating, setAverageRating] = useState(0);
+
+  useEffect(() => {
+    if (reviews) {
+      const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
+      const average = totalRating / reviews.length;
+      setAverageRating(average);
+    }
+  }, [reviews]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -56,7 +69,7 @@ const ProductDetails = () => {
                   key={index}
                   xmlns="http://www.w3.org/2000/svg"
                   className={`h-5 w-5 ${
-                    index < Math.round(product.rating) ? 'text-yellow-400' : 'text-gray-300'
+                    index < Math.round(averageRating) ? 'text-yellow-400' : 'text-gray-300'
                   }`}
                   viewBox="0 0 20 20"
                   fill="currentColor"
@@ -65,7 +78,7 @@ const ProductDetails = () => {
                 </svg>
               ))}
             </div>
-            <span className="ml-2 text-gray-600">({product.numReviews} reviews)</span>
+            <span className="ml-2 text-gray-600">{product.numReviews}</span>
           </div>
 
           <p className="text-gray-600 mb-6 leading-relaxed">
