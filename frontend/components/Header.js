@@ -155,6 +155,10 @@ const Header = () => {
                     <Link href="/profile" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">
                       Profile
                     </Link>
+
+                    <Link href="/order" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                      Order
+                    </Link>
                     <a
                       href="#"
                       onClick={handleLogout}
