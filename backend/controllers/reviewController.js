@@ -72,4 +72,51 @@ const getProductReviews = asyncHandler(async (req, res) => {
   }
 });
 
-export { createReview, getProductReviews };
+// @desc    Update a review
+// @route   PUT /api/reviews/:id
+// @access  Private
+const updateReview = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { rating, comment } = req.body;
+
+  try {
+    const review = await Review.findById(id);
+
+    if (!review) {
+      return res.status(404).json({ message: 'Review not found' });
+    }
+
+    if (review.user.toString() !== req.user._id.toString()) {
+      return res.status(401).json({ message: 'User not authorized' });
+    }
+
+    review.rating = rating || review.rating;
+    review.comment = comment || review.comment;
+
+    const updatedReview = await review.save();
+    res.status(200).json(updatedReview);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.toString() });
+  }
+});
+
+// @desc    Delete a review
+// @route   DELETE /api/reviews/:id
+// @access  Private
+const deleteReview = asyncHandler(async (req, res) => {
+  const review = await Review.findById(req.params.id);
+
+  if (!review) {
+    return res.status(404).json({ message: 'Review not found' });
+  }
+
+  if (review.user.toString() !== req.user._id.toString()) {
+    return res.status(401).json({ message: 'Login First' });
+  }
+
+  await Review.findByIdAndDelete(req.params.id);
+  res.json({ message: 'Review removed' });
+});
+
+
+export { createReview, getProductReviews ,updateReview,deleteReview};

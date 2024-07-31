@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useGetReviewsQuery, useDeleteReviewMutation } from '../store/slices/api/reviewApiSlice';
 import { useSelector } from 'react-redux';
 import ReviewForm from './ReviewForm';
+
 
 const ReviewsList = ({ productId }) => {
   const { data: reviews, error, isLoading } = useGetReviewsQuery(productId);
   const [deleteReview] = useDeleteReviewMutation();
   const { userInfo } = useSelector((state) => state.auth);
+  const user = useSelector((state) => state.user.user);
 
   const handleDelete = async (reviewId) => {
     if (window.confirm('Are you sure you want to delete this review?')) {
@@ -35,7 +37,7 @@ const ReviewsList = ({ productId }) => {
             <p className="text-sm text-gray-500">
               {new Date(review.createdAt).toLocaleDateString()}
             </p>
-            {userInfo && userInfo._id === review.user._id && (
+            {userInfo && user._id === review.user._id && (
               <div className="mt-2">
                 <button
                   onClick={() => handleDelete(review._id)}
@@ -54,3 +56,4 @@ const ReviewsList = ({ productId }) => {
 };
 
 export default ReviewsList;
+
