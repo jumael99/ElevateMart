@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
-import Sidebar from "@/components/Admin/Admin-Sidebar";
-import { Bar } from "react-chartjs-2";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchSellReport } from "@/store/slices/api/sellReportSlice";
+// components/Dashboard.js
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchSellReport } from '@/store/slices/api/sellReportSlice';
+import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,8 +11,9 @@ import {
   Title,
   Tooltip,
   Legend,
-} from "chart.js";
-import { withAuth } from "@/utils/withAuth";
+} from 'chart.js';
+import Sidebar from '@/components/Admin/Admin-Sidebar';
+import { withAuth } from '@/utils/withAuth';
 
 ChartJS.register(
   CategoryScale,
@@ -25,27 +26,11 @@ ChartJS.register(
 
 const Dashboard = () => {
   const dispatch = useDispatch();
-  const { data: sellReport, status } = useSelector((state) => state.sellReport);
-  const [startDate, setStartDate] = useState('2024-08-01');
-  const [endDate, setEndDate] = useState('2024-08-30');
+  const { data: sellReport, status, error } = useSelector((state) => state.sellReport);
 
   useEffect(() => {
-    dispatch(fetchSellReport({ startDate, endDate }));
-  }, [dispatch, startDate, endDate]);
-
-  const handleDateChange = (e) => {
-    const { name, value } = e.target;
-    if (name === 'startDate') {
-      setStartDate(value);
-    } else if (name === 'endDate') {
-      setEndDate(value);
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    dispatch(fetchSellReport({ startDate, endDate }));
-  };
+     dispatch(fetchSellReport({ startDate: '2024-08-01', endDate: '2024-08-30' }));
+  }, [dispatch]);
 
   const data = {
     labels: ["January", "February", "March", "April", "May", "June", "July"],
@@ -89,50 +74,14 @@ const Dashboard = () => {
           Welcome to the Admin Dashboard. Here you can manage users, view reports, and more.
         </p>
 
-        <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">Filter Report by Date Range</h2>
-          <div className="flex gap-4 mb-4">
-            <div>
-              <label htmlFor="startDate" className="block text-sm font-medium mb-2">Start Date:</label>
-              <input
-                type="date"
-                id="startDate"
-                name="startDate"
-                value={startDate}
-                onChange={handleDateChange}
-                className="border rounded p-2"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="endDate" className="block text-sm font-medium mb-2">End Date:</label>
-              <input
-                type="date"
-                id="endDate"
-                name="endDate"
-                value={endDate}
-                onChange={handleDateChange}
-                className="border rounded p-2"
-                required
-              />
-            </div>
-            <button
-              type="submit"
-              className="self-end bg-blue-500 text-white rounded p-2"
-            >
-              Update Report
-            </button>
-          </div>
-        </form>
-
         <div className="grid grid-cols-3 gap-6 mb-6">
           <div className="bg-blue-500 text-white shadow-md rounded-lg p-6">
             <h2 className="text-xl font-semibold mb-4">Total Revenue</h2>
-            <p>{sellReport.totalRevenue}</p>
+            <p>{status === 'loading' ? 'Loading...' : sellReport.totalRevenue}</p>
           </div>
           <div className="bg-green-500 text-white shadow-md rounded-lg p-6">
             <h2 className="text-xl font-semibold mb-4">Total Products Sold</h2>
-            <p>{sellReport.totalProductsSold}</p>
+            <p>{status === 'loading' ? 'Loading...' : sellReport.totalProductsSold}</p>
           </div>
         </div>
 
@@ -142,8 +91,6 @@ const Dashboard = () => {
         </div>
       </div>
     </div>
- 
-
   );
 };
 
