@@ -1,5 +1,6 @@
 import productModel from "../models/productModel.js";
 import asyncHandler from "../middleware/asyncHandler.js";
+import OrderModel from "../models/orderModel.js";
 
 // @desc    Fetch all products or filter by category
 // @route   GET /api/products
@@ -50,8 +51,6 @@ const createNewProduct = asyncHandler(async (req, res) => {
     subCategoryId,
     image,
   } = req.body;
-
-  console.log(req.body);
 
   const newProduct = await productModel.create({
     name,
@@ -136,10 +135,66 @@ const deleteProduct = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Trending products in last month
+// @route   GET /api/trending?limit=number
+// @access  Public
+const getTrendingProducts = asyncHandler(async (req, res) => {
+  const limit = parseInt(req.query.limit);
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const topProducts = await OrderModel.aggregate([
+    {
+      $match: {
+        createdAt: { $gte: thirtyDaysAgo },
+        "paymentResult.status": "Success",
+      },
+    },
+    {
+      $unwind: "$orderItems",
+    },
+    {
+      $group: {
+        _id: "$orderItems.product",
+        totalSell: { $sum: 1 },
+        totalQuantity: { $sum: "$orderItems.quantity" },
+      },
+    },
+    {
+      $sort: { totalSell: -1, totalQuantity: -1 },
+    },
+    {
+      $limit: limit,
+    },
+    {
+      $lookup: {
+        from: "products",
+        localField: "_id",
+        foreignField: "_id",
+        as: "productDetails",
+      },
+    },
+    {
+      $unwind: "$productDetails",
+    },
+    {
+      $project: {
+        _id: 1,
+        totalQuantity: 1,
+        totalSell: 1,
+        name: "$productDetails.name",
+        image: "$productDetails.image",
+      },
+    },
+  ]);
+
+  res.status(200).json(topProducts);
+});
+
 export {
   getProducts,
   getProductBySlug,
   createNewProduct,
   updateProduct,
   deleteProduct,
+  getTrendingProducts,
 };

@@ -19,7 +19,7 @@ const Header = () => {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const needFetch = !!user;
-  const { data: userInformation, isError } = useFetchMyProfileQuery(undefined, {
+  const { data: userInformation } = useFetchMyProfileQuery(undefined, {
     skip: needFetch,
   });
 
@@ -36,9 +36,6 @@ const Header = () => {
     } else {
       setIsUserLoggedIn(false);
     }
-    console.log("User Info:", userInfo);
-    console.log("User Information:", userInformation);
-    console.log("Is User Logged In:", isUserLoggedIn);
   }, [userInfo, userInformation]);
 
   const handleLogout = async (e) => {
@@ -75,7 +72,10 @@ const Header = () => {
     <header>
       <nav className="bg-lightBlue-500 w-full shadow-md">
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-          <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
+          <a
+            href="/"
+            className="flex items-center space-x-3 rtl:space-x-reverse"
+          >
             <span className="self-center text-2xl font-semibold whitespace-nowrap text-black">
               ElevateMart
             </span>
@@ -134,10 +134,14 @@ const Header = () => {
                   onClick={toggleDropdown}
                   className="text-gray-600 focus:outline-none flex items-center gap-2"
                 >
-                  <span className="hidden md:inline">{userInformation?.name || "User"}</span>
+                  <span className="hidden md:inline">
+                    {user?.isAdmin ? "Admin" : user?.name}
+                  </span>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className={`w-4 h-4 transform ${isDropdownOpen ? "rotate-180" : ""}`}
+                    className={`w-4 h-4 transform ${
+                      isDropdownOpen ? "rotate-180" : ""
+                    }`}
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -151,14 +155,30 @@ const Header = () => {
                   </svg>
                 </button>
                 {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2">
-                    <Link href="/profile" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md z-10 shadow-lg py-2">
+                    <Link
+                      href="/profile"
+                      className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
+                    >
                       Profile
                     </Link>
+                    {user?.isAdmin && (
+                      <Link
+                        href="/admin/dashboard"
+                        className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
+                      >
+                        Dashboard
+                      </Link>
+                    )}
 
-                    <Link href="/order" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">
-                      Order
-                    </Link>
+                    {!user?.isAdmin && (
+                      <Link
+                        href="/order"
+                        className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
+                      >
+                        Order
+                      </Link>
+                    )}
                     <a
                       href="#"
                       onClick={handleLogout}
@@ -172,10 +192,16 @@ const Header = () => {
             )}
             {!isUserLoggedIn && (
               <>
-                <Link href="/login" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">
+                <Link
+                  href="/login"
+                  className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0"
+                >
                   Login
                 </Link>
-                <Link href="/register" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">
+                <Link
+                  href="/register"
+                  className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0"
+                >
                   Register
                 </Link>
               </>
@@ -187,27 +213,41 @@ const Header = () => {
             />
           </div>
           <div
-            className={`w-full md:flex md:w-auto md:order-1 ${isMenuOpen ? "block" : "hidden"}`}
+            className={`w-full md:flex md:w-auto md:order-1 ${
+              isMenuOpen ? "block" : "hidden"
+            }`}
           >
             <ul className="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-lightBlue-500 md:flex-row md:space-x-8 md:mt-0 md:border-0">
               <li>
-                <Link href="/" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">
+                <Link
+                  href="/"
+                  className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0"
+                >
                   Home
                 </Link>
               </li>
               <li>
-                <Link href="/products" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">
+                <Link
+                  href="/products"
+                  className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0"
+                >
                   Products
                 </Link>
               </li>
               <li>
-                <Link href="/services" className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0">
+                <Link
+                  href="/services"
+                  className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0"
+                >
                   Services
                 </Link>
               </li>
               {isUserLoggedIn && (
                 <li className="ml-6">
-                  <button onClick={toggleCart} className="relative py-2 cursor-pointer">
+                  <button
+                    onClick={toggleCart}
+                    className="relative py-2 cursor-pointer"
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"

@@ -53,7 +53,7 @@ const CartDropdown = ({ isOpen, toggleCart }) => {
     }
     const toastId = toastManager.loading("Processing your order...");
     const products = await cart.cart.map((item) => ({
-      _id: item._id,
+      product: item._id,
       quantity: item.quantity,
       price: item.itemPrice,
     }));
