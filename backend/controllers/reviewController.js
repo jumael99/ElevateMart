@@ -6,7 +6,6 @@ import asyncHandler from '../middleware/asyncHandler.js';
 // @route   POST /api/reviews
 // @access  Private
 const createReview = asyncHandler(async (req, res) => {
-
   const { productId, rating, comment } = req.body;
 
   if (!productId || !rating || !comment) {
@@ -22,14 +21,24 @@ const createReview = asyncHandler(async (req, res) => {
     throw new Error("Product not found");
   }
 
-  const review = new Review({
+  // Check if the user has already reviewed the product
+  const existingReview = await Review.findOne({
+    product: productId,
+    user: req.user._id,
+  });
+
+  if (existingReview) {
+    throw new Error("You have already reviewed this product");
+  }
+
+  // Use create method to save the review
+  const savedReview = await Review.create({
     product: productId,
     user: req.user._id,
     rating: Number(rating),
     comment,
   });
 
-  const savedReview = await review.save();
   res.status(201).json(savedReview);
 });
 
@@ -43,14 +52,16 @@ const getProductReviews = asyncHandler(async (req, res) => {
     throw new Error("Product ID is required");
   }
 
-
   const product = await Product.findById(productId);
   if (!product) {
     return res.status(404).json({ message: 'Product not found' });
   }
 
   const reviews = await Review.find({ product: productId })
-    .populate('user', 'name')
+    .populate({
+      path: 'user',
+      select: 'name',
+    })
     .sort({ createdAt: -1 });
 
   res.json(reviews);
