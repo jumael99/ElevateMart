@@ -1,11 +1,13 @@
 // frontend/components/Carousel.js
-import React from "react";
+
+import React, { useState, useEffect } from "react";
 import Slider from "react-slick";
+import axios from "axios";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 const MyCarousel = () => {
-  const carouselItems = [
+  const dummylItems = [
     {
       imageUrl: "/images/70432.jpg",
     },
@@ -17,10 +19,20 @@ const MyCarousel = () => {
     },
   ];
 
-    const carouselStyle = {
-    margin: '0 auto',
-    position: 'relative',
-  };
+  // const [trendingProducts, setTrendingProducts] = useState([]);
+
+  // useEffect(() => {
+  //   const fetchTrendingProducts = async () => {
+  //     try {
+  //       const response = await axios.get("/api/products/top/trending");
+  //       setTrendingProducts(response.data);
+  //     } catch (error) {
+  //       console.error("Error fetching trending products", error);
+  //     }
+  //   };
+
+  //   fetchTrendingProducts();
+  // }, []);
 
   const settings = {
     dots: true,
@@ -63,30 +75,32 @@ const MyCarousel = () => {
 
   return (
     <div>
-      <h1 className="text-black font-bold text-3xl text-center pt-6 pb-10">Welcome to Our ElevateMart</h1>
+      <h1 className="text-black font-bold text-3xl text-center pt-6 pb-10">
+        Welcome to Our ElevateMart
+      </h1>
       <div className="mb-5 px-5">
-        
         <Slider {...settings} rtl={false}>
-          {carouselItems.map((item, index) => (
+          {dummylItems.map((product, index) => (
             <div key={index} className="flex justify-center">
               <img
-                src={item.imageUrl}
-                alt={`Item ${index}`}
-                style={{ maxHeight: "200px"}}
+                src={product.imageUrl}
+                alt={product.name}
+                style={{ maxHeight: "200px" }}
+                // onClick={}
               />
             </div>
           ))}
         </Slider>
       </div>
       <div className="px-5">
-        
         <Slider {...settings} rtl={true}>
-          {carouselItems.map((item, index) => (
+          {dummylItems.map((product, index) => (
             <div key={index} className="flex justify-center">
               <img
-                src={item.imageUrl}
-                alt={`Item ${index}`}
+                src={product.imageUrl}
+                alt={product.name}
                 style={{ maxHeight: "200px" }}
+                // onClick={}
               />
             </div>
           ))}
@@ -97,4 +111,3 @@ const MyCarousel = () => {
 };
 
 export default MyCarousel;
-
