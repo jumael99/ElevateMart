@@ -94,7 +94,7 @@ const ProductDetails = () => {
           <div className="mb-6">
             <span className="font-semibold text-gray-700">Availability:</span>
             <span className="ml-2 text-green-600">
-              {product.countInStock > 0 ? `In stock (${product.countInStock})` : 'Out of stock'}
+              {product.quantity > 0 ? `In stock (${product.quantity})` : 'Out of stock'}
             </span>
           </div>
           <div className="flex items-center justify-center">
@@ -103,7 +103,7 @@ const ProductDetails = () => {
               className="w-[40%] bg-gray-700 text-white py-3 px-6 rounded-lg hover:bg-gray-600 transition duration-300 ease-in-out transform hover:scale-105"
               disabled={product.countInStock === 0}
             >
-              {product.countInStock > 0 ? 'Add to Cart' : 'Out of Stock'}
+              {product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
             </button>
           </div>
         </div>
