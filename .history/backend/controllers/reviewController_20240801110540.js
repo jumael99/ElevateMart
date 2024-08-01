@@ -87,11 +87,11 @@ const deleteReview = asyncHandler(async (req, res) => {
   const review = await Review.findById(req.params.id);
 
   if (!review) {
-    throw new Error("Review not found");
+    return res.status(404).json({ message: 'Review not found' });
   }
 
   if (review.user.toString() !== req.user._id.toString()) {
-     throw new Error("You are not allowed to delete this review");
+    return res.status(401).json({ message: 'Login First' });
   }
 
   await Review.findByIdAndDelete(req.params.id);

@@ -91,7 +91,7 @@ const deleteReview = asyncHandler(async (req, res) => {
   }
 
   if (review.user.toString() !== req.user._id.toString()) {
-     throw new Error("You are not allowed to delete this review");
+    throw new Error("You are not allowed to delete this review")
   }
 
   await Review.findByIdAndDelete(req.params.id);

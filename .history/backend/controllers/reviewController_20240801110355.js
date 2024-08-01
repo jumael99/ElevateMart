@@ -17,20 +17,20 @@ const createReview = asyncHandler(async (req, res) => {
     throw new Error("User not authenticated");
   }
 
-  const product = await Product.findById(productId);
-  if (!product) {
-    throw new Error("Product not found");
-  }
+    const product = await Product.findById(productId);
+    if (!product) {
+      throw new Error("Product not found");
+    }
 
-  const review = new Review({
-    product: productId,
-    user: req.user._id,
-    rating: Number(rating),
-    comment,
-  });
+    const review = new Review({
+      product: productId,
+      user: req.user._id,
+      rating: Number(rating),
+      comment,
+    });
 
-  const savedReview = await review.save();
-  res.status(201).json(savedReview);
+    const savedReview = await review.save();
+    res.status(201).json(savedReview);
 });
 
 // @desc    Get reviews for a specific product
@@ -43,17 +43,17 @@ const getProductReviews = asyncHandler(async (req, res) => {
     throw new Error("Product ID is required");
   }
 
+  try {
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
 
-  const product = await Product.findById(productId);
-  if (!product) {
-    return res.status(404).json({ message: 'Product not found' });
-  }
+    const reviews = await Review.find({ product: productId })
+      .populate('user', 'name')
+      .sort({ createdAt: -1 });
 
-  const reviews = await Review.find({ product: productId })
-    .populate('user', 'name')
-    .sort({ createdAt: -1 });
-
-  res.json(reviews);
+    res.json(reviews);
 });
 
 // @desc    Update a review
@@ -63,21 +63,25 @@ const updateReview = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { rating, comment } = req.body;
 
-  const review = await Review.findById(id);
+  try {
+    const review = await Review.findById(id);
 
-  if (!review) {
-    return res.status(404).json({ message: 'Review not found' });
+    if (!review) {
+      return res.status(404).json({ message: 'Review not found' });
+    }
+
+    if (review.user.toString() !== req.user._id.toString()) {
+      return res.status(401).json({ message: 'User not authorized' });
+    }
+
+    review.rating = rating || review.rating;
+    review.comment = comment || review.comment;
+
+    const updatedReview = await review.save();
+    res.status(200).json(updatedReview);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.toString() });
   }
-
-  if (review.user.toString() !== req.user._id.toString()) {
-    return res.status(401).json({ message: 'User not authorized' });
-  }
-
-  review.rating = rating || review.rating;
-  review.comment = comment || review.comment;
-
-  const updatedReview = await review.save();
-  res.status(200).json(updatedReview);
 });
 
 // @desc    Delete a review
@@ -87,11 +91,11 @@ const deleteReview = asyncHandler(async (req, res) => {
   const review = await Review.findById(req.params.id);
 
   if (!review) {
-    throw new Error("Review not found");
+    return res.status(404).json({ message: 'Review not found' });
   }
 
   if (review.user.toString() !== req.user._id.toString()) {
-     throw new Error("You are not allowed to delete this review");
+    return res.status(401).json({ message: 'Login First' });
   }
 
   await Review.findByIdAndDelete(req.params.id);
