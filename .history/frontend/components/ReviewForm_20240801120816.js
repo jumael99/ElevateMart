@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useCreateReviewMutation } from '../store/slices/api/reviewApiSlice';
-import { toast } from 'react-toastify';
+import { toast } from '../utils/toastManager';
 import { useSelector } from 'react-redux';
 
 const ReviewForm = ({ productId }) => {
@@ -17,12 +17,19 @@ const ReviewForm = ({ productId }) => {
       return;
     }
   
+    if (!userInfo) {
+      toast.error('Please log in to submit a review');
+      return;
+    }
+  
     try {
       const result = await createReview({ productId, rating, comment }).unwrap();
+      console.log('Create result:', result);
       toast.success('Review submitted successfully');
       setRating(0);
       setComment('');
     } catch (err) {
+      console.error('Failed to add review:', err);
       toast.error(err.data?.message || 'Failed to add review');
     }
   };

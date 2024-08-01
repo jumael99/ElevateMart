@@ -41,6 +41,7 @@ const ReviewsList = ({ productId }) => {
       setEditingReview(null);
       toast.success('Review updated successfully');
     } catch (error) {
+      console.error('Failed to update review:', error);
       toast.error('Failed to update review');
     }
   };

@@ -103,7 +103,7 @@ const ProductDetails = () => {
               className="w-[40%] bg-gray-700 text-white py-3 px-6 rounded-lg hover:bg-gray-600 transition duration-300 ease-in-out transform hover:scale-105"
               disabled={product.countInStock === 0}
             >
-              {product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
+              {product.countInStock > 0 ? 'Add to Cart' : 'Out of Stock'}
             </button>
           </div>
         </div>

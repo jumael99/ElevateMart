@@ -20,6 +20,7 @@ const ReviewsList = ({ productId }) => {
         await deleteReview(reviewId).unwrap();
         toast.success('Review deleted successfully');
       } catch (error) {
+        console.error('Failed to delete review:', error);
         toast.error('Failed to delete review');
       }
     }
@@ -41,6 +42,7 @@ const ReviewsList = ({ productId }) => {
       setEditingReview(null);
       toast.success('Review updated successfully');
     } catch (error) {
+      console.error('Failed to update review:', error);
       toast.error('Failed to update review');
     }
   };

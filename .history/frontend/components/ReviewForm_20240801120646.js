@@ -17,12 +17,19 @@ const ReviewForm = ({ productId }) => {
       return;
     }
   
+    if (!userInfo) {
+      toast.error('Please log in to submit a review');
+      return;
+    }
+  
     try {
       const result = await createReview({ productId, rating, comment }).unwrap();
+      console.log('Create result:', result);
       toast.success('Review submitted successfully');
       setRating(0);
       setComment('');
     } catch (err) {
+      console.error('Failed to add review:', err);
       toast.error(err.data?.message || 'Failed to add review');
     }
   };

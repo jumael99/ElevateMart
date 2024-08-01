@@ -23,6 +23,7 @@ const ReviewForm = ({ productId }) => {
       setRating(0);
       setComment('');
     } catch (err) {
+      console.error('Failed to add review:', err);
       toast.error(err.data?.message || 'Failed to add review');
     }
   };
