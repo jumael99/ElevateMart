@@ -11,7 +11,7 @@ const createOrder = asyncHandler(async (req, res) => {
   const shippingAddress = req.user.address;
 
   for (const item of products) {
-    const product = await productModel.findById(item._id);
+    const product = await productModel.findById(item.product);
     if (product.quantity < item.quantity) {
       throw new Error(
         `${product.name} has only ${product.quantity} left. Please reduce the quantity.`
@@ -60,7 +60,7 @@ const updatePaymentStatus = asyncHandler(async (req, res) => {
   }
 
   order.paymentResult = paymentResult;
-  order.deliveryStatus = "Processing";
+  order.deliveryStatus = status === "Success" ? "Processing" : "On-Hold";
   order.paymentMethod = paymentMethod;
   await order.save();
   res.status(204).json();
@@ -74,7 +74,7 @@ const getOrderById = asyncHandler(async (req, res) => {
     .findById(req.params.id)
     .populate({
       path: "orderBy",
-      select: "name email",
+      select: "name email phone address",
     })
     .populate({
       path: "orderItems.product",
@@ -94,10 +94,17 @@ const getOrderById = asyncHandler(async (req, res) => {
 // @route   GET /api/orders/myOrders
 // @access  Private
 const getMyOrders = asyncHandler(async (req, res) => {
-  const orders = await orderModel.find({ orderBy: req.user._id }).populate({
-    path: "orderItems.product",
-    select: "name image",
-  });
+  const orders = await orderModel
+    .find({ orderBy: req.user._id })
+    .populate({
+      path: "orderItems.product",
+      select: "name image",
+    })
+    .populate({
+      path: "orderBy",
+      select: "name email address phone",
+    })
+    .sort({ createdAt: -1 });
   res.status(200).json({
     success: true,
     orders,
@@ -111,13 +118,15 @@ const getOrders = asyncHandler(async (req, res) => {
   const orders = await orderModel
     .find({})
     .populate({
-      path: "orderBy",
+      path: "orderBy.product",
       select: "name email",
     })
     .populate({
       path: "orderItems.product",
       select: "name image",
-    });
+    })
+    .sort({ createdAt: -1 });
+
   res.status(200).json({
     success: true,
     orders,
@@ -133,7 +142,7 @@ const updateDeliveryStatus = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error("Order not found");
   }
-  order.deliveryStatus = req.body.status;
+  order.deliveryStatus = req.body.deliveryStatus;
   await order.save();
   res.status(204).json();
 });
