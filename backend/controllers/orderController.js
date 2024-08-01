@@ -161,10 +161,13 @@ const getTotalSellReport = asyncHandler(async (req, res) => {
   const start = new Date(startDate);
   const end = new Date(endDate);
 
+  console.log("Start Date: ", start);
+  console.log("End Date: ", end);
+
   const salesSummary = await orderModel.aggregate([
     {
       $match: {
-        createdAt: { $gte: start, $lt: end },
+        createdAt: { $gte: start, $lte: end },
         "paymentResult.status": "Success",
       },
     },
@@ -185,6 +188,7 @@ const getTotalSellReport = asyncHandler(async (req, res) => {
         _id: 0,
         totalProductsSold: 1,
         totalRevenue: 1,
+        orders: 1,
       },
     },
   ]);
