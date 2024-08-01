@@ -47,6 +47,8 @@ const cartSlice = createSlice({
       const item = action.payload;
       const existingItem = state.cart.find((i) => i._id === item._id);
       existingItem.quantity += 1;
+      state.cartTotal += existingItem.price;
+      state.totalPayableAmount += existingItem.updatedPrice;
       typeof window !== "undefined"
         ? localStorage.setItem("elevateMart-cart", JSON.stringify(state))
         : null;
@@ -58,6 +60,8 @@ const cartSlice = createSlice({
         return;
       }
       existingItem.quantity -= 1;
+      state.cartTotal -= existingItem.price;
+      state.totalPayableAmount -= existingItem.updatedPrice;
       typeof window !== "undefined"
         ? localStorage.setItem("elevateMart-cart", JSON.stringify(state))
         : null;
@@ -74,7 +78,12 @@ const cartSlice = createSlice({
   },
 });
 
-export const { addToCart, removeFromCart, increaseQuantity, decreaseQuantity } =
-  cartSlice.actions;
+export const {
+  addToCart,
+  removeFromCart,
+  increaseQuantity,
+  decreaseQuantity,
+  deleteCart,
+} = cartSlice.actions;
 
 export default cartSlice.reducer;

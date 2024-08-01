@@ -40,6 +40,13 @@ export const productApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Product"],
     }),
+    fetchCartProductsQuantity: builder.query({
+      query: (products) => ({
+        url: `${PRODUCT_URL}/quantity`,
+        method: "GET",
+        body: products,
+      }),
+    }),
   }),
 });
 
@@ -49,4 +56,5 @@ export const {
   useCreateNewProductMutation,
   useDeleteProductMutation,
   useUpdateProductByIdMutation,
+  useFetchCartProductsQuantityQuery,
 } = productApi;

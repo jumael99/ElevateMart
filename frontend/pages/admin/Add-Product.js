@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "@/components/Admin/Admin-Sidebar";
 import dynamic from "next/dynamic";
-import { useUploadProductImageMutation } from "@/store/slices/api/uploadsApiSlice";
+import {
+  useUploadProductImageMutation,
+  useDeleteImageMutation,
+} from "@/store/slices/api/uploadsApiSlice";
 import {
   useCreateNewProductMutation,
   useFetchAllProductsQuery,
@@ -39,7 +42,7 @@ const Products = () => {
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
-  // const [currentProductId, setCurrentProductId] = useState(null);
+  const [deleteImage] = useDeleteImageMutation();
   const { data: categoriesData } = useFetchAllCategoriesQuery();
   const [deleteProduct] = useDeleteProductMutation();
   const { data: subCategoriesData } = useFetchAllSubCategoriesQuery();
@@ -101,7 +104,6 @@ const Products = () => {
         const data = await uploadProductImage(imageForm).unwrap();
         imageForm.append("imageURL", data.image);
       }
-
       const productData = {
         id: isEditing ? formData.id : undefined,
         name: formData.name,
@@ -157,10 +159,13 @@ const Products = () => {
     setIsEditing(true);
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (product) => {
     const toastID = toastManager.loading("Please wait...");
     try {
-      await deleteProduct(id).unwrap();
+      if (product.image) {
+        await deleteImage(product.image).unwrap();
+      }
+      await deleteProduct(product.id).unwrap();
       toastManager.updateStatus(toastID, {
         render: "Product deleted successfully",
         type: "success",
@@ -415,7 +420,7 @@ const Products = () => {
                         Edit
                       </button>
                       <button
-                        onClick={() => handleDelete(product._id)}
+                        onClick={() => handleDelete(product)}
                         className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ml-2"
                       >
                         Delete
