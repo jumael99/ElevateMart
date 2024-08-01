@@ -4,7 +4,7 @@ import PromotionCard from "@/components/PromotionCard";
 //     return (
 //         <div>Home</div>
 //     )
-// }
+// } 
 
  const LandingPage = () => {
     return (
