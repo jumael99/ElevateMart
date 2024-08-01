@@ -88,7 +88,7 @@ const ReviewsList = ({ productId }) => {
       <h2 className="text-2xl font-semibold mb-4">Reviews</h2>
       {reviews && reviews.length === 0 ? (
         <p className="text-gray-600 italic">No reviews yet</p>
-      ) : (
+      ) : reviews ? ( // Add this line for null check
         reviews && reviews.slice(0, visibleReviews).map((review) => (
           <div key={review._id} className="mb-4 border-b pb-4">
             {editingReview === review._id ? (
@@ -140,7 +140,7 @@ const ReviewsList = ({ productId }) => {
             )}
           </div>
         ))
-      )}
+      ) : null} 
       {reviews && visibleReviews < reviews.length && (
         <button
           onClick={handleShowMore}
