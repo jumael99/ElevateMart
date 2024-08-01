@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useGetReviewsQuery, useDeleteReviewMutation, useUpdateReviewMutation } from '../store/slices/api/reviewApiSlice';
 import { useSelector } from 'react-redux';
-import { toast, ToastContainer } from 'react-toastify';
+import { toastManager } from "@/utils/toastManager.js";
 import { FaStar, FaRegStar } from 'react-icons/fa';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -36,9 +36,9 @@ const ReviewsList = ({ productId }) => {
     if (window.confirm('Are you sure you want to delete this review?')) {
       try {
         await deleteReview(reviewId).unwrap();
-        toast.success('Review deleted successfully');
+        toastManager.success('Review deleted successfully');
       } catch (error) {
-        toast.error('Failed to delete review');
+        toastManager.error('Failed to delete review');
       }
     }
   };
@@ -57,9 +57,9 @@ const ReviewsList = ({ productId }) => {
     try {
       await updateReview({ id: reviewId, ...editForm }).unwrap();
       setEditingReview(null);
-      toast.success('Review updated successfully');
+      toastManager.success('Review updated successfully');
     } catch (error) {
-      toast.error('Failed to update review');
+      toastManager.error('Failed to update review');
     }
   };
 
@@ -84,7 +84,7 @@ const ReviewsList = ({ productId }) => {
 
   return (
     <div className="text-black w-[100%] mx-auto text-left py-10">
-      <ToastContainer />
+
       <h2 className="text-2xl font-semibold mb-4">Reviews</h2>
       {reviews && reviews.length === 0 ? (
         <p className="text-gray-600 italic">No reviews yet</p>

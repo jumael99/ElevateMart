@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useCreateReviewMutation } from '../store/slices/api/reviewApiSlice';
-import { toast } from 'react-toastify';
+import { toastManager } from "@/utils/toastManager.js";
 import { useSelector } from 'react-redux';
 
 const ReviewForm = ({ productId }) => {
@@ -13,17 +13,17 @@ const ReviewForm = ({ productId }) => {
     e.preventDefault();
   
     if (rating === 0 || !comment || comment.trim() === '') {
-      toast.error('Please fill in both rating and comment');
+      toastManager.error('Please fill in both rating and comment');
       return;
     }
   
     try {
       const result = await createReview({ productId, rating, comment }).unwrap();
-      toast.success('Review submitted successfully');
+      toastManager.success('Review submitted successfully');
       setRating(0);
       setComment('');
     } catch (err) {
-      toast.error(err.data?.message || 'Failed to add review');
+      toastManager.error(err.data?.message || 'Failed to add review');
     }
   };
 
