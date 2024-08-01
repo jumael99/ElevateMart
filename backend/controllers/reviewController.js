@@ -95,14 +95,19 @@ const updateReview = asyncHandler(async (req, res) => {
 // @route   DELETE /api/reviews/:id
 // @access  Private
 const deleteReview = asyncHandler(async (req, res) => {
-  const review = reviewModel.findById(req.params.id);
-  const canDelete = review.user_id.toString() === req.user._id.toString || req.user.isAdmin;
-  if(!canDelete){
-      throw new error("You are not authorize to perform this action");
+  const review = await Review.findById(req.params.id);
+
+  if (!review) {
+    throw new Error("Review not found");
   }
-  reviewModel.findByIdAndDelete(review._id);
-  res.status(204);
-})
+
+  if (review.user.toString() !== req.user._id.toString()) {
+     throw new Error("You are not allowed to delete this review");
+  }
+
+  await Review.findByIdAndDelete(req.params.id);
+  res.json({ message: 'Review removed' });
+});
 
 
 export { createReview, getProductReviews ,updateReview,deleteReview};
