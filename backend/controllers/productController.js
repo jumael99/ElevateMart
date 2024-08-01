@@ -51,8 +51,6 @@ const createNewProduct = asyncHandler(async (req, res) => {
     image,
   } = req.body;
 
-  console.log(req.body);
-
   const newProduct = await productModel.create({
     name,
     price,

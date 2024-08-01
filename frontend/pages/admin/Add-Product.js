@@ -172,7 +172,6 @@ const Products = () => {
       });
       resetForm();
     } catch (error) {
-      console.log(error);
       toastManager.updateStatus(toastID, {
         render: error?.data?.message || "Error deleting product",
         type: "error",
