@@ -14,7 +14,7 @@ const HomePageProducts = () => {
 
   return (
     <div>
-      <div className="w-[100%] mx-auto text-center pt-20">
+      <div className="w-[100%] mx-auto text-center pt-16">
         <div className="text-black">
           <h1 className="text-3xl font-semibold">
             Discover Your Dream Products

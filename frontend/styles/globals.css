@@ -18,6 +18,18 @@ body {
   color: rgb(var(--foreground-rgb));
 }
 
+.reverse-carousel .react-multi-carousel-list {
+  flex-direction: row-reverse;
+}
+
+/* .reverse-carousel .react-multi-carousel-item {
+  transform: rotateY(180deg);
+} */
+
+/* .reverse-carousel .react-multi-carousel-track {
+  transform: rotateY(180deg);
+}  */
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
