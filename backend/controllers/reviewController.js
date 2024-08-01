@@ -1,6 +1,7 @@
 import Review from '../models/reviewModel.js';
 import Product from '../models/productModel.js';
 import asyncHandler from '../middleware/asyncHandler.js';
+import Order from '../models/orderModel.js';
 
 // @desc    Create a review
 // @route   POST /api/reviews
@@ -29,6 +30,17 @@ const createReview = asyncHandler(async (req, res) => {
 
   if (existingReview) {
     throw new Error("You have already reviewed this product");
+  }
+
+  // Check if the user has purchased the product
+  const hasPurchased = await Order.exists({
+    orderBy: req.user._id,
+    'orderItems.product': productId,
+    deliveryStatus: { $in: ['Delivered'] }, // Ensure the product has been delivered
+  });
+
+  if (!hasPurchased) {
+    throw new Error('You have to purchase this product');
   }
 
   // Use create method to save the review
