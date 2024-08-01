@@ -7,3 +7,4 @@ export const UPLOAD_URL = `/api/upload`;
 export const CATEGORY_URL = `/api/categories`;
 export const ORDER_URL = `/api/order`;
 export const PAYMENT_URL = `/api/payment`;
+export const SELL_url = '/api/'

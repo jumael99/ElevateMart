@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "@/components/Admin/Admin-Sidebar";
 import { Bar } from "react-chartjs-2";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchSellReport } from "@/store/slices/api/sellReportSlice";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -22,58 +24,27 @@ ChartJS.register(
 );
 
 const Dashboard = () => {
-  const [formData, setFormData] = useState({
-    productName: "",
-    productDescription: "",
-    productPrice: "",
-    productImage: null,
-    productImagePreview: "",
-  });
+  const dispatch = useDispatch();
+  const { data: sellReport, status } = useSelector((state) => state.sellReport);
+  const [startDate, setStartDate] = useState('2024-08-01');
+  const [endDate, setEndDate] = useState('2024-08-30');
 
-  const [errors, setErrors] = useState({});
+  useEffect(() => {
+    dispatch(fetchSellReport({ startDate, endDate }));
+  }, [dispatch, startDate, endDate]);
 
-  const handleChange = (e) => {
+  const handleDateChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData({
-          ...formData,
-          productImage: file,
-          productImagePreview: reader.result,
-        });
-      };
-      reader.readAsDataURL(file);
+    if (name === 'startDate') {
+      setStartDate(value);
+    } else if (name === 'endDate') {
+      setEndDate(value);
     }
-  };
-
-  const validate = () => {
-    let tempErrors = {};
-    if (!formData.productName)
-      tempErrors.productName = "Product Name is required";
-    if (!formData.productDescription)
-      tempErrors.productDescription = "Product Description is required";
-    if (!formData.productPrice)
-      tempErrors.productPrice = "Product Price is required";
-    if (!formData.productImage)
-      tempErrors.productImage = "Product Image is required";
-    setErrors(tempErrors);
-    return Object.keys(tempErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validate()) {
-      console.log("Form submitted", formData);
-    }
+    dispatch(fetchSellReport({ startDate, endDate }));
   };
 
   const data = {
@@ -115,30 +86,64 @@ const Dashboard = () => {
       <div className="flex-1 p-10 text-black">
         <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
         <p className="mb-6">
-          Welcome to the Admin Dashboard. Here you can manage users, view
-          reports, and more.
+          Welcome to the Admin Dashboard. Here you can manage users, view reports, and more.
         </p>
 
-        <div className="grid grid-cols-3 gap-6">
+        <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">Filter Report by Date Range</h2>
+          <div className="flex gap-4 mb-4">
+            <div>
+              <label htmlFor="startDate" className="block text-sm font-medium mb-2">Start Date:</label>
+              <input
+                type="date"
+                id="startDate"
+                name="startDate"
+                value={startDate}
+                onChange={handleDateChange}
+                className="border rounded p-2"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="endDate" className="block text-sm font-medium mb-2">End Date:</label>
+              <input
+                type="date"
+                id="endDate"
+                name="endDate"
+                value={endDate}
+                onChange={handleDateChange}
+                className="border rounded p-2"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="self-end bg-blue-500 text-white rounded p-2"
+            >
+              Update Report
+            </button>
+          </div>
+        </form>
+
+        <div className="grid grid-cols-3 gap-6 mb-6">
           <div className="bg-blue-500 text-white shadow-md rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Product Orders</h2>
-            <p>Details about product orders.</p>
+            <h2 className="text-xl font-semibold mb-4">Total Revenue</h2>
+            <p>{sellReport.totalRevenue}</p>
           </div>
           <div className="bg-green-500 text-white shadow-md rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Income</h2>
-            <p>Details about income.</p>
-          </div>
-          <div className="bg-red-500 text-white shadow-md rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Expense</h2>
-            <p>Details about expense.</p>
+            <h2 className="text-xl font-semibold mb-4">Total Products Sold</h2>
+            <p>{sellReport.totalProductsSold}</p>
           </div>
         </div>
-        <div className="bg-white shadow-md rounded-lg p-12 mt-6">
+
+        <div className="bg-white shadow-md rounded-lg p-12">
           <h2 className="text-xl font-semibold mb-6">Graph Chart</h2>
           <Bar data={data} options={options} height={100} />
         </div>
       </div>
     </div>
+ 
+
   );
 };
 
