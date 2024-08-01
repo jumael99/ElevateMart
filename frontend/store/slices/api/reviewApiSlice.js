@@ -1,32 +1,17 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import apiSlice from "./apiSlice";
 
-const baseQuery = fetchBaseQuery({
-  baseUrl: 'http://localhost:5001/api',
-  prepareHeaders: (headers, { getState }) => {
-    const token = getState().auth.userInfo?.token;
-    if (token) {
-      headers.set('Authorization', `Bearer ${token}`);
-    }
-    return headers;
-  },
-  credentials: 'include',
-});
-
-export const reviewApiSlice = createApi({
-  reducerPath: 'reviewApi',
-  baseQuery,
-  tagTypes: ['Review'],
+const reviewApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     createReview: builder.mutation({
       query: (data) => ({
-        url: '/reviews',
+        url: '/api/reviews',
         method: 'POST',
         body: data,
       }),
       invalidatesTags: ['Review'],
     }),
     getReviews: builder.query({
-      query: (productId) => `/reviews/product/${productId}`,
+      query: (productId) => `api/reviews/product/${productId}`,
       providesTags: ['Review'],
     }),
     canReviewProduct: builder.query({
@@ -34,7 +19,7 @@ export const reviewApiSlice = createApi({
     }),
     updateReview: builder.mutation({
       query: ({ id, ...data }) => ({
-        url: `/reviews/${id}`,
+        url: `api/reviews/${id}`,
         method: 'PUT',
         body: data,
       }),
@@ -42,7 +27,7 @@ export const reviewApiSlice = createApi({
     }),
     deleteReview: builder.mutation({
       query: (id) => ({
-        url: `/reviews/${id}`,
+        url: `api/reviews/${id}`,
         method: 'DELETE',
       }),
       invalidatesTags: ['Review'],
