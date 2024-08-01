@@ -1,4 +1,3 @@
-import { updateDeliveryStatus } from "../ordersSlice";
 import apiSlice from "./apiSlice";
 import { ORDER_URL } from "./constantURL";
 

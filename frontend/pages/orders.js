@@ -1,4 +1,3 @@
-import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { useFetchMyOrdersQuery } from "@/store/slices/api/orderApiSlice";
 import OrderDetails from "@/components/orderDetails.js";
