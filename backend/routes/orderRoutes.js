@@ -6,6 +6,7 @@ import {
   getMyOrders,
   getOrders,
   updateDeliveryStatus,
+  getTotalSellReport,
 } from "../controllers/orderController.js";
 import protectMiddleware from "../middleware/protectMiddleware.js";
 
@@ -25,5 +26,9 @@ router.route("/:id/payment").patch(updatePaymentStatus);
 router
   .route("/:id/deliver")
   .patch(protectMiddleware("admin"), updateDeliveryStatus);
+
+router
+  .route("/sell/report")
+  .get(protectMiddleware("admin"), getTotalSellReport);
 
 export default router;

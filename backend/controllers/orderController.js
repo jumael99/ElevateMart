@@ -147,6 +147,56 @@ const updateDeliveryStatus = asyncHandler(async (req, res) => {
   res.status(204).json();
 });
 
+// @desc    Total Sell report from start date to end date
+// @route   GET /api/orders/sell/report?startDate={}&endDate={}
+// @access  Private/Admin
+const getTotalSellReport = asyncHandler(async (req, res) => {
+  const { startDate, endDate } = req.query;
+
+  if (!startDate || !endDate) {
+    res.status(400);
+    throw new Error("Start date and end date are required");
+  }
+
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  console.log(`Start Date: ${start}`);
+  console.log(`End Date: ${end}`);
+
+  const salesSummary = await orderModel.aggregate([
+    {
+      $match: {
+        createdAt: { $gte: start, $lt: end },
+        "paymentResult.status": "Success",
+      },
+    },
+    {
+      $unwind: "$orderItems",
+    },
+    {
+      $group: {
+        _id: null,
+        totalProductsSold: { $sum: "$orderItems.quantity" },
+        totalRevenue: {
+          $sum: { $multiply: ["$orderItems.quantity", "$orderItems.price"] },
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        totalProductsSold: 1,
+        totalRevenue: 1,
+      },
+    },
+  ]);
+
+  console.log(salesSummary);
+
+  res.json(salesSummary[0] || { totalProductsSold: 0, totalRevenue: 0 });
+});
+
 export {
   createOrder,
   updatePaymentStatus,
@@ -154,4 +204,5 @@ export {
   getMyOrders,
   getOrders,
   updateDeliveryStatus,
+  getTotalSellReport,
 };
