@@ -30,7 +30,7 @@ const PaymentSuccessful = () => {
             render: "Payment verified successfully",
           });
           setTimeout(() => {
-            router.push("/");
+            router.push("/orders");
           }, 2000);
         } else {
           await updatePaymentStatus({ orderID, paymentData }).unwrap();
@@ -46,8 +46,8 @@ const PaymentSuccessful = () => {
           render: errorMessage,
         });
         setTimeout(() => {
-          router.push("/");
-        }, 2000);
+          router.push("/orders");
+        }, 1500);
       }
     };
     if (orderID) {

@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Sidebar from "@/components/Admin/Admin-Sidebar";
-import Buttons from "@/components/Admin/Buttons";
-import { useFetchAllOrdersQuery } from "@/store/slices/api/orderApiSlice";
+import {
+  useFetchAllOrdersQuery,
+  useUpdateDeliveryStatusMutation,
+} from "@/store/slices/api/orderApiSlice";
+import { toastManager } from "@/utils/toastManager";
+import { withAuth } from "@/utils/withAuth";
 
 const ViewOrders = () => {
   const { data } = useFetchAllOrdersQuery();
   const [orderList, setOrderList] = useState([]);
   const router = useRouter();
+  const [updateDeliveryStatus] = useUpdateDeliveryStatusMutation();
 
   useEffect(() => {
     if (data) {
@@ -15,12 +20,47 @@ const ViewOrders = () => {
     }
   }, [data]);
 
-  const handleDeliveryStatus = (id, status) => {
-    setOrderList((prevOrders) =>
-      prevOrders.map((order) =>
+  const updateOrderList = (id, status) => {
+    setOrderList((prev) =>
+      prev.map((order) =>
         order._id === id ? { ...order, deliveryStatus: status } : order
       )
     );
+  };
+
+  const handleDeliveryStatus = async (id, status, pay_status) => {
+    const toastId = toastManager.loading("Updating delivery status...");
+    if (pay_status === "Failed" || pay_status === "Pending") {
+      toastManager.updateStatus(toastId, {
+        render:
+          "Payment status is failed. You cannot update the delivery status",
+        type: "error",
+      });
+      return;
+    }
+    if (status === "Initiated") {
+      toastManager.updateStatus(toastId, {
+        render: "Delivery status cannot be initiated",
+        type: "error",
+      });
+      return;
+    }
+    try {
+      await updateDeliveryStatus({
+        orderID: id,
+        deliveryStatus: status,
+      }).unwrap();
+      toastManager.updateStatus(toastId, {
+        render: "Delivery status updated successfully",
+        type: "success",
+      });
+      updateOrderList(id, status);
+    } catch (error) {
+      toastManager.updateStatus(toastId, {
+        render: error.message || "Failed to update delivery status",
+        type: "error",
+      });
+    }
   };
 
   const orderDetails = (id) => {
@@ -54,7 +94,17 @@ const ViewOrders = () => {
           </thead>
           <tbody>
             {orderList.map((order) => (
-              <tr className="cursor-pointer hover:bg-gray-300">
+              <tr
+                className={`cursor-pointer hover:bg-gray-300 ${
+                  order.deliveryStatus === "Shipped"
+                    ? "bg-green-200"
+                    : order.deliveryStatus === "Delivered"
+                    ? "bg-green-300"
+                    : order.deliveryStatus === "On-Hold"
+                    ? "bg-red-200"
+                    : null
+                }`}
+              >
                 <td
                   className="p-3 border"
                   key={order._id}
@@ -102,10 +152,18 @@ const ViewOrders = () => {
                 </td>
                 <td className="p-3 border font-bold">
                   <select
-                    className="border p-1"
+                    className="border p-1 px-4"
+                    disabled={
+                      order.deliveryStatus === "Delivered" ||
+                      order.deliveryStatus === "Initiated"
+                    }
                     value={order.deliveryStatus}
                     onChange={(e) =>
-                      handleDeliveryStatus(order._id, e.target.value)
+                      handleDeliveryStatus(
+                        order._id,
+                        e.target.value,
+                        order.paymentResult.status
+                      )
                     }
                     style={{
                       backgroundColor: ["Initiated", "On-Hold"].includes(
@@ -136,4 +194,7 @@ const ViewOrders = () => {
   );
 };
 
-export default ViewOrders;
+export default withAuth(ViewOrders, {
+  requireLogin: true,
+  requireAdmin: true,
+});

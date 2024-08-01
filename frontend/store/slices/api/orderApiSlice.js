@@ -9,6 +9,7 @@ const orderApiSlice = apiSlice.injectEndpoints({
         method: "POST",
         body: order,
       }),
+      invalidatesTags: ["MyOrder", "AllOrders"],
     }),
     updatePaymentStatus: builder.mutation({
       query: ({ orderID, paymentData }) => ({
@@ -16,15 +17,34 @@ const orderApiSlice = apiSlice.injectEndpoints({
         method: "PATCH",
         body: paymentData,
       }),
+      invalidatesTags: ["MyOrder", "AllOrders"],
+    }),
+    updateDeliveryStatus: builder.mutation({
+      query: ({ orderID, deliveryStatus }) => ({
+        url: `${ORDER_URL}/${orderID}/deliver`,
+        method: "PATCH",
+        body: { deliveryStatus },
+      }),
+      invalidatesTags: ["MyOrder", "AllOrders"],
     }),
     fetchOrderById: builder.query({
-      query: (orderID) => `${ORDER_URL}/${orderID}`,
+      query: (orderID) => ({
+        url: `${ORDER_URL}/${orderID}`,
+        method: "GET",
+      }),
     }),
     fetchAllOrders: builder.query({
-      query: () => ORDER_URL,
+      query: () => ({
+        url: `${ORDER_URL}`,
+        method: "GET",
+      }),
     }),
     fetchMyOrders: builder.query({
-      query: () => `${ORDER_URL}/myorders`,
+      query: () => ({
+        url: `${ORDER_URL}/myOrders`,
+        method: "GET",
+      }),
+      providesTags: ["MyOrder"],
     }),
   }),
 });
@@ -35,4 +55,5 @@ export const {
   useFetchAllOrdersQuery,
   useFetchMyOrdersQuery,
   useFetchOrderByIdQuery,
+  useUpdateDeliveryStatusMutation,
 } = orderApiSlice;

@@ -10,8 +10,8 @@ const createPaymentIntent = asyncHandler(async (req, res) => {
   const { email, name, phone } = req.user;
   const description = "ElevateMart Store Payment";
   const successUrl = `${process.env.FRONTEND_URL}/payment/payment-successful?order_id=${orderID}`;
-  const cancelUrl = `${process.env.FRONTEND_URL}/home`;
-  const failUrl = `${process.env.FRONTEND_URL}/home`;
+  const cancelUrl = `${process.env.FRONTEND_URL}/`;
+  const failUrl = `${process.env.FRONTEND_URL}/payment/payment-successful?order_id=${orderID}`;
   const paymentIntent = {
     store_id: process.env.AMARPAY_STORE_ID,
     signature_key: process.env.AMARPAY_SECRET_KEY,
