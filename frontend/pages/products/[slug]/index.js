@@ -78,7 +78,6 @@ const ProductDetails = () => {
                 </svg>
               ))}
             </div>
-            <span className="ml-2 text-gray-600">{product.numReviews}</span>
           </div>
 
           <p className="text-gray-600 mb-6 leading-relaxed">
@@ -101,7 +100,6 @@ const ProductDetails = () => {
             <button
               onClick={addToCartFunction}
               className="w-[40%] bg-gray-700 text-white py-3 px-6 rounded-lg hover:bg-gray-600 transition duration-300 ease-in-out transform hover:scale-105"
-              disabled={product.countInStock === 0}
             >
               {product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
             </button>
