@@ -1,16 +1,13 @@
 import Review from '../models/reviewModel.js';
 import Product from '../models/productModel.js';
 import asyncHandler from '../middleware/asyncHandler.js';
+import Order from '../models/orderModel.js';
 
 // @desc    Create a review
 // @route   POST /api/reviews
 // @access  Private
 const createReview = asyncHandler(async (req, res) => {
   const { productId, rating, comment } = req.body;
-
-  if (!productId || !rating || !comment) {
-    throw new Error('Missing required fields');
-  }
 
   if (!req.user) {
     throw new Error("User not authenticated");
@@ -29,6 +26,17 @@ const createReview = asyncHandler(async (req, res) => {
 
   if (existingReview) {
     throw new Error("You have already reviewed this product");
+  }
+
+  // Check if the user has purchased the product
+  const hasPurchased = await Order.exists({
+    orderBy: req.user._id,
+    'orderItems.product': productId,
+    deliveryStatus: { $in: ['Delivered'] }, // Ensure the product has been delivered
+  });
+
+  if (!hasPurchased) {
+    throw new Error('You have to purchase this product');
   }
 
   // Use create method to save the review
@@ -54,7 +62,7 @@ const getProductReviews = asyncHandler(async (req, res) => {
 
   const product = await Product.findById(productId);
   if (!product) {
-    return res.status(404).json({ message: 'Product not found' });
+    throw new Error("Product not found");
   }
 
   const reviews = await Review.find({ product: productId })
@@ -77,11 +85,11 @@ const updateReview = asyncHandler(async (req, res) => {
   const review = await Review.findById(id);
 
   if (!review) {
-    return res.status(404).json({ message: 'Review not found' });
+    throw new Error("Review not found");
   }
 
   if (review.user.toString() !== req.user._id.toString()) {
-    return res.status(401).json({ message: 'User not authorized' });
+    throw new Error("User not authorized");
   }
 
   review.rating = rating || review.rating;

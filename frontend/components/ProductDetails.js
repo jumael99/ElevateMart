@@ -76,7 +76,6 @@ const ProductDetails = () => {
         <ReviewsList productId={product._id} />
         
           <ReviewForm productId={product._id} />
-        )
       </div>
 
     </div>

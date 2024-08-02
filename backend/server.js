@@ -40,6 +40,7 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use('/api/contact', contactRoutes);
 
 if (process.env.NODE_ENV === "production") {
   app.use("/uploads", express.static("/var/data/uploads"));

@@ -85,7 +85,7 @@ const ReviewsList = ({ productId }) => {
   return (
     <div className="text-black w-[100%] mx-auto text-left py-10">
 
-      <h2 className="text-2xl font-semibold mb-4">Reviews</h2>
+      <h2 className="text-2xl font-semibold mb-4">Reviews <span className='text-xl'>({reviews ? reviews.length : 0})</span></h2>
       {reviews && reviews.length === 0 ? (
         <p className="text-gray-600 italic">No reviews yet</p>
       ) : reviews ? ( // Add this line for null check
