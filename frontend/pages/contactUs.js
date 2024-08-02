@@ -2,7 +2,7 @@ import React from 'react';
 import GetInTouch from "@/components/GetInTouch";
 import MessageUs from "@/components/MessageUs";
 
-function TestGet(props) {
+function ContactUs() {
     return (
         <div>
           <GetInTouch/>
@@ -11,4 +11,4 @@ function TestGet(props) {
     );
 }
 
-export default TestGet;
+export default ContactUs;
