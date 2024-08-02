@@ -2,37 +2,19 @@
 
 import React, { useState, useEffect } from "react";
 import Slider from "react-slick";
-import axios from "axios";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { useFetchTopTrendingProductsQuery } from "@/store/slices/api/productApiSlice";
 
 const MyCarousel = () => {
-  const dummylItems = [
-    {
-      imageUrl: "/images/70432.jpg",
-    },
-    {
-      imageUrl: "/images/70432.jpg",
-    },
-    {
-      imageUrl: "/images/70432.jpg",
-    },
-  ];
+  const [products, setProducts] = useState([]);
+  const { data: trendingProducts } = useFetchTopTrendingProductsQuery(4);
 
-  // const [trendingProducts, setTrendingProducts] = useState([]);
-
-  // useEffect(() => {
-  //   const fetchTrendingProducts = async () => {
-  //     try {
-  //       const response = await axios.get("/api/products/top/trending");
-  //       setTrendingProducts(response.data);
-  //     } catch (error) {
-  //       console.error("Error fetching trending products", error);
-  //     }
-  //   };
-
-  //   fetchTrendingProducts();
-  // }, []);
+  useEffect(() => {
+    if (trendingProducts) {
+      setProducts(trendingProducts);
+    }
+  }, [trendingProducts]);
 
   const settings = {
     dots: true,
@@ -80,26 +62,12 @@ const MyCarousel = () => {
       </h1>
       <div className="mb-5 px-5">
         <Slider {...settings} rtl={false}>
-          {dummylItems.map((product, index) => (
+          {products.map((product, index) => (
             <div key={index} className="flex justify-center">
               <img
-                src={product.imageUrl}
+                src={product.image}
                 alt={product.name}
-                style={{ maxHeight: "200px" }}
-                // onClick={}
-              />
-            </div>
-          ))}
-        </Slider>
-      </div>
-      <div className="px-5">
-        <Slider {...settings} rtl={true}>
-          {dummylItems.map((product, index) => (
-            <div key={index} className="flex justify-center">
-              <img
-                src={product.imageUrl}
-                alt={product.name}
-                style={{ maxHeight: "200px" }}
+                style={{ maxHeight: "250px" }}
                 // onClick={}
               />
             </div>
