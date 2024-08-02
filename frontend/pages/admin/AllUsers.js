@@ -1,21 +1,30 @@
 import Sidebar from "@/components/Admin/Admin-Sidebar";
+import { useFetchAllUsersQuery, usePromoteAdminToUserQuery } from "@/store/slices/api/userApiSlice";
 import { withAuth } from "@/utils/withAuth";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const AllUsers = () => {
-    const [users, setUsers] = useState([
-        { id: 1, name: "John Doe", email: "john@example.com", isAdmin: false },
-        { id: 2, name: "Jane Smith", email: "jane@example.com", isAdmin: true },
-        // Add more mock users as needed
-    ]);
+    const [users, setUsers] = useState();
+    const { data: allusers } = useFetchAllUsersQuery();
 
-    const promoteToAdmin = (userId) => {
-        setUsers(users.map((user) => (user.id === userId ? { ...user, isAdmin: true } : user)));
+
+
+    useEffect(() => {
+        if (allusers) {
+            setUsers(allusers);
+        }
+    }, []);
+
+    const promoteToAdmin = async (userId) => {
+        console.log(userId);
     };
 
     const viewOrderHistory = (userId) => {
-        // Implement view order history functionality
-        console.log(`Viewing order history for user ${userId}`);
+        console.log(userId)
+    };
+
+    const deleteUser = (userId) => {
+        console.log(userId);
     };
 
     return (
@@ -34,9 +43,9 @@ const AllUsers = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {users.map((user) => (
+                            {users?.map((user) => (
                                 <tr
-                                    key={user.id}
+                                    key={user._id}
                                     className="border-b border-gray-200 hover:bg-gray-100"
                                 >
                                     <td className="py-3 px-4">{user.name}</td>
@@ -54,25 +63,27 @@ const AllUsers = () => {
                                     </td>
                                     <td className="py-3 px-4">
                                         {!user.isAdmin && (
-                                            <button
-                                                onClick={() => promoteToAdmin(user.id)}
-                                                className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded mr-2"
-                                            >
-                                                Promote to Admin
-                                            </button>
+                                            <>
+                                                <button
+                                                    onClick={() => promoteToAdmin(user._id)}
+                                                    className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded mr-2"
+                                                >
+                                                    Promote to Admin
+                                                </button>
+                                                <button
+                                                    onClick={() => viewOrderHistory(user._id)}
+                                                    className="bg-gray-500 hover:bg-gray-600 text-white py-1 px-3 m-2 rounded"
+                                                >
+                                                    View Order History
+                                                </button>
+                                                <button
+                                                    className="bg-red-600 hover:bg-red-700 text-white py-1 px-3 m-2 rounded"
+                                                    onClick={() => deleteUser(user._id)}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </>
                                         )}
-                                        <button
-                                            onClick={() => viewOrderHistory(user.id)}
-                                            className="bg-gray-500 hover:bg-gray-600 text-white py-1 px-3 m-2 rounded"
-                                        >
-                                            View Order History
-                                        </button>
-                                        <button
-                                            className="bg-red-600 hover:bg-red-700 text-white py-1 px-3 m-2 rounded"
-                                            onClick={() => deleteUser(user._id)}
-                                        >
-                                            Delete
-                                        </button>
                                     </td>
                                 </tr>
                             ))}

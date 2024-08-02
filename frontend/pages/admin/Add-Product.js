@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "@/components/Admin/Admin-Sidebar";
 import dynamic from "next/dynamic";
-import { useUploadProductImageMutation } from "@/store/slices/api/uploadsApiSlice";
+import {
+  useUploadProductImageMutation,
+  useDeleteImageMutation,
+} from "@/store/slices/api/uploadsApiSlice";
 import {
     useCreateNewProductMutation,
     useFetchAllProductsQuery,
