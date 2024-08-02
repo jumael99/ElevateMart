@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Link from "next/link";
-import Contacts from "@/pages/admin/Contacts";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
