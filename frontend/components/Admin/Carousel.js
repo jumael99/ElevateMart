@@ -1,58 +1,111 @@
 // frontend/components/Carousel.js
-import React from 'react';
-import { Carousel } from 'react-responsive-carousel';
-import 'react-responsive-carousel/lib/styles/carousel.min.css';  
+
+import React, { useState, useEffect } from "react";
+import Slider from "react-slick";
+import axios from "axios";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
 const MyCarousel = () => {
-  const carouselItems = [
+  const dummylItems = [
     {
-      imageUrl: '/images/70432.jpg',   
+      imageUrl: "/images/70432.jpg",
     },
     {
-      imageUrl: 'https://via.placeholder.com/600x400?text=Slide+2',
+      imageUrl: "/images/70432.jpg",
     },
     {
-      imageUrl: 'https://via.placeholder.com/600x400?text=Slide+3',
+      imageUrl: "/images/70432.jpg",
     },
   ];
 
-  const carouselStyle = {
-    margin: '0 auto',
-    position: 'relative',  
-  };
+  // const [trendingProducts, setTrendingProducts] = useState([]);
 
-  const overlayTextStyle = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    color: '#fff',
-    fontSize: '24px',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    width: '80%',
-    maxWidth: '600px', 
-  };
+  // useEffect(() => {
+  //   const fetchTrendingProducts = async () => {
+  //     try {
+  //       const response = await axios.get("/api/products/top/trending");
+  //       setTrendingProducts(response.data);
+  //     } catch (error) {
+  //       console.error("Error fetching trending products", error);
+  //     }
+  //   };
 
-  const title = 'Welcome to Our E-commerce Site';  
+  //   fetchTrendingProducts();
+  // }, []);
+
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 4,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 1,
+          infinite: true,
+          dots: true,
+        },
+      },
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1,
+          infinite: true,
+          dots: true,
+        },
+      },
+      {
+        breakpoint: 464,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          infinite: true,
+          dots: true,
+        },
+      },
+    ],
+  };
 
   return (
-    <div style={carouselStyle}>
-      <Carousel
-        showThumbs={false}
-        autoPlay
-        infiniteLoop
-        interval={3000}  
-        showStatus={false} 
-        showIndicators={true} 
-        showArrows={true} 
-      >
-        {carouselItems.map((item, index) => (
-          <div key={index}>
-            <img src={item.imageUrl} style={{ maxHeight: '450px' }} />
-            <div style={overlayTextStyle}>{title}</div>
-          </div>
-        ))}
-      </Carousel>
+    <div>
+      <h1 className="text-black font-bold text-3xl text-center pt-6 pb-10">
+        Welcome to Our ElevateMart
+      </h1>
+      <div className="mb-5 px-5">
+        <Slider {...settings} rtl={false}>
+          {dummylItems.map((product, index) => (
+            <div key={index} className="flex justify-center">
+              <img
+                src={product.imageUrl}
+                alt={product.name}
+                style={{ maxHeight: "200px" }}
+                // onClick={}
+              />
+            </div>
+          ))}
+        </Slider>
+      </div>
+      <div className="px-5">
+        <Slider {...settings} rtl={true}>
+          {dummylItems.map((product, index) => (
+            <div key={index} className="flex justify-center">
+              <img
+                src={product.imageUrl}
+                alt={product.name}
+                style={{ maxHeight: "200px" }}
+                // onClick={}
+              />
+            </div>
+          ))}
+        </Slider>
+      </div>
     </div>
   );
 };
