@@ -16,6 +16,7 @@ import uploadRoutes from "./routes/uploadRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import reviewRoutes from './routes/reviewRoutes.js';
+import contactRoutes from "./routes/contactRoutes.js"
 
 dotenv.config();
 connectDB();
