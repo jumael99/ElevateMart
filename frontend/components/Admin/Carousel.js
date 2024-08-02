@@ -5,9 +5,11 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useFetchTopTrendingProductsQuery } from "@/store/slices/api/productApiSlice";
+import { useRouter } from "next/router";
 
 const MyCarousel = () => {
   const [products, setProducts] = useState([]);
+  const router = useRouter();
   const { data: trendingProducts } = useFetchTopTrendingProductsQuery(4);
 
   useEffect(() => {
@@ -15,6 +17,10 @@ const MyCarousel = () => {
       setProducts(trendingProducts);
     }
   }, [trendingProducts]);
+
+  const handleOnClick = (slug) => {
+    router.push(`/products/${slug}`);
+  };
 
   const settings = {
     dots: true,
@@ -63,12 +69,15 @@ const MyCarousel = () => {
       <div className="mb-5 px-5">
         <Slider {...settings} rtl={false}>
           {products.map((product, index) => (
-            <div key={index} className="flex justify-center">
+            <div
+              key={index}
+              className="flex justify-center"
+              onClick={() => handleOnClick(product.slug)}
+            >
               <img
                 src={product.image}
                 alt={product.name}
                 style={{ maxHeight: "250px" }}
-                // onClick={}
               />
             </div>
           ))}
