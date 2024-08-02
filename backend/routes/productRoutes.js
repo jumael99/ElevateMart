@@ -1,4 +1,5 @@
 import express from "express";
+import protectMiddlewere from "../middleware/protectMiddleware.js";
 import {
   getProducts,
   getProductBySlug,
@@ -10,10 +11,16 @@ import {
 const productRouter = express.Router();
 
 // Define routes
-productRouter.route("/").get(getProducts).post(createNewProduct);
+productRouter
+  .route("/")
+  .get(getProducts)
+  .post(protectMiddlewere("admin"), createNewProduct);
 
 productRouter.route("/:slug").get(getProductBySlug);
 
-productRouter.route("/:id").delete(deleteProduct).patch(updateProduct);
+productRouter
+  .route("/:id")
+  .delete(protectMiddlewere("admin"), deleteProduct)
+  .patch(protectMiddlewere("admin"), updateProduct);
 
 export default productRouter;

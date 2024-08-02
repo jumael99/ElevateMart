@@ -1,13 +1,21 @@
-// frontend/components/ProductDetails.js
+
 import React from "react";
 import { useFetchProductBySlugQuery } from "@/store/slices/api/productApiSlice";
 import { useRouter } from "next/router";
+import ReviewsList from "./ReviewsList";
+import ReviewForm from "./ReviewForm";
+import { useSelector } from "react-redux";
+import { useCanReviewProductQuery } from "@/store/slices/api/reviewApiSlice";
 
 const ProductDetails = () => {
   const router = useRouter();
   const { slug } = router.query;
+  const { userInfo } = useSelector((state) => state.auth);
 
   const { data: product, error, isLoading } = useFetchProductBySlugQuery(slug);
+  const { data: canReview } = useCanReviewProductQuery(product?._id, {
+    skip: !product || !userInfo,
+  });
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -63,6 +71,13 @@ const ProductDetails = () => {
           </div>
         </div>
       </div>
+
+      <div className="mt-12">
+        <ReviewsList productId={product._id} />
+        
+          <ReviewForm productId={product._id} />
+      </div>
+
     </div>
   );
 };
