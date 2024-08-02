@@ -7,6 +7,7 @@ import {
 } from "@/store/slices/api/orderApiSlice";
 import { toastManager } from "@/utils/toastManager";
 import { withAuth } from "@/utils/withAuth";
+import { formatToBangladeshDate } from "@/utils/formatDate";
 
 const ViewOrders = () => {
   const { data } = useFetchAllOrdersQuery();
@@ -95,6 +96,7 @@ const ViewOrders = () => {
           <tbody>
             {orderList.map((order) => (
               <tr
+                key={order._id}
                 className={`cursor-pointer hover:bg-gray-300 ${
                   order.deliveryStatus === "Shipped"
                     ? "bg-green-200"
@@ -107,21 +109,18 @@ const ViewOrders = () => {
               >
                 <td
                   className="p-3 border"
-                  key={order._id}
                   onClick={() => orderDetails(order._id)}
                 >
                   {order._id}
                 </td>
                 <td
                   className="p-3 border"
-                  key={order._id}
                   onClick={() => orderDetails(order._id)}
                 >
-                  {order.createdAt}
+                  {formatToBangladeshDate(order.createdAt)}
                 </td>
                 <td
                   className="p-3 border"
-                  key={order._id}
                   onClick={() => orderDetails(order._id)}
                 >
                   {" "}
@@ -129,14 +128,12 @@ const ViewOrders = () => {
                 </td>
                 <td
                   className="p-3 border"
-                  key={order._id}
                   onClick={() => orderDetails(order._id)}
                 >
                   {order.paymentMethod}
                 </td>
                 <td
                   className="p-3 border"
-                  key={order._id}
                   onClick={() => orderDetails(order._id)}
                 >
                   {order.paymentResult.transactionID}
@@ -155,7 +152,8 @@ const ViewOrders = () => {
                     className="border p-1 px-4"
                     disabled={
                       order.deliveryStatus === "Delivered" ||
-                      order.deliveryStatus === "Initiated"
+                      order.deliveryStatus === "Initiated" ||
+                      order.paymentResult.status === "Failed"
                     }
                     value={order.deliveryStatus}
                     onChange={(e) =>
@@ -179,7 +177,7 @@ const ViewOrders = () => {
                     }}
                   >
                     {deliveryStatuses.map((status) => (
-                      <option key={status} value={status}>
+                      <option key={`${status}-${order._id}`} value={status}>
                         {status}
                       </option>
                     ))}

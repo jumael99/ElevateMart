@@ -183,6 +183,7 @@ const getTrendingProducts = asyncHandler(async (req, res) => {
         totalSell: 1,
         name: "$productDetails.name",
         image: "$productDetails.image",
+        slug: "$productDetails.slug",
       },
     },
   ]);
