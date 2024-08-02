@@ -18,7 +18,7 @@ const apiSlice = createApi({
     "MyOrder",
     "AllOrders",
     'Review',
-    "Contact"
+    'Contact'
   ],
   endpoints: (builder) => ({}),
 });

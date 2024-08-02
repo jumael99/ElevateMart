@@ -7,7 +7,7 @@ import Contact from '../models/contactModel.js';
 // @access  Public
 export const sendMessage = asyncHandler(async (req, res) => {
   const { fullName, email, message } = req.body;
-
+console.log(fullName + " " + email + " " + message);
   if (!fullName || !email || !message) {
     throw new Error('All fields are required');
   }
