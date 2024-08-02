@@ -4,18 +4,18 @@ const contactApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     sendMessage: builder.mutation({
       query: (data) => ({
-        url: '/contact',
+        url: '/api/contact',
         method: 'POST',
         body: data,
       }),
     }),
     getMessages: builder.query({
-      query: () => '/contact',
+      query: () => '/api/contact',
       providesTags: ['Contact'],
     }),
     deleteMessage: builder.mutation({
       query: (id) => ({
-        url: `/contact/${id}`,
+        url: `/api/contact/${id}`,
         method: 'DELETE',
       }),
       invalidatesTags: ['Contact'],
