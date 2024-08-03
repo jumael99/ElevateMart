@@ -47,9 +47,6 @@ const Dashboard = () => {
           "yyyy-MM-dd'T'HH:mm:ss.SSS"
         );
 
-        console.log("Start Date: ", formattedStartDate);
-        console.log("End Date: ", formattedEndDate);
-
         const res = await fetchSellReport({
           startDate: formattedStartDate,
           endDate: formattedEndDate,

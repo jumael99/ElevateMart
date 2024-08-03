@@ -46,6 +46,9 @@ const Profile = () => {
     if (user) {
       setFormData(user);
       setDisplayData(user);
+      if (user.profilePicture) {
+        setPicture(user.profilePicture);
+      }
     }
   }, [user]);
 
@@ -138,7 +141,7 @@ const Profile = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Image src={picture} width={35} height={20} alt="Profile" />
+            <img src={picture} width={35} height={20} alt="Profile" />
             <p className="text-gray-600">{displayData.name}</p>
           </div>
         </div>
@@ -246,7 +249,7 @@ const Profile = () => {
           </div>
           <div className="flex flex-col gap-5">
             <div className="flex flex-col gap-5 bg-white pt-16 pb-16 justify-center items-center text-center border rounded-lg">
-              <Image
+              <img
                 src={picture}
                 width={120}
                 height={50}
@@ -266,7 +269,7 @@ const Profile = () => {
                 Select profile photo
               </label>
               <div className="flex items-center gap-4 px-2 py-3">
-                <Image
+                <img
                   src={picturePreview}
                   width={60}
                   height={40}
