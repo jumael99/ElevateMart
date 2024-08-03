@@ -1,5 +1,4 @@
 import asyncHandler from "../middleware/asyncHandler.js";
-import generateToken from "../utils/generateToken.js";
 import User from "../models/userModel.js";
 import Order from "../models/orderModel.js";
 
@@ -7,64 +6,50 @@ import Order from "../models/orderModel.js";
 // @route   GET /api/users
 // @access  Protected
 const getProfile = asyncHandler(async (req, res) => {
-    const { email } = req.user;
+  const { email } = req.user;
 
-    const profile = await User.findOne({ email });
-    if (!profile) {
-        throw new Error("Profile not found");
-    }
-    res.status(200).json(profile);
+  const profile = await User.findOne({ email });
+  if (!profile) {
+    throw new Error("Profile not found");
+  }
+  res.status(200).json(profile);
 });
 
 // @desc    Edit user profile
 // @route   PUT /api/users
 // @access  Protected
 const updateProfile = asyncHandler(async (req, res) => {
-    const { email, phone, address, name, image } = req.body;
+  const { email, phone, address, name, image } = req.body;
 
-    const profile = await User.findOne({ email });
-    if (!profile) {
-        throw new Error("Profile not found");
-    }
+  const profile = await User.findOne({ email });
+  if (!profile) {
+    throw new Error("Profile not found");
+  }
 
-    if (profile._id.toString() !== req.user._id.toString()) {
-        throw new Error("You are not authorized to update this profile");
-    }
+  if (profile._id.toString() !== req.user._id.toString()) {
+    throw new Error("You are not authorized to update this profile");
+  }
 
-    const newProfileData = await User.findByIdAndUpdate(
-        profile._id,
-        {
-            name,
-            phone,
-            address,
-            profilePicture: image,
-        },
-        { new: true }
-    );
+  const newProfileData = await User.findByIdAndUpdate(
+    profile._id,
+    {
+      name,
+      phone,
+      address,
+      profilePicture: image,
+    },
+    { new: true }
+  );
 
-    res.status(200).json(newProfileData);
+  res.status(200).json(newProfileData);
 });
 
 // @desc    get all users
 // @route   get /api/users/allUsers
 // @access  Protected
-
 const getAllUsers = asyncHandler(async (req, res) => {
-    const allusers = await User.find({}, "-password");
-    res.status(200).json(allusers);
-});
-
-// @desc    get all users order data
-// @route   get /api/users/:id
-// @access  Protected
-const getUsersOrderData = asyncHandler(async (req, res) => {
-    const allOrders = await Order.find(
-        {
-            orderBy: req.params.id,
-        },
-        "-password"
-    );
-    res.status(200).json(allOrders);
+  const allUsers = await User.find({});
+  res.status(200).json(allUsers);
 });
 
 // @desc    Promoted user
@@ -72,24 +57,20 @@ const getUsersOrderData = asyncHandler(async (req, res) => {
 // @access  Protected
 
 const userPromote = asyncHandler(async (req, res) => {
-    const { id } = req.params;
+  const { id } = req.params;
 
-    const profile = await User.findOne({ _id: id });
-    if (!profile) {
-        throw new Error("Profile not found");
-    }
+  const profile = await User.findOne({ _id: id });
+  if (!profile) {
+    throw new Error("Profile not found");
+  }
 
-    if (profile._id.toString() !== req.user._id.toString()) {
-        throw new Error("You are not authorized to update this profile");
-    }
+  profile.isAdmin = true;
+  await profile.save();
 
-    profile.isAdmin = true;
-    await profile.save();
-
-    res.status(200).json({
-        status: "success",
-        message: "User successfully promoted to Admin",
-    });
+  res.status(200).json({
+    status: "success",
+    message: "User successfully promoted to Admin",
+  });
 });
 
 // @desc    delete a user
@@ -97,27 +78,26 @@ const userPromote = asyncHandler(async (req, res) => {
 // @access  Protected
 
 const deleteUser = asyncHandler(async (req, res) => {
-    const { id } = req.params;
+  const { id } = req.params;
 
-    const profile = await User.findOne({ _id: id });
-    if (!profile) {
-        throw new Error("Profile not found");
-    }
+  const profile = await User.findOne({ _id: id });
+  if (!profile) {
+    throw new Error("Profile not found");
+  }
 
-    if (profile.isAdmin) {
-        throw new Error("Admin can't be delete");
-    }
+  if (id === req.user._id.toString()) {
+    throw new Error("User cannot delete himself");
+  }
 
-    await Order.deleteMany({
-        orderBy: id,
-    });
-    await User.deleteOne({ _id: id });
+  await Order.deleteMany({
+    orderBy: id,
+  });
+  await User.deleteOne({ _id: id });
 
-    res.status(200).json({
-        status: "success",
-        message: "User deleted successfully",
-    });
+  res.status(200).json({
+    status: "success",
+    message: "User deleted successfully",
+  });
 });
 
-
-export { getProfile, updateProfile, userPromote, getAllUsers, getUsersOrderData, deleteUser };
+export { getProfile, updateProfile, userPromote, getAllUsers, deleteUser };

@@ -10,9 +10,11 @@ import { withAuth } from "@/utils/withAuth";
 import { formatToBangladeshDate } from "@/utils/formatDate";
 
 const ViewOrders = () => {
-  const { data } = useFetchAllOrdersQuery();
-  const [orderList, setOrderList] = useState([]);
   const router = useRouter();
+  const { query } = router;
+  const params = query.user;
+  const { data } = useFetchAllOrdersQuery({ params });
+  const [orderList, setOrderList] = useState([]);
   const [updateDeliveryStatus] = useUpdateDeliveryStatusMutation();
 
   useEffect(() => {

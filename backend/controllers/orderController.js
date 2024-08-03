@@ -115,8 +115,15 @@ const getMyOrders = asyncHandler(async (req, res) => {
 // @route   GET /api/orders
 // @access  Private/Admin
 const getOrders = asyncHandler(async (req, res) => {
+  const { user } = req.query;
+
+  const query = {};
+  if (user !== "undefined") {
+    query.orderBy = user;
+  }
+
   const orders = await orderModel
-    .find({})
+    .find(query)
     .populate({
       path: "orderBy.product",
       select: "name email",

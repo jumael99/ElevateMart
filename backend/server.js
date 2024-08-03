@@ -17,6 +17,7 @@ import orderRoutes from "./routes/orderRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import { getTotalSellReport } from "./controllers/orderController.js";
 import { getTrendingProducts } from "./controllers/productController.js";
+import morgan from "morgan";
 
 dotenv.config();
 connectDB();
@@ -29,6 +30,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors(corsOptions));
+app.use(morgan("dev"));
 
 // Routes
 app.use(authMiddleware);
@@ -40,8 +42,8 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api/payment", paymentRoutes);
-app.get('/api/orders/sell/report', authMiddleware, getTotalSellReport);
-app.get('/api/products/top/trending', getTrendingProducts);
+app.get("/api/orders/sell/report", authMiddleware, getTotalSellReport);
+app.get("/api/products/top/trending", getTrendingProducts);
 
 if (process.env.NODE_ENV === "production") {
   app.use("/uploads", express.static("/var/data/uploads"));

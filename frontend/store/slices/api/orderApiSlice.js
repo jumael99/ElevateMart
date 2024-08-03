@@ -34,8 +34,8 @@ const orderApiSlice = apiSlice.injectEndpoints({
       }),
     }),
     fetchAllOrders: builder.query({
-      query: () => ({
-        url: `${ORDER_URL}`,
+      query: ({ params }) => ({
+        url: `${ORDER_URL}?user=${params}`,
         method: "GET",
       }),
     }),

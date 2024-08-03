@@ -3,10 +3,15 @@ import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
 import { addToCart } from "@/store/slices/cartSlice";
 import React from "react";
+import Image from "next/image";
 
 const ProductDetails = () => {
   const slug = useRouter().query.slug;
-  const { data: product, error, isLoading } = useFetchProductBySlugQuery(slug);
+  const {
+    data: product,
+    error,
+    isLoading,
+  } = useFetchProductBySlugQuery(slug, { skip: !slug });
   const dispatch = useDispatch();
 
   if (isLoading) {
@@ -29,9 +34,10 @@ const ProductDetails = () => {
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden">
         <div className="relative h-96">
-          <img
-            src={product.image || "/placeholder-image.jpg"}
-            alt="Product"
+          <Image
+            src={`/${product.image}`}
+            alt={`${product.name} image`}
+            fill="responsive"
             className="absolute inset-0 w-full h-full object-fill"
           />
         </div>
