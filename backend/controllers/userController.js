@@ -48,7 +48,7 @@ const updateProfile = asyncHandler(async (req, res) => {
 // @route   get /api/users/allUsers
 // @access  Protected
 const getAllUsers = asyncHandler(async (req, res) => {
-  const allUsers = await User.find({});
+  const allUsers = await User.find({}).sort({ isAdmin: -1 });
   res.status(200).json(allUsers);
 });
 

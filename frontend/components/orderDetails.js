@@ -6,6 +6,7 @@ import {
 import { useUpdatePaymentStatusMutation } from "@/store/slices/api/orderApiSlice";
 import { toastManager } from "@/utils/toastManager";
 import { formatToBangladeshDate } from "@/utils/formatDate";
+import Image from "next/image";
 
 const OrderDetails = ({ order }) => {
   const [paymentVerification] = usePaymentVerificationMutation();
@@ -108,8 +109,8 @@ const OrderDetails = ({ order }) => {
                 <tr className="border-b text-gray-600 ">
                   <td className="p-3">
                     <div className="flex gap-2 items-center">
-                      <img
-                        src={item.product.image}
+                      <Image
+                        src={item.product?.image}
                         alt={item.product.name}
                         className="w-16 h-12 object-cover"
                       />
