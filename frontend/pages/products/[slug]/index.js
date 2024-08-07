@@ -1,17 +1,15 @@
 import { useFetchProductBySlugQuery } from "@/store/slices/api/productApiSlice";
-import { useRouter } from "next/router";
-import { useDispatch } from "react-redux";
-import { addToCart } from "@/store/slices/cartSlice";
-import React from "react";
 import Image from "next/image";
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import { useDispatch, useSelector } from 'react-redux';
-import { addToCart } from '@/store/slices/cartSlice';
-import { useFetchProductBySlugQuery } from '@/store/slices/api/productApiSlice';
-import { useCanReviewProductQuery, useGetReviewsQuery } from '@/store/slices/api/reviewApiSlice';
-import ReviewsList from '@/components/ReviewsList';
-import ReviewForm from '@/components/ReviewForm';
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart } from "@/store/slices/cartSlice";
+import {
+  useCanReviewProductQuery,
+  useGetReviewsQuery,
+} from "@/store/slices/api/reviewApiSlice";
+import ReviewsList from "@/components/ReviewsList";
+import ReviewForm from "@/components/ReviewForm";
 
 const ProductDetails = () => {
   const slug = useRouter().query.slug;
@@ -22,11 +20,8 @@ const ProductDetails = () => {
   } = useFetchProductBySlugQuery(slug, { skip: !slug });
   const dispatch = useDispatch();
   const router = useRouter();
-  const { slug } = router.query;
-  const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
 
-  const { data: product, error, isLoading } = useFetchProductBySlugQuery(slug);
   const { data: reviews } = useGetReviewsQuery(product?._id, {
     skip: !product,
   });
@@ -38,7 +33,10 @@ const ProductDetails = () => {
 
   useEffect(() => {
     if (reviews) {
-      const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
+      const totalRating = reviews.reduce(
+        (acc, review) => acc + review.rating,
+        0
+      );
       const average = totalRating / reviews.length;
       setAverageRating(average);
     }
@@ -69,10 +67,6 @@ const ProductDetails = () => {
             alt={`${product.name} image`}
             fill="responsive"
             className="absolute inset-0 w-full h-full object-fill"
-          <img
-            src={product.image || "/placeholder-image.jpg"}
-            alt={product.name}
-            className="absolute inset-0 w-full h-full object-cover"
           />
         </div>
 
@@ -87,7 +81,9 @@ const ProductDetails = () => {
                   key={index}
                   xmlns="http://www.w3.org/2000/svg"
                   className={`h-5 w-5 ${
-                    index < Math.round(averageRating) ? 'text-yellow-400' : 'text-gray-300'
+                    index < Math.round(averageRating)
+                      ? "text-yellow-400"
+                      : "text-gray-300"
                   }`}
                   viewBox="0 0 20 20"
                   fill="currentColor"
@@ -111,7 +107,9 @@ const ProductDetails = () => {
           <div className="mb-6">
             <span className="font-semibold text-gray-700">Availability:</span>
             <span className="ml-2 text-green-600">
-              {product.quantity > 0 ? `In stock (${product.quantity})` : 'Out of stock'}
+              {product.quantity > 0
+                ? `In stock (${product.quantity})`
+                : "Out of stock"}
             </span>
           </div>
           <div className="flex items-center justify-center">
@@ -119,7 +117,7 @@ const ProductDetails = () => {
               onClick={addToCartFunction}
               className="w-[40%] bg-gray-700 text-white py-3 px-6 rounded-lg hover:bg-gray-600 transition duration-300 ease-in-out transform hover:scale-105"
             >
-              {product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
+              {product.quantity > 0 ? "Add to Cart" : "Out of Stock"}
             </button>
           </div>
         </div>
