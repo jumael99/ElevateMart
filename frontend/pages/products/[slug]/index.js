@@ -1,38 +1,22 @@
-import { useFetchProductBySlugQuery } from "@/store/slices/api/productApiSlice";
-import { useRouter } from "next/router";
-import { useDispatch } from "react-redux";
-import { addToCart } from "@/store/slices/cartSlice";
-import React from "react";
-import Image from "next/image";
-import React, { useEffect, useState } from 'react';
+import { useFetchProductBySlugQuery } from '@/store/slices/api/productApiSlice';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '@/store/slices/cartSlice';
-import { useFetchProductBySlugQuery } from '@/store/slices/api/productApiSlice';
 import { useCanReviewProductQuery, useGetReviewsQuery } from '@/store/slices/api/reviewApiSlice';
 import ReviewsList from '@/components/ReviewsList';
 import ReviewForm from '@/components/ReviewForm';
+import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 const ProductDetails = () => {
-  const slug = useRouter().query.slug;
-  const {
-    data: product,
-    error,
-    isLoading,
-  } = useFetchProductBySlugQuery(slug, { skip: !slug });
-  const dispatch = useDispatch();
   const router = useRouter();
   const { slug } = router.query;
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
 
-  const { data: product, error, isLoading } = useFetchProductBySlugQuery(slug);
-  const { data: reviews } = useGetReviewsQuery(product?._id, {
-    skip: !product,
-  });
-  const { data: canReview } = useCanReviewProductQuery(product?._id, {
-    skip: !product || !userInfo,
-  });
+  const { data: product, error, isLoading } = useFetchProductBySlugQuery(slug, { skip: !slug });
+  const { data: reviews } = useGetReviewsQuery(product?._id, { skip: !product });
+  const { data: canReview } = useCanReviewProductQuery(product?._id, { skip: !product || !userInfo });
 
   const [averageRating, setAverageRating] = useState(0);
 
@@ -65,14 +49,11 @@ const ProductDetails = () => {
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden">
         <div className="relative h-96">
           <Image
-            src={`/${product.image}`}
-            alt={`${product.name} image`}
-            fill="responsive"
-            className="absolute inset-0 w-full h-full object-fill"
-          <img
             src={product.image || "/placeholder-image.jpg"}
-            alt={product.name}
-            className="absolute inset-0 w-full h-full object-cover"
+            alt={`${product.name} image`}
+            layout="fill"
+            objectFit="cover"
+            className="absolute inset-0 w-full h-full"
           />
         </div>
 
@@ -129,7 +110,7 @@ const ProductDetails = () => {
       <div className="mt-12 max-w-5xl mx-auto">
         <h2 className="text-2xl font-bold mb-4">Product Reviews</h2>
         <ReviewsList productId={product._id} />
-        {userInfo && (
+        {userInfo && canReview && (
           <>
             <h3 className="text-xl font-bold mt-8 mb-4">Add Your Review</h3>
             <ReviewForm productId={product._id} />
