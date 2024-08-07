@@ -167,13 +167,14 @@ const ViewOrders = () => {
       <div className="py-10 px-16 bg-gray-100 flex-grow">
         <h1 className="text-black font-bold text-3xl mb-6">Orders</h1>
         <div className="mb-6 flex items-center space-x-4">
-          <input
-            type="text"
-            value={searchValue}
-            onChange={handleSearchChange}
-            placeholder="Search orders..."
-            className="border p-2 px-4 rounded-lg w-full md:w-1/3 shadow-lg focus:ring-2 focus:ring-blue-500"
-          />
+        <input
+  type="text"
+  value={searchValue}
+  onChange={handleSearchChange}
+  placeholder="Search users..."
+  className="border p-2 px-4 rounded-lg w-full md:w-1/3 shadow-lg focus:ring-2 focus:ring-blue-500 text-black"
+/>
+
         </div>
         <div className="overflow-x-auto mb-6">
           <table className="min-w-full bg-white text-black shadow-lg rounded-lg overflow-hidden" {...getTableProps()}>
