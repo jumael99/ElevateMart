@@ -17,7 +17,8 @@ const apiSlice = createApi({
     "SubCategory",
     "MyOrder",
     "AllOrders",
-    'Review'
+    'Review',
+    'Contact'
   ],
   endpoints: (builder) => ({}),
 });

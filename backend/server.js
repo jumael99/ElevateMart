@@ -16,6 +16,7 @@ import uploadRoutes from "./routes/uploadRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import reviewRoutes from './routes/reviewRoutes.js';
+import contactRoutes from "./routes/contactRoutes.js"
 
 dotenv.config();
 connectDB();
@@ -40,6 +41,7 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use('/api/contact', contactRoutes);
 
 if (process.env.NODE_ENV === "production") {
   app.use("/uploads", express.static("/var/data/uploads"));

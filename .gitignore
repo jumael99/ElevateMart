@@ -7,9 +7,9 @@ node_modules
 .pnp.js
 
 #.idea file ignored
-.idea
-.history
-.vscode
+.idea\
+.history\
+.vscode\
 
 # testing
 /coverage
