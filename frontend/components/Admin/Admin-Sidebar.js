@@ -34,14 +34,13 @@ const Sidebar = () => {
   const navItems = [
     { to: "/admin/dashboard", icon: <HomeIcon />, label: "Home" },
     {
-      to: "/admin/store",
-      icon: <StoreIcon />,
       label: "Product",
-    },
-    {
-      label: "Product Actions",
       icon: <StoreIcon />,
       children: [
+        {
+          to: "/admin/All-Products",
+          label: "All Products",
+        },
         {
           to: "/admin/Add-Product",
           label: "Add Product",
@@ -67,6 +66,7 @@ const Sidebar = () => {
     },
     { to: "/admin/Orders", icon: <OrdersIcon />, label: "Orders" },
     { to: "/admin/EditOffer", icon: <OffersIcon />, label: "Offer" },
+    { to: "/admin/AllUsers", label: "AllUsers" },
     { to: "/user-dashboard/balance", icon: <BalanceIcon />, label: "Balance" },
     { to: "/admin/Contacts", icon: <BalanceIcon />, label: "Contact" },
     {
@@ -99,7 +99,7 @@ const Sidebar = () => {
                   <div
                     className="md:p-3 bg-white rounded-sm border shadow-sm font-semibold text-black transition-all flex gap-2 cursor-pointer"
                     onClick={
-                      item.label === "Product Actions"
+                      item.label === "Product"
                         ? toggleProductDropdown
                         : toggleCategoriesDropdown
                     }
@@ -111,7 +111,7 @@ const Sidebar = () => {
                       </span>
                       <div
                         className={`ml-auto transition-transform ${
-                          item.label === "Product Actions"
+                          item.label === "Product"
                             ? productDropdownOpen
                               ? "rotate-180"
                               : ""
@@ -124,8 +124,7 @@ const Sidebar = () => {
                       </div>
                     </div>
                   </div>
-                  {(item.label === "Product Actions" && productDropdownOpen) || 
-                   (item.label === "Categories" && categoriesDropdownOpen) ? (
+                  {item.label === "Product" && productDropdownOpen && (
                     <div className="ml-4 mt-2">
                       {item.children.map((child, childIndex) => (
                         <Link key={childIndex} href={child.to}>
@@ -140,7 +139,23 @@ const Sidebar = () => {
                         </Link>
                       ))}
                     </div>
-                  ) : null}
+                  )}
+                  {item.label === "Categories" && categoriesDropdownOpen && (
+                    <div className="ml-4 mt-2">
+                      {item.children.map((child, childIndex) => (
+                        <Link key={childIndex} href={child.to}>
+                          <div className="md:p-3 bg-gray-100 rounded-sm border shadow-sm font-semibold text-black transition-all flex gap-2 cursor-pointer">
+                            <div className="mx-auto md:mx-0 md:truncate md:flex gap-2">
+                              <div className="shrink-0">{child.icon}</div>
+                              <span className="truncate hidden md:block">
+                                {child.label}
+                              </span>
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <Link href={item.to}>

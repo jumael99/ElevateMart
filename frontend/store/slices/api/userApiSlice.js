@@ -18,7 +18,34 @@ const userApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
+    fetchAllUsers: builder.query({
+      query: () => ({
+        url: `${USER_URL}/allusers`,
+        method: "GET",
+      }),
+      providesTags: ["User"],
+    }),
+    promoteAdminToUser: builder.mutation({
+      query: (userId) => ({
+        url: `${USER_URL}/${userId}`,
+        method: "PUT",
+      }),
+      invalidatesTags: ["User"],
+    }),
+    deleteUser: builder.mutation({
+      query: (userId) => ({
+        url: `${USER_URL}/${userId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["User"],
+    }),
   }),
 });
 
-export const { useFetchMyProfileQuery, useUpdateMyProfileMutation } = userApi;
+export const {
+  useFetchMyProfileQuery,
+  useUpdateMyProfileMutation,
+  useFetchAllUsersQuery,
+  usePromoteAdminToUserMutation,
+  useDeleteUserMutation,
+} = userApi;

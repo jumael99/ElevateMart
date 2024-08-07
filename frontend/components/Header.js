@@ -155,7 +155,10 @@ const Header = () => {
                   </svg>
                 </button>
                 {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md z-10 shadow-lg py-2">
+                  <div
+                    className="absolute right-0 mt-2 w-48 bg-white rounded-md z-10 shadow-lg py-2"
+                    onClick={toggleDropdown}
+                  >
                     <Link
                       href="/profile"
                       className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
@@ -207,7 +210,7 @@ const Header = () => {
               </>
             )}
             <img
-              src="https://via.placeholder.com/40"
+              src={`/${user?.profilePicture}`}
               className="w-10 h-10 rounded-full ml-4"
               alt="Profile"
             />

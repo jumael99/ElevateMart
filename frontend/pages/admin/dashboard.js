@@ -1,6 +1,8 @@
-import { useState } from "react";
-import Sidebar from "@/components/Admin/Admin-Sidebar";
+// components/Dashboard.js
+import { useEffect, useState, useMemo } from "react";
 import { Bar } from "react-chartjs-2";
+import { subMonths, startOfMonth, endOfMonth, format } from "date-fns";
+import { useLazyFetchSellReportQuery } from "@/store/slices/api/orderApiSlice";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -10,6 +12,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import Sidebar from "@/components/Admin/Admin-Sidebar";
 import { withAuth } from "@/utils/withAuth";
 
 ChartJS.register(
@@ -22,73 +25,92 @@ ChartJS.register(
 );
 
 const Dashboard = () => {
-  const [formData, setFormData] = useState({
-    productName: "",
-    productDescription: "",
-    productPrice: "",
-    productImage: null,
-    productImagePreview: "",
-  });
+  const [sellReportData, setSellReportData] = useState([]);
+  const [fetchSellReport] = useLazyFetchSellReportQuery();
 
-  const [errors, setErrors] = useState({});
+  useEffect(() => {
+    const fetchMonthlyReports = async () => {
+      const endDate = new Date();
+      let reports = [];
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
+      const fetchReportForMonth = async (monthOffset) => {
+        const monthEndDate = endOfMonth(subMonths(endDate, monthOffset));
+        const monthStartDate = startOfMonth(subMonths(endDate, monthOffset));
+        monthStartDate.setHours(0, 0, 0, 0);
+        monthEndDate.setHours(23, 59, 59, 999);
+        const formattedStartDate = format(
+          monthStartDate,
+          "yyyy-MM-dd'T'HH:mm:ss.SSS"
+        );
+        const formattedEndDate = format(
+          monthEndDate,
+          "yyyy-MM-dd'T'HH:mm:ss.SSS"
+        );
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData({
-          ...formData,
-          productImage: file,
-          productImagePreview: reader.result,
-        });
+        const res = await fetchSellReport({
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
+        }).unwrap();
+
+        return { month: formattedStartDate, report: res };
       };
-      reader.readAsDataURL(file);
-    }
-  };
 
-  const validate = () => {
-    let tempErrors = {};
-    if (!formData.productName)
-      tempErrors.productName = "Product Name is required";
-    if (!formData.productDescription)
-      tempErrors.productDescription = "Product Description is required";
-    if (!formData.productPrice)
-      tempErrors.productPrice = "Product Price is required";
-    if (!formData.productImage)
-      tempErrors.productImage = "Product Image is required";
-    setErrors(tempErrors);
-    return Object.keys(tempErrors).length === 0;
-  };
+      const promises = [];
+      for (let i = 0; i < 6; i++) {
+        promises.push(fetchReportForMonth(i));
+      }
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validate()) {
-      console.log("Form submitted", formData);
-    }
-  };
+      reports = await Promise.all(promises);
+      setSellReportData(reports);
+    };
+
+    fetchMonthlyReports();
+  }, [fetchSellReport]);
+
+  const totalIncome = useMemo(() => {
+    return sellReportData.reduce((acc, report) => {
+      return acc + report.report.totalRevenue;
+    }, 0);
+  }, [sellReportData]);
+
+  const totalProductsSold = useMemo(() => {
+    return sellReportData.reduce((acc, report) => {
+      return acc + report.report.totalProductsSold;
+    }, 0);
+  }, [sellReportData]);
+
+  const totalRevenueData = sellReportData.map(
+    (item) => item.report.totalRevenue
+  );
+  const totalProductsSoldData = sellReportData.map(
+    (item) => item.report.totalProductsSold
+  );
+
+  const maxRevenue = Math.max(...totalRevenueData);
+  const maxProductsSold = Math.max(...totalProductsSoldData);
+
+  const revenuePercentages = totalRevenueData.map((value) =>
+    maxRevenue ? (value / maxRevenue) * 100 : 0
+  );
+  const productsSoldPercentages = totalProductsSoldData.map((value) =>
+    maxProductsSold ? (value / maxProductsSold) * 100 : 0
+  );
 
   const data = {
-    labels: ["January", "February", "March", "April", "May", "June", "July"],
+    labels: sellReportData.map((item) =>
+      new Date(item.month).toLocaleString("default", { month: "long" })
+    ),
     datasets: [
       {
         label: "Income",
-        data: [65, 59, 80, 81, 56, 55, 40],
+        data: revenuePercentages,
         backgroundColor: "rgba(75, 192, 192, 0.2)",
         borderColor: "rgba(75, 192, 192, 1)",
         borderWidth: 1,
       },
       {
-        label: "Expense",
-        data: [28, 48, 40, 19, 86, 27, 90],
+        label: "Total Products Sold",
+        data: productsSoldPercentages,
         backgroundColor: "rgba(255, 99, 132, 0.2)",
         borderColor: "rgba(255, 99, 132, 1)",
         borderWidth: 1,
@@ -106,6 +128,28 @@ const Dashboard = () => {
         display: true,
         text: "Income and Expense Chart",
       },
+      tooltip: {
+        callbacks: {
+          label: function (context) {
+            let label = context.dataset.label || "";
+            if (label) {
+              label += ": ";
+            }
+            if (context.parsed.y !== null) {
+              const maxValue =
+                context.dataset.label === "Income"
+                  ? maxRevenue
+                  : maxProductsSold;
+              const suffix =
+                context.dataset.label === "Income" ? "BDT" : "units";
+              label += `${
+                (parseInt(context.parsed.y) * maxValue) / 100
+              } ${suffix}`;
+            }
+            return label;
+          },
+        },
+      },
     },
   };
 
@@ -119,21 +163,18 @@ const Dashboard = () => {
           reports, and more.
         </p>
 
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-3 gap-6 mb-6">
           <div className="bg-blue-500 text-white shadow-md rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Product Orders</h2>
-            <p>Details about product orders.</p>
+            <h2 className="text-xl font-semibold mb-4">Total Revenue</h2>
+            <p>{totalIncome}</p>
           </div>
           <div className="bg-green-500 text-white shadow-md rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Income</h2>
-            <p>Details about income.</p>
-          </div>
-          <div className="bg-red-500 text-white shadow-md rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Expense</h2>
-            <p>Details about expense.</p>
+            <h2 className="text-xl font-semibold mb-4">Total Products Sold</h2>
+            <p>{totalProductsSold}</p>
           </div>
         </div>
-        <div className="bg-white shadow-md rounded-lg p-12 mt-6">
+
+        <div className="bg-white shadow-md rounded-lg p-12">
           <h2 className="text-xl font-semibold mb-6">Graph Chart</h2>
           <Bar data={data} options={options} height={100} />
         </div>

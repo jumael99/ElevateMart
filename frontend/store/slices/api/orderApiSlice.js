@@ -34,8 +34,8 @@ const orderApiSlice = apiSlice.injectEndpoints({
       }),
     }),
     fetchAllOrders: builder.query({
-      query: () => ({
-        url: `${ORDER_URL}`,
+      query: ({ params }) => ({
+        url: `${ORDER_URL}?user=${params}`,
         method: "GET",
       }),
     }),
@@ -45,6 +45,12 @@ const orderApiSlice = apiSlice.injectEndpoints({
         method: "GET",
       }),
       providesTags: ["MyOrder"],
+    }),
+    fetchSellReport: builder.query({
+      query: ({ startDate, endDate }) => ({
+        url: `${ORDER_URL}/sell/report?startDate=${startDate}&endDate=${endDate}`,
+        method: "GET",
+      }),
     }),
   }),
 });
@@ -56,4 +62,5 @@ export const {
   useFetchMyOrdersQuery,
   useFetchOrderByIdQuery,
   useUpdateDeliveryStatusMutation,
+  useLazyFetchSellReportQuery,
 } = orderApiSlice;

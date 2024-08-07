@@ -32,7 +32,9 @@ router.post("/user", (req, res) => {
       return res.status(400).send({ message: err.message });
     }
 
-    const outputPath = `uploads/users/${req.file.fieldname}-${Date.now()}.png`;
+    const outputPath = `frontend/public/uploads/users/${
+      req.file.fieldname
+    }-${Date.now()}.png`;
 
     try {
       await sharp(req.file.buffer)
@@ -40,9 +42,10 @@ router.post("/user", (req, res) => {
         .toFormat("png")
         .png({ quality: 90 })
         .toFile(outputPath);
+      const transformedPath = outputPath.replace("frontend/public/", "");
       res.status(200).send({
         message: "Image uploaded and resized successfully",
-        image: `/${outputPath}`,
+        image: `${transformedPath}`,
       });
     } catch (error) {
       res.status(500).send({ message: error.message });
@@ -56,7 +59,7 @@ router.post("/product", (req, res) => {
       return res.status(400).send({ message: err.message });
     }
 
-    const outputPath = `uploads/products/${
+    const outputPath = `frontend/public/uploads/products/${
       req.file.fieldname
     }-${Date.now()}.png`;
 
@@ -67,9 +70,11 @@ router.post("/product", (req, res) => {
         .png({ quality: 90 })
         .toFile(outputPath);
 
+      const transformedPath = outputPath.replace("frontend/public/", "");
+
       res.status(200).send({
         message: "Image uploaded and resized successfully",
-        image: `/${outputPath}`,
+        image: `${transformedPath}`,
       });
     } catch (error) {
       res.status(500).send({ message: error.message });
@@ -89,21 +94,23 @@ router.post(
     }
 
     if (
-      !imagePath.startsWith("/uploads/users") &&
-      !imagePath.startsWith("/uploads/products")
+      !imagePath.startsWith("uploads/users") &&
+      !imagePath.startsWith("uploads/products")
     ) {
       throw new Error(
         "Invalid image path. You can only delete product or user image"
       );
     }
 
-    if (imagePath.startsWith("/uploads/products")) {
+    if (imagePath.startsWith("uploads/products")) {
       if (!req.user.isAdmin) {
         throw new Error("You are not allowed to delete product images");
       }
     }
 
-    const fullPath = path.join(__dirname, imagePath);
+    const newPath = `frontend/public/${imagePath}`;
+
+    const fullPath = path.join(__dirname, newPath);
 
     await new Promise((resolve, reject) => {
       fs.access(fullPath, fs.constants.F_OK, (err) => {

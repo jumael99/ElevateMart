@@ -12,7 +12,7 @@ const ProductCard = ({ productData }) => {
   return (
     <div className="w-[90%] mx-auto bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden shadow-lg">
       <img
-        src={getImageURL(image)}
+        src={productData.image}
         alt={name}
         className="w-full h-64 object-cover"
         onClick={handleViewProduct}

@@ -15,8 +15,11 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
-import reviewRoutes from './routes/reviewRoutes.js';
-import contactRoutes from "./routes/contactRoutes.js"
+import { getTotalSellReport } from "./controllers/orderController.js";
+import { getTrendingProducts } from "./controllers/productController.js";
+import morgan from "morgan";
+import reviewRoutes from "./routes/reviewRoutes.js";
+import contactRoutes from "./routes/contactRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -29,6 +32,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors(corsOptions));
+app.use(morgan("dev"));
 
 // Routes
 app.use(authMiddleware);
@@ -40,8 +44,10 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api/payment", paymentRoutes);
+app.get("/api/orders/sell/report", authMiddleware, getTotalSellReport);
+app.get("/api/products/top/trending", getTrendingProducts);
 app.use("/api/reviews", reviewRoutes);
-app.use('/api/contact', contactRoutes);
+app.use("/api/contact", contactRoutes);
 
 if (process.env.NODE_ENV === "production") {
   app.use("/uploads", express.static("/var/data/uploads"));

@@ -1,3 +1,9 @@
+import { useFetchProductBySlugQuery } from "@/store/slices/api/productApiSlice";
+import { useRouter } from "next/router";
+import { useDispatch } from "react-redux";
+import { addToCart } from "@/store/slices/cartSlice";
+import React from "react";
+import Image from "next/image";
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,6 +14,13 @@ import ReviewsList from '@/components/ReviewsList';
 import ReviewForm from '@/components/ReviewForm';
 
 const ProductDetails = () => {
+  const slug = useRouter().query.slug;
+  const {
+    data: product,
+    error,
+    isLoading,
+  } = useFetchProductBySlugQuery(slug, { skip: !slug });
+  const dispatch = useDispatch();
   const router = useRouter();
   const { slug } = router.query;
   const dispatch = useDispatch();
@@ -51,6 +64,11 @@ const ProductDetails = () => {
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden">
         <div className="relative h-96">
+          <Image
+            src={`/${product.image}`}
+            alt={`${product.name} image`}
+            fill="responsive"
+            className="absolute inset-0 w-full h-full object-fill"
           <img
             src={product.image || "/placeholder-image.jpg"}
             alt={product.name}

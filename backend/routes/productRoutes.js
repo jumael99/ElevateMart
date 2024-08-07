@@ -6,6 +6,7 @@ import {
   createNewProduct,
   updateProduct,
   deleteProduct,
+  getTrendingProducts,
 } from "../controllers/productController.js";
 
 const productRouter = express.Router();
@@ -22,5 +23,6 @@ productRouter
   .route("/:id")
   .delete(protectMiddlewere("admin"), deleteProduct)
   .patch(protectMiddlewere("admin"), updateProduct);
+productRouter.route("/top/trending").get(getTrendingProducts);
 
 export default productRouter;

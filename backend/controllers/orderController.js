@@ -115,8 +115,15 @@ const getMyOrders = asyncHandler(async (req, res) => {
 // @route   GET /api/orders
 // @access  Private/Admin
 const getOrders = asyncHandler(async (req, res) => {
+  const { user } = req.query;
+
+  const query = {};
+  if (user !== "undefined") {
+    query.orderBy = user;
+  }
+
   const orders = await orderModel
-    .find({})
+    .find(query)
     .populate({
       path: "orderBy.product",
       select: "name email",
@@ -147,6 +154,52 @@ const updateDeliveryStatus = asyncHandler(async (req, res) => {
   res.status(204).json();
 });
 
+// @desc    Total Sell report from start date to end date
+// @route   GET /api/orders/sell/report?startDate={}&endDate={}
+// @access  Private/Admin
+const getTotalSellReport = asyncHandler(async (req, res) => {
+  const { startDate, endDate } = req.query;
+
+  if (!startDate || !endDate) {
+    res.status(400);
+    throw new Error("Start date and end date are required");
+  }
+
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  const salesSummary = await orderModel.aggregate([
+    {
+      $match: {
+        createdAt: { $gte: start, $lte: end },
+        "paymentResult.status": "Success",
+      },
+    },
+    {
+      $unwind: "$orderItems",
+    },
+    {
+      $group: {
+        _id: null,
+        totalProductsSold: { $sum: "$orderItems.quantity" },
+        totalRevenue: {
+          $sum: { $multiply: ["$orderItems.quantity", "$orderItems.price"] },
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        totalProductsSold: 1,
+        totalRevenue: 1,
+        orders: 1,
+      },
+    },
+  ]);
+
+  res.json(salesSummary[0] || { totalProductsSold: 0, totalRevenue: 0 });
+});
+
 export {
   createOrder,
   updatePaymentStatus,
@@ -154,4 +207,5 @@ export {
   getMyOrders,
   getOrders,
   updateDeliveryStatus,
+  getTotalSellReport,
 };

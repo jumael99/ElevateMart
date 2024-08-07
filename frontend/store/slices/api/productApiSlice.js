@@ -47,6 +47,13 @@ export const productApi = apiSlice.injectEndpoints({
         body: products,
       }),
     }),
+    fetchTopTrendingProducts: builder.query({
+      query: (limit) => ({
+        url: `${PRODUCT_URL}/top/trending?limit=${limit}`,
+        method: "GET",
+      }),
+      providesTags: ["Product"],
+    }),
   }),
 });
 
@@ -57,4 +64,5 @@ export const {
   useDeleteProductMutation,
   useUpdateProductByIdMutation,
   useFetchCartProductsQuantityQuery,
+  useFetchTopTrendingProductsQuery,
 } = productApi;
