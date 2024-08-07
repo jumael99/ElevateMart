@@ -245,6 +245,14 @@ const Header = () => {
                   Services
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/contactUs"
+                  className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0"
+                >
+                  Contact Us
+                </Link>
+              </li>
               {isUserLoggedIn && (
                 <li className="ml-6">
                   <button
