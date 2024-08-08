@@ -18,11 +18,11 @@ const ProductDetails = () => {
     error,
     isLoading,
   } = useFetchProductBySlugQuery(slug, { skip: !slug });
+
   const dispatch = useDispatch();
   const router = useRouter();
   const { userInfo } = useSelector((state) => state.auth);
 
-  const { data: product, error, isLoading } = useFetchProductBySlugQuery(slug, { skip: !slug });
   const { data: reviews } = useGetReviewsQuery(product?._id, { skip: !product });
   const { data: canReview } = useCanReviewProductQuery(product?._id, { skip: !product || !userInfo });
 
