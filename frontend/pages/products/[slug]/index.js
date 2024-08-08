@@ -23,13 +23,13 @@ const ProductDetails = () => {
   const router = useRouter();
   const { userInfo } = useSelector((state) => state.auth);
 
-  const { data: reviews } = useGetReviewsQuery(product?._id, { skip: !product });
+  const { data: reviews = [] } = useGetReviewsQuery(product?._id, { skip: !product });
   const { data: canReview } = useCanReviewProductQuery(product?._id, { skip: !product || !userInfo });
 
   const [averageRating, setAverageRating] = useState(0);
 
   useEffect(() => {
-    if (reviews) {
+    if (reviews.length > 0) {
       const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
       const average = totalRating / reviews.length;
       setAverageRating(average);
@@ -57,11 +57,11 @@ const ProductDetails = () => {
       <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="relative w-full border-2 border-green-300" style={{ height: '300px', maxWidth: '550px', margin: '15px auto 0' }}>
           <Image
-            src={product.image || "/placeholder-image.jpg"}
-            alt={`${product.name} image`}
-            layout="fill"
-            objectFit="cover"
-            className="absolute inset-0 w-full h-full"
+          src={`/${product.image}` || "/placeholder-image.jpg"}   
+          alt={`${product.name} image`}
+          layout="fill"
+          objectFit="cover"
+          className="absolute inset-0 w-full h-full"
           />
         </div>
 
