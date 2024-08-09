@@ -10,6 +10,7 @@ import { FaMinus, FaPlus, FaTimes } from "react-icons/fa";
 import { useCreateOrderMutation } from "@/store/slices/api/orderApiSlice";
 import { toastManager } from "@/utils/toastManager";
 import { useCreatePaymentIntentMutation } from "@/store/slices/api/paymentSlice";
+import Image from "next/image";
 
 const CartDropdown = ({ isOpen, toggleCart }) => {
   const cart = useSelector((state) => state.cart);
@@ -124,11 +125,13 @@ const CartDropdown = ({ isOpen, toggleCart }) => {
                 ) : (
                   cart.cart.map((item) => (
                     <li key={item._id} className="flex py-6">
-                      <div className="flex-shrink-0 w-24 h-24 overflow-hidden rounded-md border border-gray-200">
-                        <img
-                          src={item.imgUrl}
+                      <div className="flex-shrink-0 w-24 h-[4.5rem] overflow-hidden rounded-md border border-gray-200">
+                        <Image
+                          src={`/${item.image}`}
                           alt={item.name}
-                          className="w-full h-full object-cover"
+                          width={96}
+                          height={72}
+                          objectFit="cover"
                         />
                       </div>
                       <div className="ml-4 flex-1 flex flex-col">

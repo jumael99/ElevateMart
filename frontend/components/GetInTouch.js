@@ -11,25 +11,22 @@ const GetInTouch = () => {
                         Icon={MapPin}
                         title="Address"
                         details={[
-                            "123 Business Street",
-                            "Suite 100",
-                            "City, State 12345"
+                            "5th Floor, House 1289, Road 11, Avenue 02",
+                            "Mirpur DOHS,Dhaka 1216"
                         ]}
                     />
                     <ContactCard
                         Icon={Phone}
                         title="Phone"
                         details={[
-                            "Main: (555) 123-4567",
-                            "Toll-free: 1-800-555-1234"
+                            "Main: +8801708-562437"
                         ]}
                     />
                     <ContactCard
                         Icon={Mail}
                         title="Email"
                         details={[
-                            "info@example.com",
-                            "support@example.com"
+                            "rijon.codeelevate@gmail.com",
                         ]}
                     />
                 </div>
