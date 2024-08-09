@@ -6,15 +6,40 @@ import OrderModel from "../models/orderModel.js";
 // @route   GET /api/products
 // @access  Public
 const getProducts = asyncHandler(async (req, res) => {
-  const { category } = req.query;
+  const { category, limit = 30, page = 1, sort, search } = req.query;
   let filter = {};
 
   if (category) {
-    filter.category = category;
+    filter.category = { category };
+  }
+  if (search !== undefined) {
+    filter.name = { $regex: search, $options: "i" };
   }
 
-  const products = await productModel
-    .find(filter)
+  const parsedLimit = parseInt(limit);
+  const parsedPage = parseInt(page);
+  const skip = (parsedPage - 1) * parsedLimit;
+
+  const numberOfProducts = await productModel.countDocuments();
+  const numberOfPages = Math.ceil(numberOfProducts / parsedLimit);
+
+  let query = productModel.find(filter);
+
+  if (sort) {
+    if (sort === "lowToHigh") {
+      query = query.sort({ price: 1 });
+    }
+    if (sort === "highToLow") {
+      query = query.sort({ price: -1 });
+    }
+    if (sort === "newest") {
+      query = query.sort({ createdAt: -1 });
+    }
+  }
+
+  const products = await query
+    .skip(skip)
+    .limit(parsedLimit)
     .populate({
       path: "category",
       select: "name",
@@ -23,7 +48,15 @@ const getProducts = asyncHandler(async (req, res) => {
       path: "subCategory",
       select: "name",
     });
-  res.status(200).json(products);
+
+  res.status(200).json({
+    status: "success",
+    data: products,
+    page: parsedPage,
+    limit: parsedLimit,
+    totalProducts: numberOfProducts,
+    totalPages: numberOfPages,
+  });
 });
 
 // @desc    Fetch single product
@@ -142,7 +175,8 @@ const getTrendingProducts = asyncHandler(async (req, res) => {
   const limit = parseInt(req.query.limit);
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-  const topProducts = await OrderModel.aggregate([
+
+  let topProducts = await OrderModel.aggregate([
     {
       $match: {
         createdAt: { $gte: thirtyDaysAgo },
@@ -187,6 +221,27 @@ const getTrendingProducts = asyncHandler(async (req, res) => {
       },
     },
   ]);
+
+  if (topProducts.length < limit) {
+    const additionalProducts = await productModel
+      .find()
+      .sort({ createdAt: -1 })
+      .limit(limit - topProducts.length)
+      .select("_id name image slug");
+
+    // Map additional products to the same structure as topProducts
+    const additionalProductsMapped = additionalProducts.map((product) => ({
+      _id: product._id,
+      totalQuantity: 0,
+      totalSell: 0,
+      name: product.name,
+      image: product.image,
+      slug: product.slug,
+    }));
+
+    // Combine topProducts and additionalProducts
+    topProducts = topProducts.concat(additionalProductsMapped);
+  }
 
   res.status(200).json(topProducts);
 });

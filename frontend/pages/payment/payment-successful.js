@@ -46,7 +46,7 @@ const PaymentSuccessful = () => {
           render: errorMessage,
         });
         setTimeout(() => {
-          router.push("/orders");
+          router.push(`/orders/${orderID}`);
         }, 1500);
       }
     };

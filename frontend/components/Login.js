@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import styles from "../styles/Login.module.css";
-  import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setCredentials } from "../store/slices/authSlice";
 import { useLoginMutation } from "../store/slices/api/authApiSlice";
 import { toastManager } from "@/utils/toastManager";
+import Link from "next/link";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -65,6 +66,17 @@ export default function Login() {
           />
         </div>
         <button type="submit">{isLoading ? "Logging in..." : "Login"}</button>
+        <div class="flex justify-center items-center my-2">
+          <span class="px-6 py-3 bg-gray-100 rounded-lg shadow-md text-gray-700 text-sm">
+            Forgot password?
+            <Link
+              href="/auth/forget-password"
+              class="ml-2 font-semibold text-blue-600 hover:text-blue-800 transition duration-300 ease-in-out hover:underline"
+            >
+              Click here to reset password
+            </Link>
+          </span>
+        </div>
       </form>
     </div>
   );
