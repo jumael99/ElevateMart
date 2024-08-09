@@ -4,11 +4,20 @@ import { useFetchAllProductsQuery } from "@/store/slices/api/productApiSlice";
 
 const HomePageProducts = () => {
   const [products, setProducts] = useState([]);
-  const { data: productsData, error, isLoading } = useFetchAllProductsQuery();
+  const {
+    data: productsData,
+    error,
+    isLoading,
+  } = useFetchAllProductsQuery({
+    limit: 4,
+    page: "",
+    search: "",
+    sort: "",
+  });
 
   useEffect(() => {
     if (productsData) {
-      setProducts(productsData);
+      setProducts(productsData.data);
     }
   }, [productsData]);
 

@@ -1,36 +1,42 @@
-import React, { useState } from 'react';
-import { useCreateReviewMutation } from '../store/slices/api/reviewApiSlice';
+import React, { useState } from "react";
+import { useCreateReviewMutation } from "../store/slices/api/reviewApiSlice";
 import { toastManager } from "@/utils/toastManager.js";
-import { useSelector } from 'react-redux';
+import { useSelector } from "react-redux";
 
 const ReviewForm = ({ productId }) => {
   const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState('');
+  const [comment, setComment] = useState("");
   const [createReview, { isLoading }] = useCreateReviewMutation();
-  const { userInfo } = useSelector((state) => state.auth);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    if (rating === 0 || !comment || comment.trim() === '') {
-      toastManager.error('Please fill in both rating and comment');
+
+    if (rating === 0 || !comment || comment.trim() === "") {
+      toastManager.error("Please fill in both rating and comment");
       return;
     }
-  
+
     try {
-      const result = await createReview({ productId, rating, comment }).unwrap();
-      toastManager.success('Review submitted successfully');
+      const result = await createReview({
+        productId,
+        rating,
+        comment,
+      }).unwrap();
+      toastManager.success("Review submitted successfully");
       setRating(0);
-      setComment('');
+      setComment("");
     } catch (err) {
-      toastManager.error(err.data?.message || 'Failed to add review');
+      toastManager.error(err.data?.message || "Failed to add review");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-md">
+    <form
+      onSubmit={handleSubmit}
+      className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-md"
+    >
       <h2 className="text-2xl font-semibold mb-4">Add a Review</h2>
-      
+
       {/* Rating */}
       <div className="mb-6">
         <label className="block text-gray-700 font-bold mb-2">Rating</label>
@@ -40,7 +46,9 @@ const ReviewForm = ({ productId }) => {
               key={r}
               onClick={() => setRating(r)}
               xmlns="http://www.w3.org/2000/svg"
-              className={`h-6 w-6 cursor-pointer ${r <= rating ? 'text-yellow-400' : 'text-gray-300'}`}
+              className={`h-6 w-6 cursor-pointer ${
+                r <= rating ? "text-yellow-400" : "text-gray-300"
+              }`}
               viewBox="0 0 24 24"
               fill="currentColor"
               stroke="currentColor"
@@ -56,7 +64,9 @@ const ReviewForm = ({ productId }) => {
 
       {/* Comment */}
       <div className="mb-6">
-        <label className="block text-gray-700 font-bold mb-2" htmlFor="comment">Comment</label>
+        <label className="block text-gray-700 font-bold mb-2" htmlFor="comment">
+          Comment
+        </label>
         <textarea
           id="comment"
           value={comment}
@@ -73,7 +83,7 @@ const ReviewForm = ({ productId }) => {
         disabled={isLoading}
         className="w-full py-3 px-6 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition duration-300 disabled:opacity-50"
       >
-        {isLoading ? 'Submitting...' : 'Submit Review'}
+        {isLoading ? "Submitting..." : "Submit Review"}
       </button>
     </form>
   );

@@ -4,10 +4,19 @@ import { PRODUCT_URL } from "./constantURL";
 export const productApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     fetchAllProducts: builder.query({
-      query: () => ({
-        url: PRODUCT_URL,
-        method: "GET",
-      }),
+      query: ({ limit, category, page, sort, search }) => {
+        const queryParams = [];
+        if (limit) queryParams.push(`limit=${limit}`);
+        if (category) queryParams.push(`category=${category}`);
+        if (page) queryParams.push(`page=${page}`);
+        if (sort) queryParams.push(`sort=${sort}`);
+        if (search) queryParams.push(`search=${search}`);
+        const queryString = queryParams.join("&");
+        return {
+          url: `${PRODUCT_URL}/?${queryString}`,
+          method: "GET",
+        };
+      },
       providesTags: ["Product"],
     }),
     fetchProductBySlug: builder.query({

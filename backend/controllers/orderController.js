@@ -118,7 +118,7 @@ const getOrders = asyncHandler(async (req, res) => {
   const { user } = req.query;
 
   const query = {};
-  if (user !== "undefined") {
+  if (user !== undefined) {
     query.orderBy = user;
   }
 

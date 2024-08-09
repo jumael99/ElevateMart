@@ -58,7 +58,7 @@ const OrderDetails = () => {
                       <td className="p-3">
                         <div className="flex gap-2 items-center">
                           <img
-                            src={item.product.image}
+                            src={`/${item.product.image}`}
                             alt={item.product.name}
                             className="w-16 h-12 object-cover"
                           />

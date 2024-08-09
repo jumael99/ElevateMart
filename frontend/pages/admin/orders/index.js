@@ -8,11 +8,7 @@ import {
 import { toastManager } from "@/utils/toastManager";
 import { withAuth } from "@/utils/withAuth";
 import { formatToBangladeshDate } from "@/utils/formatDate";
-import {
-  useTable,
-  useGlobalFilter,
-  usePagination
-} from "react-table";
+import { useTable, useGlobalFilter, usePagination } from "react-table";
 
 const ViewOrders = () => {
   const router = useRouter();
@@ -41,7 +37,8 @@ const ViewOrders = () => {
     const toastId = toastManager.loading("Updating delivery status...");
     if (pay_status === "Failed" || pay_status === "Pending") {
       toastManager.updateStatus(toastId, {
-        render: "Payment status is failed. You cannot update the delivery status",
+        render:
+          "Payment status is failed. You cannot update the delivery status",
         type: "error",
       });
       return;
@@ -71,6 +68,10 @@ const ViewOrders = () => {
     }
   };
 
+  const onGotoOrderDetails = (orderID) => {
+    router.push(`/admin/orders/${orderID}`);
+  };
+
   const deliveryStatuses = [
     "Initiated",
     "Processing",
@@ -82,14 +83,26 @@ const ViewOrders = () => {
   const columns = React.useMemo(
     () => [
       { Header: "Order ID", accessor: "_id" },
-      { Header: "Created", accessor: "createdAt", Cell: ({ value }) => formatToBangladeshDate(value) },
+      {
+        Header: "Created",
+        accessor: "createdAt",
+        Cell: ({ value }) => formatToBangladeshDate(value),
+      },
       { Header: "Price", accessor: "totalAmount" },
       { Header: "Method", accessor: "paymentMethod" },
       { Header: "Transaction ID", accessor: "paymentResult.transactionID" },
       {
         Header: "Payment",
         accessor: "paymentResult.status",
-        Cell: ({ value }) => <span className={`font-bold ${value === "Failed" ? "text-red-600" : "text-green-600"}`}>{value}</span>,
+        Cell: ({ value }) => (
+          <span
+            className={`font-bold ${
+              value === "Failed" ? "text-red-600" : "text-green-600"
+            }`}
+          >
+            {value}
+          </span>
+        ),
       },
       {
         Header: "Delivery Status",
@@ -111,8 +124,12 @@ const ViewOrders = () => {
               )
             }
             style={{
-              backgroundColor: ["Initiated", "On-Hold"].includes(value) ? "yellow" : "green",
-              color: ["Initiated", "On-Hold"].includes(value) ? "black" : "white",
+              backgroundColor: ["Initiated", "On-Hold"].includes(value)
+                ? "yellow"
+                : "green",
+              color: ["Initiated", "On-Hold"].includes(value)
+                ? "black"
+                : "white",
             }}
           >
             {deliveryStatuses.map((status) => (
@@ -141,12 +158,12 @@ const ViewOrders = () => {
     canNextPage,
     canPreviousPage,
     pageCount,
-    setPageSize
+    setPageSize,
   } = useTable(
-    { 
-      columns, 
-      data: orderList, 
-      initialState: { pageSize: 10 } // Set the initial page size
+    {
+      columns,
+      data: orderList,
+      initialState: { pageSize: 10 }, // Set the initial page size
     },
     useGlobalFilter,
     usePagination
@@ -167,22 +184,27 @@ const ViewOrders = () => {
       <div className="py-10 px-16 bg-gray-100 flex-grow">
         <h1 className="text-black font-bold text-3xl mb-6">Orders</h1>
         <div className="mb-6 flex items-center space-x-4">
-        <input
-  type="text"
-  value={searchValue}
-  onChange={handleSearchChange}
-  placeholder="Search users..."
-  className="border p-2 px-4 rounded-lg w-full md:w-1/3 shadow-lg focus:ring-2 focus:ring-blue-500 text-black"
-/>
-
+          <input
+            type="text"
+            value={searchValue}
+            onChange={handleSearchChange}
+            placeholder="Search users..."
+            className="border p-2 px-4 rounded-lg w-full md:w-1/3 shadow-lg focus:ring-2 focus:ring-blue-500 text-black"
+          />
         </div>
         <div className="overflow-x-auto mb-6">
-          <table className="min-w-full bg-white text-black shadow-lg rounded-lg overflow-hidden" {...getTableProps()}>
+          <table
+            className="min-w-full bg-white text-black shadow-lg rounded-lg overflow-hidden"
+            {...getTableProps()}
+          >
             <thead className="bg-gray-300">
               {headerGroups.map((headerGroup) => (
                 <tr {...headerGroup.getHeaderGroupProps()} className="border-b">
                   {headerGroup.headers.map((column) => (
-                    <th {...column.getHeaderProps()} className="p-3 text-left font-semibold">
+                    <th
+                      {...column.getHeaderProps()}
+                      className="p-3 text-left font-semibold"
+                    >
                       {column.render("Header")}
                     </th>
                   ))}
@@ -197,7 +219,15 @@ const ViewOrders = () => {
                     <tr
                       key={row.id}
                       {...row.getRowProps()}
-                      className={`hover:bg-gray-100 transition-colors duration-300 ${row.original.deliveryStatus === "Shipped" ? "bg-green-100" : row.original.deliveryStatus === "Delivered" ? "bg-green-200" : row.original.deliveryStatus === "On-Hold" ? "bg-red-100" : ""}`}
+                      className={`hover:bg-gray-100 transition-colors duration-300 ${
+                        row.original.deliveryStatus === "Shipped"
+                          ? "bg-green-100"
+                          : row.original.deliveryStatus === "Delivered"
+                          ? "bg-green-200"
+                          : row.original.deliveryStatus === "On-Hold"
+                          ? "bg-red-100"
+                          : ""
+                      }`}
                     >
                       {row.cells.map((cell) => (
                         <td {...cell.getCellProps()} className="p-3 border-b">
@@ -233,7 +263,8 @@ const ViewOrders = () => {
             {"<"}
           </button>
           <span className="text-lg font-semibold">
-            Page <strong>{pageIndex + 1}</strong> of <strong>{pageCount}</strong>
+            Page <strong>{pageIndex + 1}</strong> of{" "}
+            <strong>{pageCount}</strong>
           </span>
           <button
             onClick={() => nextPage()}

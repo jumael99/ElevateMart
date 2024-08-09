@@ -80,8 +80,10 @@ const Header = () => {
               ElevateMart
             </span>
           </a>
-          <div className="flex md:order-2 items-center space-x-4"> {/* Adjusted the spacing here */}
-            <div className="relative hidden md:block">
+          <div className="flex md:order-2 items-center space-x-4">
+            {" "}
+            {/* Adjusted the spacing here */}
+            {/* <div className="relative hidden md:block">
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg
                   className="w-4 h-4 text-gray-500"
@@ -105,7 +107,7 @@ const Header = () => {
                 className="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Search..."
               />
-            </div>
+            </div> */}
             <button
               type="button"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -193,7 +195,9 @@ const Header = () => {
               </div>
             )}
             {!isUserLoggedIn && (
-              <div className="flex space-x-4"> {/* Added a container for the buttons with spacing */}
+              <div className="flex space-x-4">
+                {" "}
+                {/* Added a container for the buttons with spacing */}
                 <Link
                   href="/login"
                   className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0"
@@ -208,11 +212,13 @@ const Header = () => {
                 </Link>
               </div>
             )}
-            <img
-              src={`/${user?.profilePicture}`}
-              className="w-10 h-10 rounded-full ml-4"
-              alt="Profile"
-            />
+            {isUserLoggedIn && (
+              <img
+                src={`/${user?.profilePicture}`}
+                className="w-10 h-10 rounded-full ml-4"
+                alt="Profile"
+              />
+            )}
           </div>
           <div
             className={`w-full md:flex md:w-auto md:order-1 ${

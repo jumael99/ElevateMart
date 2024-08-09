@@ -15,8 +15,6 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
-import { getTotalSellReport } from "./controllers/orderController.js";
-import { getTrendingProducts } from "./controllers/productController.js";
 import morgan from "morgan";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
@@ -44,8 +42,6 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api/payment", paymentRoutes);
-app.get("/api/orders/sell/report", authMiddleware, getTotalSellReport);
-app.get("/api/products/top/trending", getTrendingProducts);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/contact", contactRoutes);
 

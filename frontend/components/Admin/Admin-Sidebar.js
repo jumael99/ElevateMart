@@ -64,7 +64,7 @@ const Sidebar = () => {
         },
       ],
     },
-    { to: "/admin/Orders", icon: <OrdersIcon />, label: "Orders" },
+    { to: "/admin/orders", icon: <OrdersIcon />, label: "Orders" },
     { to: "/admin/EditOffer", icon: <OffersIcon />, label: "Offer" },
     { to: "/admin/AllUsers", label: "AllUsers" },
     { to: "/user-dashboard/balance", icon: <BalanceIcon />, label: "Balance" },
