@@ -9,9 +9,15 @@ import "react-quill/dist/quill.snow.css";
 import AddProduct from "./Add-Product";
 import { withAuth } from "@/utils/withAuth";
 import { debounce } from "lodash";
+import Image from "next/image";
 
 const AllProducts = () => {
-  const { data: productsData } = useFetchAllProductsQuery();
+  const { data: productsData } = useFetchAllProductsQuery({
+    limit: 100000,
+    page: 1,
+    search: "",
+    sort: "",
+  });
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
@@ -23,8 +29,8 @@ const AllProducts = () => {
 
   useEffect(() => {
     if (productsData) {
-      setProducts(productsData);
-      setFilteredProducts(productsData);
+      setProducts(productsData.data);
+      setFilteredProducts(productsData.data);
     }
   }, [productsData]);
 
@@ -64,8 +70,12 @@ const AllProducts = () => {
     const lowerCaseQuery = query.toLowerCase();
     const filtered = products.filter((product) => {
       const nameMatch = product.name.toLowerCase().includes(lowerCaseQuery);
-      const categoryMatch = product.category?.name?.toLowerCase().includes(lowerCaseQuery) || !product.category;
-      const subCategoryMatch = product.subCategory?.name?.toLowerCase().includes(lowerCaseQuery) || !product.subCategory;
+      const categoryMatch =
+        product.category?.name?.toLowerCase().includes(lowerCaseQuery) ||
+        !product.category;
+      const subCategoryMatch =
+        product.subCategory?.name?.toLowerCase().includes(lowerCaseQuery) ||
+        !product.subCategory;
       return nameMatch || categoryMatch || subCategoryMatch;
     });
     setFilteredProducts(filtered);
@@ -81,7 +91,7 @@ const AllProducts = () => {
     setCurrentPage(1);
   };
 
-   const indexOfLastProduct = currentPage * itemsPerPage;
+  const indexOfLastProduct = currentPage * itemsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
   const currentProducts = filteredProducts.slice(
     indexOfFirstProduct,
@@ -129,10 +139,14 @@ const AllProducts = () => {
                           className="border-b hover:bg-gray-50 transition duration-150 ease-in-out"
                         >
                           <td className="py-4 px-4">
-                            <img
-                              src={product.image}
-                              alt={product.name}
-                              className="h-16 w-16 object-cover rounded"
+                            <Image
+                              src={
+                                `/${product.image}` || "/placeholder-image.jpg"
+                              }
+                              alt={`${product.name} image`}
+                              width={50}
+                              height={50}
+                              // className="absolute inset-0 w-full h-full"
                             />
                           </td>
                           <td className="py-4 px-4">{product.name}</td>

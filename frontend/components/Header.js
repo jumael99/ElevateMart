@@ -242,14 +242,14 @@ const Header = () => {
                   Products
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   href="/services"
                   className="block py-2 px-3 text-black rounded hover:bg-lightBlue-600 md:hover:bg-transparent md:hover:text-blue-800 md:p-0"
                 >
                   Services
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link
                   href="/contactUs"

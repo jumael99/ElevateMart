@@ -8,9 +8,12 @@ const Footer = () => {
         <p className="text-sm">&copy; 2024 ElevateMart</p>
         <ul className="flex space-x-4">
           <li>
-            <a href="/" className="text-black hover:text-blue-800">
+            <Link
+              href="/privacy&policy"
+              className="text-black hover:text-blue-800"
+            >
               Privacy Policy
-            </a>
+            </Link>
           </li>
           <li>
             <Link

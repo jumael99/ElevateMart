@@ -9,6 +9,7 @@ import { toastManager } from "@/utils/toastManager";
 import { withAuth } from "@/utils/withAuth";
 import { formatToBangladeshDate } from "@/utils/formatDate";
 import { useTable, useGlobalFilter, usePagination } from "react-table";
+import { IoFastFood } from "react-icons/io5";
 
 const ViewOrders = () => {
   const router = useRouter();
@@ -68,10 +69,6 @@ const ViewOrders = () => {
     }
   };
 
-  const onGotoOrderDetails = (orderID) => {
-    router.push(`/admin/orders/${orderID}`);
-  };
-
   const deliveryStatuses = [
     "Initiated",
     "Processing",
@@ -79,6 +76,13 @@ const ViewOrders = () => {
     "Shipped",
     "Delivered",
   ];
+
+  const onGotoOrderDetails = (orderID, cellValue) => {
+    if (deliveryStatuses.includes(cellValue)) {
+      return;
+    }
+    router.push(`/admin/orders/${orderID}`);
+  };
 
   const columns = React.useMemo(
     () => [
@@ -148,7 +152,7 @@ const ViewOrders = () => {
     getTableProps,
     getTableBodyProps,
     headerGroups,
-    page, // instead of using rows, we'll use page
+    page,
     prepareRow,
     state: { pageIndex, pageSize },
     setGlobalFilter,
@@ -163,14 +167,14 @@ const ViewOrders = () => {
     {
       columns,
       data: orderList,
-      initialState: { pageSize: 10 }, // Set the initial page size
+      initialState: { pageSize: 10 },
     },
     useGlobalFilter,
     usePagination
   );
 
   useEffect(() => {
-    setPageSize(10); // Ensure page size is always 10
+    setPageSize(10);
   }, [setPageSize]);
 
   const handleSearchChange = (e) => {
@@ -230,7 +234,13 @@ const ViewOrders = () => {
                       }`}
                     >
                       {row.cells.map((cell) => (
-                        <td {...cell.getCellProps()} className="p-3 border-b">
+                        <td
+                          {...cell.getCellProps()}
+                          onClick={() =>
+                            onGotoOrderDetails(row.original._id, cell.value)
+                          }
+                          className="p-3 border-b"
+                        >
                           {cell.render("Cell")}
                         </td>
                       ))}
