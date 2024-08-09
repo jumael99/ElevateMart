@@ -1,7 +1,6 @@
 import { format, parseISO } from "date-fns";
 const formatToBangladeshDate = (date) => {
   if (!date) return "";
-  const bangladeshTimeZone = "Asia/Dhaka";
   const convertedDate = parseISO(date);
   const formattedDate = format(
     new Date(convertedDate),

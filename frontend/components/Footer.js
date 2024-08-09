@@ -1,4 +1,5 @@
-import React from 'react';
+import React from "react";
+import Link from "next/link";
 
 const Footer = () => {
   return (
@@ -7,13 +8,25 @@ const Footer = () => {
         <p className="text-sm">&copy; 2024 ElevateMart</p>
         <ul className="flex space-x-4">
           <li>
-            <a href="/" className="text-black hover:text-blue-800">Privacy Policy</a>
+            <Link
+              href="/privacy&policy"
+              className="text-black hover:text-blue-800"
+            >
+              Privacy Policy
+            </Link>
           </li>
           <li>
-            <a href="/" className="text-black hover:text-blue-800">Terms of Service</a>
+            <Link
+              href="/terms&conditions"
+              className="text-black hover:text-blue-800"
+            >
+              Terms of Service
+            </Link>
           </li>
           <li>
-            <a href="/contactUs" className="text-black hover:text-blue-800">Contact Us</a>
+            <a href="/contactUs" className="text-black hover:text-blue-800">
+              Contact Us
+            </a>
           </li>
         </ul>
       </div>
